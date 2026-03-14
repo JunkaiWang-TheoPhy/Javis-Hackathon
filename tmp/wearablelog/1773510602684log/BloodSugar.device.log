@@ -1,0 +1,504 @@
+2025-02-27 20:56:00.661|3.37.3|I|BloodSugarManagerImpl_22780_22780|ble_turn_on
+2025-02-28 00:31:34.326|3.37.3|I|BloodSugarManagerImpl_22780_22780|ble_turn_off
+2025-02-28 00:31:34.334|3.37.3|I|BloodSugarManagerImpl_22780_22780|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-02 14:11:43.501|3.37.3|I|BloodSugarManagerImpl_20798_20798|ble_turn_off
+2025-03-02 14:11:43.519|3.37.3|I|BloodSugarManagerImpl_20798_20798|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-03 18:15:09.896|3.37.3|I|BloodSugarManagerImpl_5244_5244|ble_turn_off
+2025-03-03 18:15:09.910|3.37.3|I|BloodSugarManagerImpl_5244_5244|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-04 12:37:52.404|3.37.3|I|BloodSugarManagerImpl_32213_32213|ble_turn_on
+2025-03-04 14:50:12.619|3.37.3|I|BloodSugarManagerImpl_21143_21143|ble_turn_on
+2025-03-04 19:37:19.703|3.37.3|I|BloodSugarManagerImpl_30606_30606|ble_turn_on
+2025-03-05 17:02:21.293|3.37.3|I|BloodSugarManagerImpl_13277_13277|ble_turn_on
+2025-03-05 22:18:29.377|3.37.3|I|BloodSugarManagerImpl_8913_8913|ble_turn_on
+2025-03-05 23:36:17.325|3.37.3|I|BloodSugarManagerImpl_8913_8913|ble_turn_off
+2025-03-05 23:36:17.333|3.37.3|I|BloodSugarManagerImpl_8913_8913|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-05 23:54:15.693|3.37.3|I|BloodSugarManagerImpl_8913_8913|onResultFlowState() called with: status = BLE_OPEN, msg = 蓝牙模块开启, bindFlag = false ,connectcallback = null
+2025-03-05 23:54:15.693|3.37.3|I|BloodSugarManagerImpl_8913_8913|ble_turn_on
+2025-03-06 00:17:59.969|3.37.3|I|BloodSugarManagerImpl_8913_8913|ble_turn_off
+2025-03-06 00:17:59.974|3.37.3|I|BloodSugarManagerImpl_8913_8913|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-06 00:18:01.522|3.37.3|I|BloodSugarManagerImpl_8913_8913|onResultFlowState() called with: status = BLE_OPEN, msg = 蓝牙模块开启, bindFlag = false ,connectcallback = null
+2025-03-06 00:18:01.522|3.37.3|I|BloodSugarManagerImpl_8913_8913|ble_turn_on
+2025-03-06 08:19:20.725|3.37.3|I|BloodSugarManagerImpl_6311_6311|ble_turn_on
+2025-03-06 08:19:22.608|3.37.3|I|BloodSugarManagerImpl_6311_6311|ble_turn_off
+2025-03-06 08:19:22.608|3.37.3|I|BloodSugarManagerImpl_6311_6311|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-06 08:30:13.094|3.37.3|I|BloodSugarManagerImpl_6311_6311|ble_turn_off
+2025-03-06 08:30:13.094|3.37.3|I|BloodSugarManagerImpl_6311_6311|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-06 11:14:08.526|3.37.3|I|BloodSugarManagerImpl_17316_17316|ble_turn_on
+2025-03-06 23:26:15.157|3.37.3|I|BloodSugarManagerImpl_25275_25275|ble_turn_off
+2025-03-06 23:26:15.161|3.37.3|I|BloodSugarManagerImpl_25275_25275|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-07 00:22:23.678|3.37.3|I|BloodSugarManagerImpl_4766_4766|ble_turn_off
+2025-03-07 00:22:23.685|3.37.3|I|BloodSugarManagerImpl_4766_4766|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-07 16:58:40.010|3.37.3|I|BloodSugarManagerImpl_17453_17453|ble_turn_on
+2025-03-07 23:03:51.594|3.37.3|I|BloodSugarManagerImpl_17453_17453|ble_turn_off
+2025-03-07 23:03:51.601|3.37.3|I|BloodSugarManagerImpl_17453_17453|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-08 19:53:31.065|3.37.3|I|BloodSugarManagerImpl_4662_4662|ble_turn_off
+2025-03-08 19:53:31.085|3.37.3|I|BloodSugarManagerImpl_4662_4662|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-08 21:23:12.941|3.37.3|I|BloodSugarManagerImpl_4619_4619|ble_turn_off
+2025-03-08 21:23:12.943|3.37.3|I|BloodSugarManagerImpl_4619_4619|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-09 00:05:14.286|3.37.3|I|BloodSugarManagerImpl_4570_4570|ble_turn_off
+2025-03-09 00:05:14.293|3.37.3|I|BloodSugarManagerImpl_4570_4570|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-09 20:41:10.837|3.37.3|I|BloodSugarManagerImpl_18893_18893|ble_turn_on
+2025-03-09 21:45:34.687|3.37.3|I|BloodSugarManagerImpl_22443_22443|ble_turn_on
+2025-03-10 00:07:09.599|3.37.3|I|BloodSugarManagerImpl_22443_22443|ble_turn_off
+2025-03-10 00:07:09.601|3.37.3|I|BloodSugarManagerImpl_22443_22443|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-10 16:04:45.777|3.37.3|I|BloodSugarManagerImpl_23372_23372|ble_turn_on
+2025-03-10 22:35:51.644|3.37.3|I|BloodSugarManagerImpl_23372_23372|ble_turn_off
+2025-03-10 22:35:51.650|3.37.3|I|BloodSugarManagerImpl_23372_23372|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-10 22:36:18.925|3.37.3|I|BloodSugarManagerImpl_23372_23372|onResultFlowState() called with: status = BLE_OPEN, msg = 蓝牙模块开启, bindFlag = false ,connectcallback = null
+2025-03-10 22:36:18.925|3.37.3|I|BloodSugarManagerImpl_23372_23372|ble_turn_on
+2025-03-10 23:26:52.334|3.37.3|I|BloodSugarManagerImpl_23372_23372|ble_turn_off
+2025-03-10 23:26:52.335|3.37.3|I|BloodSugarManagerImpl_23372_23372|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-10 23:40:59.685|3.37.3|I|BloodSugarManagerImpl_4522_4522|ble_turn_off
+2025-03-10 23:40:59.690|3.37.3|I|BloodSugarManagerImpl_4522_4522|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-10 23:59:24.116|3.37.3|I|BloodSugarManagerImpl_4565_4565|ble_turn_off
+2025-03-10 23:59:24.136|3.37.3|I|BloodSugarManagerImpl_4565_4565|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-11 22:41:36.318|3.37.3|I|BloodSugarManagerImpl_4758_4758|ble_turn_off
+2025-03-11 22:41:36.360|3.37.3|I|BloodSugarManagerImpl_4758_4758|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-11 22:41:37.712|3.37.3|I|BloodSugarManagerImpl_4758_4758|onResultFlowState() called with: status = BLE_OPEN, msg = 蓝牙模块开启, bindFlag = false ,connectcallback = null
+2025-03-11 22:41:37.712|3.37.3|I|BloodSugarManagerImpl_4758_4758|ble_turn_on
+2025-03-12 09:42:39.673|3.37.3|I|BloodSugarManagerImpl_4758_4758|ble_turn_off
+2025-03-12 09:42:39.675|3.37.3|I|BloodSugarManagerImpl_4758_4758|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-12 09:46:08.749|3.37.3|I|BloodSugarManagerImpl_4588_4588|ble_turn_off
+2025-03-12 09:46:08.751|3.37.3|I|BloodSugarManagerImpl_4588_4588|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-12 14:10:02.871|3.38.1|I|BloodSugarManagerImpl_18870_18870|ble_turn_off
+2025-03-12 14:10:02.902|3.38.1|I|BloodSugarManagerImpl_18870_18870|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-12 14:10:04.579|3.38.1|I|BloodSugarManagerImpl_18870_18870|onResultFlowState() called with: status = BLE_OPEN, msg = 蓝牙模块开启, bindFlag = false ,connectcallback = null
+2025-03-12 14:10:04.579|3.38.1|I|BloodSugarManagerImpl_18870_18870|ble_turn_on
+2025-03-14 08:35:22.154|3.38.1|I|BloodSugarManagerImpl_8549_8549|ble_turn_off
+2025-03-14 08:35:22.155|3.38.1|I|BloodSugarManagerImpl_8549_8549|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-15 09:27:18.894|3.38.1|I|BloodSugarManagerImpl_31691_31691|ble_turn_off
+2025-03-15 09:27:18.900|3.38.1|I|BloodSugarManagerImpl_31691_31691|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-16 13:47:15.231|3.38.1|I|BloodSugarManagerImpl_4678_4678|ble_turn_off
+2025-03-16 13:47:15.260|3.38.1|I|BloodSugarManagerImpl_4678_4678|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-17 13:30:49.605|3.38.1|I|BloodSugarManagerImpl_5149_5149|ble_turn_off
+2025-03-17 13:30:49.637|3.38.1|I|BloodSugarManagerImpl_5149_5149|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-17 23:53:35.246|3.38.1|I|BloodSugarManagerImpl_4812_4812|ble_turn_off
+2025-03-17 23:53:35.247|3.38.1|I|BloodSugarManagerImpl_4812_4812|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-18 11:29:36.976|3.38.1|I|BloodSugarManagerImpl_4800_4800|ble_turn_off
+2025-03-18 11:29:36.997|3.38.1|I|BloodSugarManagerImpl_4800_4800|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-18 12:02:57.003|3.38.1|I|BloodSugarManagerImpl_4790_4790|ble_turn_off
+2025-03-18 12:02:57.004|3.38.1|I|BloodSugarManagerImpl_4790_4790|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-18 19:49:26.618|3.38.1|I|BloodSugarManagerImpl_23827_23827|ble_turn_on
+2025-03-18 21:33:33.983|3.38.1|I|BloodSugarManagerImpl_3759_3759|ble_turn_on
+2025-03-19 15:24:32.238|3.38.1|I|BloodSugarManagerImpl_19874_19874|ble_turn_on
+2025-03-19 18:01:17.124|3.38.1|I|BloodSugarManagerImpl_11269_11269|ble_turn_on
+2025-03-19 22:27:52.158|3.38.1|I|BloodSugarManagerImpl_21867_21867|ble_turn_on
+2025-03-19 23:43:13.298|3.38.1|I|BloodSugarManagerImpl_13352_13352|ble_turn_on
+2025-03-20 10:21:58.246|3.38.1|I|BloodSugarManagerImpl_13352_13352|ble_turn_off
+2025-03-20 10:21:58.265|3.38.1|I|BloodSugarManagerImpl_13352_13352|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-20 11:02:46.403|3.38.1|I|BloodSugarManagerImpl_4781_4781|ble_turn_off
+2025-03-20 11:02:46.428|3.38.1|I|BloodSugarManagerImpl_4781_4781|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-20 11:55:46.272|3.38.1|I|BloodSugarManagerImpl_4601_4601|ble_turn_off
+2025-03-20 11:55:46.281|3.38.1|I|BloodSugarManagerImpl_4601_4601|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-20 12:17:28.403|3.38.1|I|BloodSugarManagerImpl_4597_4597|ble_turn_off
+2025-03-20 12:17:28.417|3.38.1|I|BloodSugarManagerImpl_4597_4597|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-20 23:00:44.382|3.38.1|I|BloodSugarManagerImpl_4851_4851|ble_turn_off
+2025-03-20 23:00:44.393|3.38.1|I|BloodSugarManagerImpl_4851_4851|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-20 23:00:45.713|3.38.1|I|BloodSugarManagerImpl_4851_4851|onResultFlowState() called with: status = BLE_OPEN, msg = 蓝牙模块开启, bindFlag = false ,connectcallback = null
+2025-03-20 23:00:45.713|3.38.1|I|BloodSugarManagerImpl_4851_4851|ble_turn_on
+2025-03-21 12:03:21.582|3.38.1|I|BloodSugarManagerImpl_16745_16745|ble_turn_on
+2025-03-21 18:41:21.484|3.38.1|I|BloodSugarManagerImpl_13528_13528|ble_turn_on
+2025-03-21 22:45:44.616|3.38.1|I|BloodSugarManagerImpl_23682_23682|ble_turn_on
+2025-03-22 03:33:20.441|3.38.1|I|BloodSugarManagerImpl_23682_23682|ble_turn_off
+2025-03-22 03:33:20.442|3.38.1|I|BloodSugarManagerImpl_23682_23682|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-22 21:00:26.212|3.38.1|I|BloodSugarManagerImpl_4773_4773|ble_turn_off
+2025-03-22 21:00:26.230|3.38.1|I|BloodSugarManagerImpl_4773_4773|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-22 22:05:01.472|3.38.1|I|BloodSugarManagerImpl_4693_4693|ble_turn_off
+2025-03-22 22:05:01.481|3.38.1|I|BloodSugarManagerImpl_4693_4693|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-22 22:05:02.833|3.38.1|I|BloodSugarManagerImpl_4693_4693|onResultFlowState() called with: status = BLE_OPEN, msg = 蓝牙模块开启, bindFlag = false ,connectcallback = null
+2025-03-22 22:05:02.833|3.38.1|I|BloodSugarManagerImpl_4693_4693|ble_turn_on
+2025-03-23 21:47:52.715|3.38.1|I|BloodSugarManagerImpl_4693_4693|ble_turn_off
+2025-03-23 21:47:52.726|3.38.1|I|BloodSugarManagerImpl_4693_4693|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-24 04:35:31.443|3.38.1|I|BloodSugarManagerImpl_4693_4693|ble_turn_off
+2025-03-24 04:35:31.457|3.38.1|I|BloodSugarManagerImpl_4693_4693|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-24 05:39:58.258|3.38.1|I|BloodSugarManagerImpl_4693_4693|onResultFlowState() called with: status = BLE_OPEN, msg = 蓝牙模块开启, bindFlag = false ,connectcallback = null
+2025-03-24 05:39:58.258|3.38.1|I|BloodSugarManagerImpl_4693_4693|ble_turn_on
+2025-03-24 17:38:20.647|3.38.1|I|BloodSugarManagerImpl_4693_4693|ble_turn_off
+2025-03-24 17:38:20.649|3.38.1|I|BloodSugarManagerImpl_4693_4693|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-24 17:38:21.948|3.38.1|I|BloodSugarManagerImpl_4693_4693|onResultFlowState() called with: status = BLE_OPEN, msg = 蓝牙模块开启, bindFlag = false ,connectcallback = null
+2025-03-24 17:38:21.948|3.38.1|I|BloodSugarManagerImpl_4693_4693|ble_turn_on
+2025-03-24 22:57:04.117|3.38.1|I|BloodSugarManagerImpl_8811_8811|ble_turn_off
+2025-03-24 22:57:04.124|3.38.1|I|BloodSugarManagerImpl_8811_8811|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-25 19:27:25.476|3.38.1|I|BloodSugarManagerImpl_32044_32044|ble_turn_on
+2025-03-25 19:48:46.645|3.38.1|I|BloodSugarManagerImpl_32044_32044|ble_turn_off
+2025-03-25 19:48:46.647|3.38.1|I|BloodSugarManagerImpl_32044_32044|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-25 20:58:54.995|3.38.1|I|BloodSugarManagerImpl_29004_29004|ble_turn_off
+2025-03-25 20:58:54.995|3.38.1|I|BloodSugarManagerImpl_29004_29004|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-25 22:47:46.713|3.38.1|I|BloodSugarManagerImpl_4612_4612|ble_turn_off
+2025-03-25 22:47:46.715|3.38.1|I|BloodSugarManagerImpl_4612_4612|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-26 19:18:58.706|3.38.1|I|BloodSugarManagerImpl_4863_4863|ble_turn_off
+2025-03-26 19:18:58.717|3.38.1|I|BloodSugarManagerImpl_4863_4863|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-26 22:55:47.476|3.38.1|I|BloodSugarManagerImpl_4712_4712|ble_turn_off
+2025-03-26 22:55:47.484|3.38.1|I|BloodSugarManagerImpl_4712_4712|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-26 23:36:33.204|3.38.1|I|BloodSugarManagerImpl_4712_4712|onResultFlowState() called with: status = BLE_OPEN, msg = 蓝牙模块开启, bindFlag = false ,connectcallback = null
+2025-03-26 23:36:33.204|3.38.1|I|BloodSugarManagerImpl_4712_4712|ble_turn_on
+2025-03-27 12:11:49.665|3.38.1|I|BloodSugarManagerImpl_4712_4712|ble_turn_off
+2025-03-27 12:11:49.672|3.38.1|I|BloodSugarManagerImpl_4712_4712|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-27 12:39:34.626|3.38.1|I|BloodSugarManagerImpl_4745_4745|ble_turn_off
+2025-03-27 12:39:34.636|3.38.1|I|BloodSugarManagerImpl_4745_4745|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-28 21:30:36.573|3.38.1|I|BloodSugarManagerImpl_4772_4772|ble_turn_off
+2025-03-28 21:30:36.571|3.38.1|I|BloodSugarManagerImpl_4772_4772|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-28 22:47:04.981|3.38.1|I|BloodSugarManagerImpl_4596_4596|ble_turn_off
+2025-03-28 22:47:04.985|3.38.1|I|BloodSugarManagerImpl_4596_4596|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-29 08:20:10.214|3.38.1|I|BloodSugarManagerImpl_4769_4769|ble_turn_off
+2025-03-29 08:20:10.234|3.38.1|I|BloodSugarManagerImpl_4769_4769|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-29 12:12:40.027|3.38.1|I|BloodSugarManagerImpl_4693_4693|ble_turn_off
+2025-03-29 12:12:40.054|3.38.1|I|BloodSugarManagerImpl_4693_4693|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-29 22:39:34.268|3.38.1|I|BloodSugarManagerImpl_4730_4730|ble_turn_off
+2025-03-29 22:39:34.295|3.38.1|I|BloodSugarManagerImpl_4730_4730|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-30 16:51:11.115|3.38.1|I|BloodSugarManagerImpl_4685_4685|ble_turn_off
+2025-03-30 16:51:11.155|3.38.1|I|BloodSugarManagerImpl_4685_4685|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-03-31 14:23:13.387|3.38.1|I|BloodSugarManagerImpl_4714_4714|ble_turn_off
+2025-03-31 14:23:13.427|3.38.1|I|BloodSugarManagerImpl_4714_4714|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-01 07:30:44.719|3.38.1|I|BloodSugarManagerImpl_4712_4712|ble_turn_off
+2025-04-01 07:30:44.765|3.38.1|I|BloodSugarManagerImpl_4712_4712|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-02 09:15:03.560|3.38.1|I|BloodSugarManagerImpl_4669_4669|ble_turn_off
+2025-04-02 09:15:03.615|3.38.1|I|BloodSugarManagerImpl_4669_4669|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-02 09:46:33.661|3.38.1|I|BloodSugarManagerImpl_4641_4641|ble_turn_off
+2025-04-02 09:46:33.663|3.38.1|I|BloodSugarManagerImpl_4641_4641|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-02 19:48:27.402|3.38.1|I|BloodSugarManagerImpl_4745_4745|ble_turn_off
+2025-04-02 19:48:27.427|3.38.1|I|BloodSugarManagerImpl_4745_4745|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-03 07:31:40.594|3.38.1|I|BloodSugarManagerImpl_4653_4653|ble_turn_off
+2025-04-03 07:31:40.614|3.38.1|I|BloodSugarManagerImpl_4653_4653|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-03 21:00:22.768|3.38.1|I|BloodSugarManagerImpl_4795_4795|ble_turn_off
+2025-04-03 21:00:22.795|3.38.1|I|BloodSugarManagerImpl_4795_4795|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-04 06:08:54.877|3.38.1|I|BloodSugarManagerImpl_4762_4762|ble_turn_off
+2025-04-04 06:08:54.902|3.38.1|I|BloodSugarManagerImpl_4762_4762|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-04 14:39:40.473|3.38.1|I|BloodSugarManagerImpl_4692_4692|ble_turn_off
+2025-04-04 14:39:40.506|3.38.1|I|BloodSugarManagerImpl_4692_4692|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-05 19:14:39.123|3.38.1|I|BloodSugarManagerImpl_4631_4631|ble_turn_off
+2025-04-05 19:14:39.160|3.38.1|I|BloodSugarManagerImpl_4631_4631|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-05 19:15:34.069|3.38.1|I|BloodSugarManagerImpl_4631_4631|onResultFlowState() called with: status = BLE_OPEN, msg = 蓝牙模块开启, bindFlag = false ,connectcallback = null
+2025-04-05 19:15:34.069|3.38.1|I|BloodSugarManagerImpl_4631_4631|ble_turn_on
+2025-04-05 19:17:51.707|3.38.1|I|BloodSugarManagerImpl_4631_4631|ble_turn_off
+2025-04-05 19:17:51.708|3.38.1|I|BloodSugarManagerImpl_4631_4631|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-05 22:43:05.580|3.38.1|I|BloodSugarManagerImpl_4631_4631|onResultFlowState() called with: status = BLE_OPEN, msg = 蓝牙模块开启, bindFlag = false ,connectcallback = null
+2025-04-05 22:43:05.580|3.38.1|I|BloodSugarManagerImpl_4631_4631|ble_turn_on
+2025-04-05 22:43:09.433|3.38.1|I|BloodSugarManagerImpl_4631_4631|ble_turn_off
+2025-04-05 22:43:09.433|3.38.1|I|BloodSugarManagerImpl_4631_4631|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-05 22:47:14.292|3.38.1|I|BloodSugarManagerImpl_4631_4631|ble_turn_off
+2025-04-05 22:47:14.292|3.38.1|I|BloodSugarManagerImpl_4631_4631|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-06 15:40:22.902|3.38.1|I|BloodSugarManagerImpl_23791_23791|ble_turn_off
+2025-04-06 15:40:22.927|3.38.1|I|BloodSugarManagerImpl_23791_23791|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-06 15:43:14.348|3.38.1|I|BloodSugarManagerImpl_4773_4773|ble_turn_off
+2025-04-06 15:43:14.349|3.38.1|I|BloodSugarManagerImpl_4773_4773|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-09 09:39:33.301|3.38.1|I|BloodSugarManagerImpl_26044_26044|ble_turn_off
+2025-04-09 09:39:33.311|3.38.1|I|BloodSugarManagerImpl_26044_26044|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-09 19:49:49.252|3.38.1|I|BloodSugarManagerImpl_4720_4720|ble_turn_off
+2025-04-09 19:49:49.272|3.38.1|I|BloodSugarManagerImpl_4720_4720|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-10 11:06:01.369|3.38.1|I|BloodSugarManagerImpl_4644_4644|ble_turn_off
+2025-04-10 11:06:01.396|3.38.1|I|BloodSugarManagerImpl_4644_4644|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-10 14:30:36.968|3.38.1|I|BloodSugarManagerImpl_4721_4721|ble_turn_off
+2025-04-10 14:30:37.001|3.38.1|I|BloodSugarManagerImpl_4721_4721|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-10 16:35:19.718|3.38.1|I|BloodSugarManagerImpl_18414_18414|ble_turn_on
+2025-04-10 16:35:20.045|3.38.1|I|BloodSugarManagerImpl_18414_18414|ble_turn_off
+2025-04-10 16:35:20.045|3.38.1|I|BloodSugarManagerImpl_18414_18414|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-11 01:07:57.236|3.38.1|I|BloodSugarManagerImpl_18414_18414|ble_turn_off
+2025-04-11 01:07:57.251|3.38.1|I|BloodSugarManagerImpl_18414_18414|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-11 06:07:52.408|3.38.1|I|BloodSugarManagerImpl_18414_18414|onResultFlowState() called with: status = BLE_OPEN, msg = 蓝牙模块开启, bindFlag = false ,connectcallback = null
+2025-04-11 06:07:52.409|3.38.1|I|BloodSugarManagerImpl_18414_18414|ble_turn_on
+2025-04-11 09:23:46.874|3.38.1|I|BloodSugarManagerImpl_18414_18414|ble_turn_off
+2025-04-11 09:23:46.876|3.38.1|I|BloodSugarManagerImpl_18414_18414|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-11 13:54:18.363|3.38.1|I|BloodSugarManagerImpl_4648_4648|ble_turn_off
+2025-04-11 13:54:18.376|3.38.1|I|BloodSugarManagerImpl_4648_4648|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-12 12:44:34.806|3.38.1|I|BloodSugarManagerImpl_4698_4698|ble_turn_off
+2025-04-12 12:44:34.824|3.38.1|I|BloodSugarManagerImpl_4698_4698|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-12 16:34:50.495|3.38.1|I|BloodSugarManagerImpl_4710_4710|ble_turn_off
+2025-04-12 16:34:50.525|3.38.1|I|BloodSugarManagerImpl_4710_4710|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-12 19:02:38.264|3.38.1|I|BloodSugarManagerImpl_4685_4685|ble_turn_off
+2025-04-12 19:02:38.275|3.38.1|I|BloodSugarManagerImpl_4685_4685|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-12 19:21:01.456|3.38.1|I|BloodSugarManagerImpl_4772_4772|ble_turn_off
+2025-04-12 19:21:01.482|3.38.1|I|BloodSugarManagerImpl_4772_4772|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-13 07:35:07.987|3.38.1|I|BloodSugarManagerImpl_4766_4766|ble_turn_off
+2025-04-13 07:35:08.019|3.38.1|I|BloodSugarManagerImpl_4766_4766|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-13 08:13:18.680|3.38.1|I|BloodSugarManagerImpl_4729_4729|ble_turn_off
+2025-04-13 08:13:18.698|3.38.1|I|BloodSugarManagerImpl_4729_4729|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-13 09:50:47.957|3.38.1|I|BloodSugarManagerImpl_4763_4763|ble_turn_off
+2025-04-13 09:50:47.965|3.38.1|I|BloodSugarManagerImpl_4763_4763|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-13 18:46:11.063|3.38.1|I|BloodSugarManagerImpl_4756_4756|ble_turn_off
+2025-04-13 18:46:11.070|3.38.1|I|BloodSugarManagerImpl_4756_4756|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-14 09:06:55.445|3.38.1|I|BloodSugarManagerImpl_4693_4693|ble_turn_off
+2025-04-14 09:06:55.466|3.38.1|I|BloodSugarManagerImpl_4693_4693|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-15 00:31:15.336|3.38.1|I|BloodSugarManagerImpl_4718_4718|ble_turn_off
+2025-04-15 00:31:15.354|3.38.1|I|BloodSugarManagerImpl_4718_4718|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-15 14:00:30.913|3.38.1|I|BloodSugarManagerImpl_4679_4679|ble_turn_off
+2025-04-15 14:00:30.947|3.38.1|I|BloodSugarManagerImpl_4679_4679|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-15 14:17:20.597|3.38.1|I|BloodSugarManagerImpl_4679_4679|onResultFlowState() called with: status = BLE_OPEN, msg = 蓝牙模块开启, bindFlag = false ,connectcallback = null
+2025-04-15 14:17:20.597|3.38.1|I|BloodSugarManagerImpl_4679_4679|ble_turn_on
+2025-04-15 14:17:44.116|3.38.1|I|BloodSugarManagerImpl_4679_4679|ble_turn_off
+2025-04-15 14:17:44.116|3.38.1|I|BloodSugarManagerImpl_4679_4679|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-15 14:34:53.695|3.38.1|I|BloodSugarManagerImpl_4679_4679|onResultFlowState() called with: status = BLE_OPEN, msg = 蓝牙模块开启, bindFlag = false ,connectcallback = null
+2025-04-15 14:34:53.695|3.38.1|I|BloodSugarManagerImpl_4679_4679|ble_turn_on
+2025-04-16 04:00:47.963|3.38.1|I|BloodSugarManagerImpl_4679_4679|ble_turn_off
+2025-04-16 04:00:47.965|3.38.1|I|BloodSugarManagerImpl_4679_4679|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-16 08:17:04.549|3.38.1|I|BloodSugarManagerImpl_4730_4730|ble_turn_off
+2025-04-16 08:17:04.553|3.38.1|I|BloodSugarManagerImpl_4730_4730|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-16 11:05:27.722|3.38.1|I|BloodSugarManagerImpl_4733_4733|ble_turn_off
+2025-04-16 11:05:27.738|3.38.1|I|BloodSugarManagerImpl_4733_4733|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-17 11:17:52.799|3.38.1|I|BloodSugarManagerImpl_4776_4776|ble_turn_off
+2025-04-17 11:17:52.826|3.38.1|I|BloodSugarManagerImpl_4776_4776|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-17 20:58:58.589|3.38.1|I|BloodSugarManagerImpl_4666_4666|ble_turn_off
+2025-04-17 20:58:58.624|3.38.1|I|BloodSugarManagerImpl_4666_4666|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-17 23:44:13.069|3.38.1|I|BloodSugarManagerImpl_4738_4738|ble_turn_off
+2025-04-17 23:44:13.085|3.38.1|I|BloodSugarManagerImpl_4738_4738|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-18 05:54:01.654|3.38.1|I|BloodSugarManagerImpl_7745_7745|ble_turn_off
+2025-04-18 05:54:01.655|3.38.1|I|BloodSugarManagerImpl_7745_7745|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-18 13:31:39.552|3.38.1|I|BloodSugarManagerImpl_4832_4832|ble_turn_off
+2025-04-18 13:31:39.569|3.38.1|I|BloodSugarManagerImpl_4832_4832|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-19 17:54:10.939|3.38.1|I|BloodSugarManagerImpl_4700_4700|ble_turn_off
+2025-04-19 17:54:10.960|3.38.1|I|BloodSugarManagerImpl_4700_4700|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-19 18:20:49.608|3.38.1|I|BloodSugarManagerImpl_4827_4827|ble_turn_off
+2025-04-19 18:20:49.617|3.38.1|I|BloodSugarManagerImpl_4827_4827|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-19 18:35:55.003|3.38.1|I|BloodSugarManagerImpl_4698_4698|ble_turn_off
+2025-04-19 18:35:55.012|3.38.1|I|BloodSugarManagerImpl_4698_4698|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-19 19:21:35.756|3.38.1|I|BloodSugarManagerImpl_4816_4816|ble_turn_off
+2025-04-19 19:21:35.764|3.38.1|I|BloodSugarManagerImpl_4816_4816|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-20 08:07:08.611|3.38.1|I|BloodSugarManagerImpl_15338_15338|ble_turn_off
+2025-04-20 08:07:08.618|3.38.1|I|BloodSugarManagerImpl_15338_15338|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-22 10:31:12.575|3.38.1|I|BloodSugarManagerImpl_1379_1379|ble_turn_off
+2025-04-22 10:31:12.597|3.38.1|I|BloodSugarManagerImpl_1379_1379|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-23 16:04:52.353|3.38.1|I|BloodSugarManagerImpl_4222_4222|ble_turn_off
+2025-04-23 16:04:52.374|3.38.1|I|BloodSugarManagerImpl_4222_4222|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-23 16:26:49.304|3.38.1|I|BloodSugarManagerImpl_7396_7396|ble_turn_off
+2025-04-23 16:26:49.320|3.38.1|I|BloodSugarManagerImpl_7396_7396|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-23 18:07:59.029|3.38.1|I|BloodSugarManagerImpl_4861_4861|ble_turn_off
+2025-04-23 18:07:59.046|3.38.1|I|BloodSugarManagerImpl_4861_4861|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-24 07:42:04.287|3.38.1|I|BloodSugarManagerImpl_10899_10899|ble_turn_off
+2025-04-24 07:42:04.327|3.38.1|I|BloodSugarManagerImpl_10899_10899|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-24 21:26:31.426|3.38.1|I|BloodSugarManagerImpl_5144_5144|ble_turn_off
+2025-04-24 21:26:31.459|3.38.1|I|BloodSugarManagerImpl_5144_5144|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-25 00:31:03.331|3.38.1|I|BloodSugarManagerImpl_5144_5144|ble_turn_off
+2025-04-25 00:31:03.367|3.38.1|I|BloodSugarManagerImpl_5144_5144|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-25 04:35:45.790|3.38.1|I|BloodSugarManagerImpl_5144_5144|onResultFlowState() called with: status = BLE_OPEN, msg = 蓝牙模块开启, bindFlag = false ,connectcallback = null
+2025-04-25 04:35:45.790|3.38.1|I|BloodSugarManagerImpl_5144_5144|ble_turn_on
+2025-04-25 04:35:46.281|3.38.1|I|BloodSugarManagerImpl_5144_5144|ble_turn_off
+2025-04-25 04:35:46.285|3.38.1|I|BloodSugarManagerImpl_5144_5144|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-25 05:00:00.176|3.38.1|I|BloodSugarManagerImpl_5144_5144|onResultFlowState() called with: status = BLE_OPEN, msg = 蓝牙模块开启, bindFlag = false ,connectcallback = null
+2025-04-25 05:00:00.176|3.38.1|I|BloodSugarManagerImpl_5144_5144|ble_turn_on
+2025-04-25 10:54:07.605|3.38.1|I|BloodSugarManagerImpl_5144_5144|ble_turn_off
+2025-04-25 10:54:07.607|3.38.1|I|BloodSugarManagerImpl_5144_5144|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-25 11:04:38.543|3.38.1|I|BloodSugarManagerImpl_8978_8978|ble_turn_off
+2025-04-25 11:04:38.547|3.38.1|I|BloodSugarManagerImpl_8978_8978|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-25 11:33:58.657|3.38.1|I|BloodSugarManagerImpl_5045_5045|ble_turn_off
+2025-04-25 11:33:58.671|3.38.1|I|BloodSugarManagerImpl_5045_5045|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-25 15:58:59.651|3.38.1|I|BloodSugarManagerImpl_5053_5053|ble_turn_off
+2025-04-25 15:58:59.682|3.38.1|I|BloodSugarManagerImpl_5053_5053|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-26 01:44:32.710|3.38.1|I|BloodSugarManagerImpl_5053_5053|ble_turn_off
+2025-04-26 01:44:33.000|3.38.1|I|BloodSugarManagerImpl_5053_5053|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-26 08:13:37.338|3.38.1|I|BloodSugarManagerImpl_4867_4867|ble_turn_on
+2025-04-26 12:12:17.379|3.38.1|I|BloodSugarManagerImpl_4867_4867|ble_turn_off
+2025-04-26 12:12:17.383|3.38.1|I|BloodSugarManagerImpl_4867_4867|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-26 21:14:17.428|3.38.1|I|BloodSugarManagerImpl_10734_10734|ble_turn_off
+2025-04-26 21:14:17.439|3.38.1|I|BloodSugarManagerImpl_10734_10734|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-27 06:47:02.338|3.38.1|I|BloodSugarManagerImpl_5087_5087|ble_turn_off
+2025-04-27 06:47:02.350|3.38.1|I|BloodSugarManagerImpl_5087_5087|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-27 13:52:48.246|3.38.1|I|BloodSugarManagerImpl_5135_5135|ble_turn_off
+2025-04-27 13:52:48.281|3.38.1|I|BloodSugarManagerImpl_5135_5135|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-27 14:01:28.576|3.38.1|I|BloodSugarManagerImpl_7636_7636|ble_turn_off
+2025-04-27 14:01:28.623|3.38.1|I|BloodSugarManagerImpl_7636_7636|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-27 19:43:06.526|3.38.1|I|BloodSugarManagerImpl_4959_4959|ble_turn_off
+2025-04-27 19:43:06.541|3.38.1|I|BloodSugarManagerImpl_4959_4959|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-27 20:05:03.297|3.38.1|I|BloodSugarManagerImpl_5090_5090|ble_turn_off
+2025-04-27 20:05:03.312|3.38.1|I|BloodSugarManagerImpl_5090_5090|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-27 20:47:05.270|3.38.1|I|BloodSugarManagerImpl_5002_5002|ble_turn_off
+2025-04-27 20:47:05.286|3.38.1|I|BloodSugarManagerImpl_5002_5002|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-28 21:44:45.392|3.38.1|I|BloodSugarManagerImpl_7752_7752|ble_turn_off
+2025-04-28 21:44:45.434|3.38.1|I|BloodSugarManagerImpl_7752_7752|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-29 03:43:48.559|3.38.1|I|BloodSugarManagerImpl_8386_8386|ble_turn_off
+2025-04-29 03:43:48.572|3.38.1|I|BloodSugarManagerImpl_8386_8386|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-29 04:11:48.088|3.38.1|I|BloodSugarManagerImpl_5146_5146|ble_turn_off
+2025-04-29 04:11:48.097|3.38.1|I|BloodSugarManagerImpl_5146_5146|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-29 10:08:53.289|3.38.1|I|BloodSugarManagerImpl_5096_5096|ble_turn_off
+2025-04-29 10:08:53.304|3.38.1|I|BloodSugarManagerImpl_5096_5096|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-29 16:24:48.551|3.38.1|I|BloodSugarManagerImpl_5341_5341|ble_turn_off
+2025-04-29 16:24:48.564|3.38.1|I|BloodSugarManagerImpl_5341_5341|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-29 23:25:34.159|3.38.1|I|BloodSugarManagerImpl_4956_4956|ble_turn_off
+2025-04-29 23:25:34.177|3.38.1|I|BloodSugarManagerImpl_4956_4956|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-04-30 10:25:56.329|3.38.1|I|BloodSugarManagerImpl_5090_5090|ble_turn_off
+2025-04-30 10:25:56.345|3.38.1|I|BloodSugarManagerImpl_5090_5090|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-01 08:11:33.960|3.38.1|I|BloodSugarManagerImpl_5588_5588|ble_turn_off
+2025-05-01 08:11:33.968|3.38.1|I|BloodSugarManagerImpl_5588_5588|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-01 15:21:59.010|3.40.2|I|BloodSugarManagerImpl_32579_32579|ble_turn_off
+2025-05-01 15:21:59.021|3.40.2|I|BloodSugarManagerImpl_32579_32579|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-01 16:47:24.955|3.40.2|I|BloodSugarManagerImpl_5177_5177|ble_turn_off
+2025-05-01 16:47:24.956|3.40.2|I|BloodSugarManagerImpl_5177_5177|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-02 11:41:24.308|3.40.2|I|BloodSugarManagerImpl_5041_5041|ble_turn_off
+2025-05-02 11:41:24.313|3.40.2|I|BloodSugarManagerImpl_5041_5041|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-04 00:21:45.358|3.40.2|I|BloodSugarManagerImpl_8629_8629|ble_turn_off
+2025-05-04 00:21:45.384|3.40.2|I|BloodSugarManagerImpl_8629_8629|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-04 01:00:50.971|3.40.2|I|BloodSugarManagerImpl_5072_5072|ble_turn_off
+2025-05-04 01:00:50.993|3.40.2|I|BloodSugarManagerImpl_5072_5072|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-06 23:14:29.372|3.40.2|I|BloodSugarManagerImpl_5001_5001|ble_turn_off
+2025-05-06 23:14:29.395|3.40.2|I|BloodSugarManagerImpl_5001_5001|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-07 01:36:19.862|3.40.2|I|BloodSugarManagerImpl_5114_5114|ble_turn_off
+2025-05-07 01:36:19.892|3.40.2|I|BloodSugarManagerImpl_5114_5114|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-07 19:36:18.818|3.40.2|I|BloodSugarManagerImpl_5000_5000|ble_turn_off
+2025-05-07 19:36:18.840|3.40.2|I|BloodSugarManagerImpl_5000_5000|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-08 10:41:42.249|3.40.2|I|BloodSugarManagerImpl_4963_4963|ble_turn_off
+2025-05-08 10:41:42.256|3.40.2|I|BloodSugarManagerImpl_4963_4963|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-08 21:10:36.769|3.40.2|I|BloodSugarManagerImpl_5263_5263|ble_turn_off
+2025-05-08 21:10:36.790|3.40.2|I|BloodSugarManagerImpl_5263_5263|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-09 10:20:20.689|3.40.2|I|BloodSugarManagerImpl_5012_5012|ble_turn_off
+2025-05-09 10:20:20.690|3.40.2|I|BloodSugarManagerImpl_5012_5012|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-09 11:30:26.637|3.40.2|I|BloodSugarManagerImpl_12722_12722|ble_turn_off
+2025-05-09 11:30:26.650|3.40.2|I|BloodSugarManagerImpl_12722_12722|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-09 20:57:39.057|3.40.2|I|BloodSugarManagerImpl_8585_8585|ble_turn_off
+2025-05-09 20:57:39.085|3.40.2|I|BloodSugarManagerImpl_8585_8585|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-09 21:38:03.651|3.40.2|I|BloodSugarManagerImpl_14505_14505|ble_turn_off
+2025-05-09 21:38:03.683|3.40.2|I|BloodSugarManagerImpl_14505_14505|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-11 09:05:05.555|3.40.2|I|BloodSugarManagerImpl_8099_8099|ble_turn_off
+2025-05-11 09:05:05.564|3.40.2|I|BloodSugarManagerImpl_8099_8099|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-13 11:37:04.977|3.40.2|I|BloodSugarManagerImpl_5297_5297|ble_turn_off
+2025-05-13 11:37:04.997|3.40.2|I|BloodSugarManagerImpl_5297_5297|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-13 19:11:33.366|3.40.2|I|BloodSugarManagerImpl_5039_5039|ble_turn_off
+2025-05-13 19:11:33.377|3.40.2|I|BloodSugarManagerImpl_5039_5039|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-14 19:22:25.743|3.40.2|I|BloodSugarManagerImpl_5003_5003|ble_turn_off
+2025-05-14 19:22:25.779|3.40.2|I|BloodSugarManagerImpl_5003_5003|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-14 23:25:16.629|3.40.2|I|BloodSugarManagerImpl_4928_4928|ble_turn_off
+2025-05-14 23:25:16.641|3.40.2|I|BloodSugarManagerImpl_4928_4928|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-15 14:22:52.181|3.40.2|I|BloodSugarManagerImpl_4907_4907|ble_turn_off
+2025-05-15 14:22:52.209|3.40.2|I|BloodSugarManagerImpl_4907_4907|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-15 14:29:24.853|3.40.2|I|BloodSugarManagerImpl_11914_11914|ble_turn_off
+2025-05-15 14:29:24.861|3.40.2|I|BloodSugarManagerImpl_11914_11914|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-15 14:34:18.778|3.40.2|I|BloodSugarManagerImpl_4896_4896|ble_turn_off
+2025-05-15 14:34:18.832|3.40.2|I|BloodSugarManagerImpl_4896_4896|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-15 15:53:32.062|3.40.2|I|BloodSugarManagerImpl_4896_4896|ble_turn_off
+2025-05-15 15:53:32.069|3.40.2|I|BloodSugarManagerImpl_4896_4896|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-15 20:45:33.320|3.40.2|I|BloodSugarManagerImpl_4929_4929|ble_turn_off
+2025-05-15 20:45:33.346|3.40.2|I|BloodSugarManagerImpl_4929_4929|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-15 21:18:17.539|3.40.2|I|BloodSugarManagerImpl_12338_12338|ble_turn_off
+2025-05-15 21:18:17.595|3.40.2|I|BloodSugarManagerImpl_12338_12338|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-16 15:43:03.401|3.40.2|I|BloodSugarManagerImpl_4835_4835|ble_turn_off
+2025-05-16 15:43:03.417|3.40.2|I|BloodSugarManagerImpl_4835_4835|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-16 16:03:59.376|3.40.2|I|BloodSugarManagerImpl_12445_12445|ble_turn_off
+2025-05-16 16:03:59.387|3.40.2|I|BloodSugarManagerImpl_12445_12445|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-17 06:53:11.314|3.40.2|I|BloodSugarManagerImpl_4894_4894|ble_turn_off
+2025-05-17 06:53:11.375|3.40.2|I|BloodSugarManagerImpl_4894_4894|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-17 20:48:56.079|3.40.2|I|BloodSugarManagerImpl_5123_5123|ble_turn_off
+2025-05-17 20:48:56.092|3.40.2|I|BloodSugarManagerImpl_5123_5123|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-18 09:51:56.262|3.40.2|I|BloodSugarManagerImpl_4873_4873|ble_turn_off
+2025-05-18 09:51:56.288|3.40.2|I|BloodSugarManagerImpl_4873_4873|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-24 02:14:09.274|3.40.2|I|BloodSugarManagerImpl_8007_8007|ble_turn_off
+2025-05-24 02:14:09.287|3.40.2|I|BloodSugarManagerImpl_8007_8007|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-24 16:21:58.044|3.40.2|I|BloodSugarManagerImpl_5047_5047|ble_turn_off
+2025-05-24 16:21:58.051|3.40.2|I|BloodSugarManagerImpl_5047_5047|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-24 21:20:32.364|3.40.2|I|BloodSugarManagerImpl_4905_4905|ble_turn_off
+2025-05-24 21:20:32.373|3.40.2|I|BloodSugarManagerImpl_4905_4905|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-24 22:11:10.096|3.40.2|I|BloodSugarManagerImpl_4918_4918|ble_turn_off
+2025-05-24 22:11:10.100|3.40.2|I|BloodSugarManagerImpl_4918_4918|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-24 22:30:08.014|3.40.2|I|BloodSugarManagerImpl_4889_4889|ble_turn_off
+2025-05-24 22:30:08.041|3.40.2|I|BloodSugarManagerImpl_4889_4889|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-24 22:49:32.963|3.40.2|I|BloodSugarManagerImpl_7811_7811|ble_turn_off
+2025-05-24 22:49:32.975|3.40.2|I|BloodSugarManagerImpl_7811_7811|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-24 22:58:12.942|3.40.2|I|BloodSugarManagerImpl_7837_7837|ble_turn_off
+2025-05-24 22:58:12.949|3.40.2|I|BloodSugarManagerImpl_7837_7837|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-25 00:32:20.844|3.40.2|I|BloodSugarManagerImpl_4865_4865|ble_turn_off
+2025-05-25 00:32:20.851|3.40.2|I|BloodSugarManagerImpl_4865_4865|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-25 00:41:43.085|3.40.2|I|BloodSugarManagerImpl_8098_8098|ble_turn_off
+2025-05-25 00:41:43.090|3.40.2|I|BloodSugarManagerImpl_8098_8098|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-25 01:04:00.945|3.40.2|I|BloodSugarManagerImpl_4978_4978|ble_turn_off
+2025-05-25 01:04:00.953|3.40.2|I|BloodSugarManagerImpl_4978_4978|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-26 22:04:21.630|3.40.2|I|BloodSugarManagerImpl_7987_7987|ble_turn_off
+2025-05-26 22:04:21.647|3.40.2|I|BloodSugarManagerImpl_7987_7987|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-26 22:32:55.351|3.40.2|I|BloodSugarManagerImpl_4898_4898|ble_turn_off
+2025-05-26 22:32:55.370|3.40.2|I|BloodSugarManagerImpl_4898_4898|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-28 02:05:49.080|3.40.2|I|BloodSugarManagerImpl_4955_4955|ble_turn_off
+2025-05-28 02:05:49.109|3.40.2|I|BloodSugarManagerImpl_4955_4955|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-28 14:41:26.757|3.40.2|I|BloodSugarManagerImpl_5034_5034|ble_turn_off
+2025-05-28 14:41:26.779|3.40.2|I|BloodSugarManagerImpl_5034_5034|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-29 05:15:25.643|3.40.2|I|BloodSugarManagerImpl_5100_5100|ble_turn_off
+2025-05-29 05:15:25.655|3.40.2|I|BloodSugarManagerImpl_5100_5100|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-30 12:59:25.617|3.40.2|I|BloodSugarManagerImpl_5148_5148|ble_turn_off
+2025-05-30 12:59:25.641|3.40.2|I|BloodSugarManagerImpl_5148_5148|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-05-30 14:06:40.127|3.40.2|I|BloodSugarManagerImpl_5060_5060|ble_turn_off
+2025-05-30 14:06:40.139|3.40.2|I|BloodSugarManagerImpl_5060_5060|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-06-01 03:09:15.347|3.40.2|I|BloodSugarManagerImpl_5186_5186|ble_turn_off
+2025-06-01 03:09:15.385|3.40.2|I|BloodSugarManagerImpl_5186_5186|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-06-01 23:45:11.349|3.40.2|I|BloodSugarManagerImpl_5091_5091|ble_turn_off
+2025-06-01 23:45:11.355|3.40.2|I|BloodSugarManagerImpl_5091_5091|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-06-02 01:10:15.324|3.40.2|I|BloodSugarManagerImpl_5053_5053|ble_turn_off
+2025-06-02 01:10:15.339|3.40.2|I|BloodSugarManagerImpl_5053_5053|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-06-02 06:54:50.144|3.40.2|I|BloodSugarManagerImpl_5268_5268|ble_turn_off
+2025-06-02 06:54:50.149|3.40.2|I|BloodSugarManagerImpl_5268_5268|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-06-02 07:59:57.707|3.40.2|I|BloodSugarManagerImpl_7312_7312|ble_turn_off
+2025-06-02 07:59:57.711|3.40.2|I|BloodSugarManagerImpl_7312_7312|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-06-03 22:36:02.051|3.40.2|I|BloodSugarManagerImpl_5078_5078|ble_turn_off
+2025-06-03 22:36:02.095|3.40.2|I|BloodSugarManagerImpl_5078_5078|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-06-05 04:32:12.170|3.40.2|I|BloodSugarManagerImpl_4905_4905|ble_turn_off
+2025-06-05 04:32:12.241|3.40.2|I|BloodSugarManagerImpl_4905_4905|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-06-06 05:20:49.724|3.40.2|I|BloodSugarManagerImpl_5218_5218|ble_turn_off
+2025-06-06 05:20:49.735|3.40.2|I|BloodSugarManagerImpl_5218_5218|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-06-08 12:34:17.714|3.40.2|I|BloodSugarManagerImpl_5131_5131|ble_turn_off
+2025-06-08 12:34:17.732|3.40.2|I|BloodSugarManagerImpl_5131_5131|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-06-11 07:06:33.682|3.40.2|I|BloodSugarManagerImpl_5008_5008|ble_turn_off
+2025-06-11 07:06:33.746|3.40.2|I|BloodSugarManagerImpl_5008_5008|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-06-11 08:43:21.439|3.40.2|I|BloodSugarManagerImpl_6695_6695|ble_turn_off
+2025-06-11 08:43:21.448|3.40.2|I|BloodSugarManagerImpl_6695_6695|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-06-11 20:29:15.800|3.40.2|I|BloodSugarManagerImpl_4884_4884|ble_turn_off
+2025-06-11 20:29:15.839|3.40.2|I|BloodSugarManagerImpl_4884_4884|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-06-13 02:44:56.478|3.40.2|I|BloodSugarManagerImpl_4909_4909|ble_turn_off
+2025-06-13 02:44:56.791|3.40.2|I|BloodSugarManagerImpl_4909_4909|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-06-14 04:23:43.688|3.40.2|I|BloodSugarManagerImpl_5380_5380|ble_turn_off
+2025-06-14 04:23:43.701|3.40.2|I|BloodSugarManagerImpl_5380_5380|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-06-15 23:52:43.631|3.40.2|I|BloodSugarManagerImpl_5115_5115|ble_turn_off
+2025-06-15 23:52:43.632|3.40.2|I|BloodSugarManagerImpl_5115_5115|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-06-17 04:55:33.760|3.40.2|I|BloodSugarManagerImpl_5152_5152|ble_turn_off
+2025-06-17 04:55:33.787|3.40.2|I|BloodSugarManagerImpl_5152_5152|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-06-17 15:41:05.326|3.40.2|I|BloodSugarManagerImpl_5027_5027|ble_turn_off
+2025-06-17 15:41:05.344|3.40.2|I|BloodSugarManagerImpl_5027_5027|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-06-18 13:23:46.374|3.40.2|I|BloodSugarManagerImpl_10973_10973|ble_turn_off
+2025-06-18 13:23:46.381|3.40.2|I|BloodSugarManagerImpl_10973_10973|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-06-20 20:42:54.590|3.40.2|I|BloodSugarManagerImpl_5026_5026|ble_turn_off
+2025-06-20 20:42:54.595|3.40.2|I|BloodSugarManagerImpl_5026_5026|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-06-23 01:37:06.595|3.40.2|I|BloodSugarManagerImpl_8319_8319|ble_turn_off
+2025-06-23 01:37:06.628|3.40.2|I|BloodSugarManagerImpl_8319_8319|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-06-25 21:38:50.456|3.40.2|I|BloodSugarManagerImpl_5141_5141|ble_turn_off
+2025-06-25 21:38:50.477|3.40.2|I|BloodSugarManagerImpl_5141_5141|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-06-26 00:29:12.972|3.40.2|I|BloodSugarManagerImpl_5120_5120|ble_turn_off
+2025-06-26 00:29:12.982|3.40.2|I|BloodSugarManagerImpl_5120_5120|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-06-27 05:49:03.529|3.40.2|I|BloodSugarManagerImpl_5103_5103|ble_turn_off
+2025-06-27 05:49:03.554|3.40.2|I|BloodSugarManagerImpl_5103_5103|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-06-28 00:20:44.280|3.40.2|I|BloodSugarManagerImpl_5184_5184|ble_turn_off
+2025-06-28 00:20:44.310|3.40.2|I|BloodSugarManagerImpl_5184_5184|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-07-02 14:32:23.409|3.40.2|I|BloodSugarManagerImpl_5345_5345|ble_turn_off
+2025-07-02 14:32:23.444|3.40.2|I|BloodSugarManagerImpl_5345_5345|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-07-04 10:17:20.333|3.40.2|I|BloodSugarManagerImpl_5143_5143|ble_turn_off
+2025-07-04 10:17:20.405|3.40.2|I|BloodSugarManagerImpl_5143_5143|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-07-04 13:45:11.478|3.40.2|I|BloodSugarManagerImpl_5164_5164|ble_turn_off
+2025-07-04 13:45:11.492|3.40.2|I|BloodSugarManagerImpl_5164_5164|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-07-06 03:35:50.930|3.40.2|I|BloodSugarManagerImpl_5011_5011|ble_turn_off
+2025-07-06 03:35:50.977|3.40.2|I|BloodSugarManagerImpl_5011_5011|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-07-06 11:40:14.115|3.40.2|I|BloodSugarManagerImpl_5314_5314|ble_turn_off
+2025-07-06 11:40:14.126|3.40.2|I|BloodSugarManagerImpl_5314_5314|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-07-06 11:58:33.894|3.40.2|I|BloodSugarManagerImpl_8150_8150|ble_turn_off
+2025-07-06 11:58:33.913|3.40.2|I|BloodSugarManagerImpl_8150_8150|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-07-07 21:27:31.727|3.40.2|I|BloodSugarManagerImpl_5103_5103|ble_turn_off
+2025-07-07 21:27:31.755|3.40.2|I|BloodSugarManagerImpl_5103_5103|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-07-08 06:20:53.721|3.40.2|I|BloodSugarManagerImpl_5056_5056|ble_turn_off
+2025-07-08 06:20:53.724|3.40.2|I|BloodSugarManagerImpl_5056_5056|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-07-09 12:50:37.666|3.40.2|I|BloodSugarManagerImpl_5202_5202|ble_turn_off
+2025-07-09 12:50:37.680|3.40.2|I|BloodSugarManagerImpl_5202_5202|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-07-09 22:59:57.885|3.40.2|I|BloodSugarManagerImpl_4871_4871|ble_turn_off
+2025-07-09 22:59:57.952|3.40.2|I|BloodSugarManagerImpl_4871_4871|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-07-11 00:48:36.707|3.40.2|I|BloodSugarManagerImpl_5107_5107|ble_turn_off
+2025-07-11 00:48:36.711|3.40.2|I|BloodSugarManagerImpl_5107_5107|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-07-16 10:34:35.196|3.40.2|I|BloodSugarManagerImpl_5441_5441|ble_turn_off
+2025-07-16 10:34:35.563|3.40.2|I|BloodSugarManagerImpl_5441_5441|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-07-17 14:21:20.803|3.40.2|I|BloodSugarManagerImpl_7036_7036|ble_turn_off
+2025-07-17 14:21:20.835|3.40.2|I|BloodSugarManagerImpl_7036_7036|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-07-18 06:45:16.789|3.40.2|I|BloodSugarManagerImpl_4980_4980|ble_turn_off
+2025-07-18 06:45:16.824|3.40.2|I|BloodSugarManagerImpl_4980_4980|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-07-20 22:04:07.081|3.40.2|I|BloodSugarManagerImpl_5169_5169|ble_turn_off
+2025-07-20 22:04:07.109|3.40.2|I|BloodSugarManagerImpl_5169_5169|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-07-22 23:48:57.496|3.40.2|I|BloodSugarManagerImpl_7601_7601|ble_turn_off
+2025-07-22 23:48:57.557|3.40.2|I|BloodSugarManagerImpl_7601_7601|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-07-24 03:52:21.466|3.40.2|I|BloodSugarManagerImpl_5104_5104|ble_turn_off
+2025-07-24 03:52:21.475|3.40.2|I|BloodSugarManagerImpl_5104_5104|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-07-25 14:40:52.059|3.40.2|I|BloodSugarManagerImpl_5240_5240|ble_turn_off
+2025-07-25 14:40:52.083|3.40.2|I|BloodSugarManagerImpl_5240_5240|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-07-27 13:08:53.773|3.40.2|I|BloodSugarManagerImpl_5075_5075|ble_turn_off
+2025-07-27 13:08:53.825|3.40.2|I|BloodSugarManagerImpl_5075_5075|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-07-28 16:24:24.659|3.40.2|I|BloodSugarManagerImpl_5272_5272|ble_turn_off
+2025-07-28 16:24:24.680|3.40.2|I|BloodSugarManagerImpl_5272_5272|onResultFlowState() called with: status = BLE_OFF, msg = 蓝牙模块关闭, bindFlag = false ,connectcallback = null
+2025-07-28 16:24:27.625|3.40.2|I|BloodSugarManagerImpl_5272_5272|onResultFlowState() called with: status = BLE_OPEN, msg = 蓝牙模块开启, bindFlag = false ,connectcallback = null
+2025-07-28 16:24:27.625|3.40.2|I|BloodSugarManagerImpl_5272_5272|ble_turn_on

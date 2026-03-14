@@ -1,5 +1,11 @@
 import { Type } from "@sinclair/typebox";
 import WebSocket from "ws";
+import {
+  buildEcosystemRegistry,
+  listCapabilities,
+  resolveIntentExecution,
+  type HaControlConfig,
+} from "./ecosystem.ts";
 
 type ToolContent = { type: "text"; text: string };
 
@@ -20,42 +26,6 @@ type PluginApi = {
   }) => void;
   registerGatewayMethod: (name: string, handler: (ctx: any) => void) => void;
   registerService: (service: { id: string; start: () => void; stop: () => void }) => void;
-};
-
-type HaControlConfig = {
-  baseUrl: string;
-  token: string;
-  webhookSecret?: string;
-  presenceEntityId?: string;
-  coolingSceneEntityId?: string;
-  fanEntityId?: string;
-  climateEntityId?: string;
-  targetTemperatureC?: number;
-  climateHvacMode?: string;
-  notification?: {
-    domain?: string;
-    service?: string;
-    title?: string;
-    extraData?: Record<string, unknown>;
-  };
-  mechanicalSwitch?: {
-    thirdRealityEntityId?: string;
-    switchBotEntityId?: string;
-    onHighHeartRate?: boolean;
-    onArrivalCooling?: boolean;
-  };
-  mirrorEntities?: {
-    latestHeartRate?: string;
-    recentHighHr?: string;
-    presence?: string;
-  };
-  policies?: {
-    highHrThresholdBpm?: number;
-    highHrSustainSec?: number;
-    recentHrWindowSec?: number;
-    dedupeWindowSec?: number;
-    autoCoolOnHighHrAtHome?: boolean;
-  };
 };
 
 type HrPayload = {
@@ -390,6 +360,82 @@ export default function register(api: PluginApi) {
         const cfg = getCfg(api);
         const data = await processConversation(cfg, params.text, params.language ?? "en");
         return asTextContent(data);
+      },
+    },
+    { optional: true },
+  );
+
+  api.registerTool(
+    {
+      name: "home_list_capabilities",
+      description: "List configured Xiaomi, Matter, Aqara, Tuya, SwitchBot, and other ecosystem devices routed through Home Assistant.",
+      parameters: Type.Object({
+        ecosystem: Type.Optional(Type.String()),
+        vendor: Type.Optional(Type.String()),
+        area: Type.Optional(Type.String()),
+        kind: Type.Optional(Type.String()),
+      }),
+      async execute(
+        _id: string,
+        params: {
+          ecosystem?: string;
+          vendor?: string;
+          area?: string;
+          kind?: string;
+        },
+      ) {
+        const cfg = getCfg(api);
+        const registry = buildEcosystemRegistry(cfg);
+        return asTextContent({
+          ok: true,
+          capabilities: listCapabilities(registry, params),
+        });
+      },
+    },
+    { optional: true },
+  );
+
+  api.registerTool(
+    {
+      name: "home_execute_intent",
+      description: "Resolve a configured ecosystem device intent into a constrained Home Assistant service call.",
+      parameters: Type.Object({
+        device_id: Type.Optional(Type.String()),
+        alias: Type.Optional(Type.String()),
+        intent: Type.String(),
+        value: Type.Optional(Type.Any()),
+        confirmed: Type.Optional(Type.Boolean()),
+      }),
+      async execute(
+        _id: string,
+        params: {
+          device_id?: string;
+          alias?: string;
+          intent: string;
+          value?: unknown;
+          confirmed?: boolean;
+        },
+      ) {
+        const cfg = getCfg(api);
+        const registry = buildEcosystemRegistry(cfg);
+        const resolved = resolveIntentExecution(registry, {
+          deviceId: params.device_id,
+          alias: params.alias,
+          intent: params.intent,
+          value: params.value,
+          confirmed: params.confirmed,
+        });
+        const result = await callService(
+          cfg,
+          resolved.serviceCall.domain,
+          resolved.serviceCall.service,
+          resolved.serviceCall.data,
+        );
+        return asTextContent({
+          ok: true,
+          ...resolved,
+          result,
+        });
       },
     },
     { optional: true },

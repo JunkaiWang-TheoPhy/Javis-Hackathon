@@ -67,7 +67,311 @@
             "recentHrWindowSec": 1800,
             "dedupeWindowSec": 180,
             "autoCoolOnHighHrAtHome": true
-          }
+          },
+          "ecosystems": [
+            {
+              "id": "xiaomi-home",
+              "vendor": "xiaomi",
+              "integration": "home_assistant",
+              "connectionMode": "hybrid",
+              "directAdapter": "xiaomi-miot",
+              "region": "cn",
+              "devices": [
+                {
+                  "id": "mi-bedroom-fan",
+                  "entityId": "fan.mi_bedroom",
+                  "kind": "fan",
+                  "area": "bedroom",
+                  "aliases": ["xiaomi fan", "mi fan", "bedroom fan"],
+                  "externalIds": {
+                    "miotDid": "xiaomi-demo-fan-01"
+                  },
+                  "capabilities": [
+                    {
+                      "intent": "turn_on",
+                      "domain": "fan",
+                      "service": "turn_on",
+                      "riskTier": "side_effect"
+                    },
+                    {
+                      "intent": "turn_off",
+                      "domain": "fan",
+                      "service": "turn_off",
+                      "riskTier": "side_effect"
+                    },
+                    {
+                      "intent": "set_percentage",
+                      "domain": "fan",
+                      "service": "set_percentage",
+                      "dataTemplate": {
+                        "percentage": "{{value}}"
+                      },
+                      "requiresConfirmation": true,
+                      "riskTier": "side_effect"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "matter-home",
+              "vendor": "matter",
+              "integration": "home_assistant",
+              "connectionMode": "home_assistant",
+              "devices": [
+                {
+                  "id": "living-room-lamp",
+                  "entityId": "light.living_room_lamp",
+                  "kind": "light",
+                  "area": "living_room",
+                  "aliases": ["matter lamp", "living room lamp"],
+                  "capabilities": [
+                    {
+                      "intent": "turn_on",
+                      "domain": "light",
+                      "service": "turn_on",
+                      "riskTier": "side_effect"
+                    },
+                    {
+                      "intent": "turn_off",
+                      "domain": "light",
+                      "service": "turn_off",
+                      "riskTier": "side_effect"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "aqara-home",
+              "vendor": "aqara",
+              "integration": "home_assistant",
+              "connectionMode": "bridge",
+              "devices": [
+                {
+                  "id": "aqara-entry-switch",
+                  "entityId": "switch.aqara_entry_switch",
+                  "kind": "switch",
+                  "area": "entry",
+                  "aliases": ["aqara switch", "entry switch"],
+                  "capabilities": [
+                    {
+                      "intent": "turn_on",
+                      "domain": "switch",
+                      "service": "turn_on",
+                      "riskTier": "side_effect"
+                    },
+                    {
+                      "intent": "turn_off",
+                      "domain": "switch",
+                      "service": "turn_off",
+                      "riskTier": "side_effect"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "tuya-home",
+              "vendor": "tuya",
+              "integration": "home_assistant",
+              "connectionMode": "cloud_api",
+              "directAdapter": "tuya-cloud",
+              "region": "us",
+              "devices": [
+                {
+                  "id": "tuya-curtain",
+                  "entityId": "cover.tuya_curtain",
+                  "kind": "cover",
+                  "area": "living_room",
+                  "aliases": ["tuya curtain", "living room curtain"],
+                  "capabilities": [
+                    {
+                      "intent": "open",
+                      "domain": "cover",
+                      "service": "open_cover",
+                      "riskTier": "side_effect"
+                    },
+                    {
+                      "intent": "close",
+                      "domain": "cover",
+                      "service": "close_cover",
+                      "riskTier": "side_effect"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "switchbot-home",
+              "vendor": "switchbot",
+              "integration": "home_assistant",
+              "connectionMode": "bridge",
+              "directAdapter": "switchbot-openapi",
+              "devices": [
+                {
+                  "id": "switchbot-bot",
+                  "entityId": "switch.switchbot_bot",
+                  "kind": "switch",
+                  "area": "office",
+                  "aliases": ["switchbot bot", "desk switchbot"],
+                  "capabilities": [
+                    {
+                      "intent": "turn_on",
+                      "domain": "switch",
+                      "service": "turn_on",
+                      "riskTier": "side_effect"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "hue-home",
+              "vendor": "hue",
+              "integration": "home_assistant",
+              "connectionMode": "bridge",
+              "directAdapter": "hue-local",
+              "devices": [
+                {
+                  "id": "hue-living-room-light",
+                  "entityId": "light.hue_living_room",
+                  "kind": "light",
+                  "area": "living_room",
+                  "aliases": ["hue light", "living room hue"],
+                  "externalIds": {
+                    "hueLightId": "7",
+                    "hueBridgeId": "bridge-1"
+                  },
+                  "capabilities": [
+                    {
+                      "intent": "turn_on",
+                      "domain": "light",
+                      "service": "turn_on",
+                      "riskTier": "side_effect"
+                    },
+                    {
+                      "intent": "turn_off",
+                      "domain": "light",
+                      "service": "turn_off",
+                      "riskTier": "side_effect"
+                    }
+                  ]
+                },
+                {
+                  "id": "hue-evening-scene",
+                  "entityId": "scene.hue_evening",
+                  "kind": "scene",
+                  "area": "living_room",
+                  "aliases": ["hue evening scene", "evening lights"],
+                  "capabilities": [
+                    {
+                      "intent": "activate",
+                      "domain": "scene",
+                      "service": "turn_on",
+                      "riskTier": "side_effect"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "homekit-home",
+              "vendor": "homekit",
+              "integration": "home_assistant",
+              "connectionMode": "bridge",
+              "devices": [
+                {
+                  "id": "homekit-bedroom-blinds",
+                  "entityId": "cover.homekit_bedroom_blinds",
+                  "kind": "cover",
+                  "area": "bedroom",
+                  "aliases": ["homekit blinds", "bedroom blinds"],
+                  "externalIds": {
+                    "accessoryId": "hk-acc-1"
+                  },
+                  "capabilities": [
+                    {
+                      "intent": "open",
+                      "domain": "cover",
+                      "service": "open_cover",
+                      "riskTier": "side_effect"
+                    },
+                    {
+                      "intent": "close",
+                      "domain": "cover",
+                      "service": "close_cover",
+                      "riskTier": "side_effect"
+                    }
+                  ]
+                },
+                {
+                  "id": "homekit-thermostat",
+                  "entityId": "climate.homekit_thermostat",
+                  "kind": "climate",
+                  "area": "living_room",
+                  "aliases": ["homekit thermostat", "apple thermostat"],
+                  "externalIds": {
+                    "accessoryId": "hk-acc-2"
+                  },
+                  "capabilities": [
+                    {
+                      "intent": "set_temperature",
+                      "domain": "climate",
+                      "service": "set_temperature",
+                      "dataTemplate": {
+                        "temperature": "{{value}}"
+                      },
+                      "requiresConfirmation": true,
+                      "riskTier": "side_effect"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "google-nest-home",
+              "vendor": "google",
+              "integration": "home_assistant",
+              "connectionMode": "cloud_api",
+              "directAdapter": "google-home",
+              "devices": [
+                {
+                  "id": "nest-thermostat",
+                  "entityId": "climate.nest_thermostat",
+                  "kind": "climate",
+                  "area": "living_room",
+                  "aliases": ["nest thermostat", "google thermostat"],
+                  "externalIds": {
+                    "googleDeviceId": "nest-device-1"
+                  },
+                  "capabilities": [
+                    {
+                      "intent": "set_temperature",
+                      "domain": "climate",
+                      "service": "set_temperature",
+                      "dataTemplate": {
+                        "temperature": "{{value}}"
+                      },
+                      "requiresConfirmation": true,
+                      "riskTier": "side_effect"
+                    }
+                  ]
+                },
+                {
+                  "id": "nest-doorbell",
+                  "entityId": "camera.nest_front_door",
+                  "kind": "camera",
+                  "area": "entry",
+                  "aliases": ["nest doorbell", "front door camera"],
+                  "externalIds": {
+                    "googleDeviceId": "nest-camera-1"
+                  },
+                  "capabilities": []
+                }
+              ]
+            }
+          ]
         }
       },
       "rokid-bridge": {

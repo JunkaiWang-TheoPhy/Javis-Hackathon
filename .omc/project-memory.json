@@ -1,0 +1,87 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1773525440426,
+  "projectRoot": "/Users/thomasjwang/Documents/GitHub/Javis-Hackathon",
+  "techStack": {
+    "languages": [],
+    "frameworks": [],
+    "packageManager": null,
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": null,
+    "scripts": {}
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "0313": {
+      "path": "0313",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1773525440410,
+      "keyFiles": [
+        "openclaw-ha-blueprint.zip"
+      ]
+    },
+    "Mira_v1": {
+      "path": "Mira_v1",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1773525440412,
+      "keyFiles": []
+    },
+    "Readme": {
+      "path": "Readme",
+      "purpose": null,
+      "fileCount": 8,
+      "lastAccessed": 1773525440413,
+      "keyFiles": [
+        "30 s自动拍照程序.pdf",
+        "ADB环境配置.pdf",
+        "ChatGPT-OpenClaw Jarvis系统设计 (1).md",
+        "ChatGPT-OpenClaw 智能设备演示.md",
+        "ChatGPT-Vision Pro 开发指南.md"
+      ]
+    },
+    "Rokid": {
+      "path": "Rokid",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1773525440413,
+      "keyFiles": []
+    },
+    "tmp": {
+      "path": "tmp",
+      "purpose": null,
+      "fileCount": 17,
+      "lastAccessed": 1773525440413,
+      "keyFiles": [
+        "rokid-after-tap.png",
+        "rokid-camera-after-next-1.png",
+        "rokid-camera-back.png",
+        "rokid-camera-check.png",
+        "rokid-camera-current-retry.png"
+      ]
+    }
+  },
+  "hotPaths": [],
+  "userDirectives": []
+}
