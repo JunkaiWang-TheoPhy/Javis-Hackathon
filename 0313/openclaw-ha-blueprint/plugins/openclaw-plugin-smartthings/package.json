@@ -1,0 +1,10 @@
+{
+  "name": "openclaw-plugin-smartthings",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "SmartThings readiness plugin for OpenClaw",
+  "openclaw": {
+    "extensions": ["./src/index.ts"]
+  }
+}

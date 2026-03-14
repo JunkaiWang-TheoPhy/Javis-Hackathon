@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Mi Band Gateway</string>
+    <string name="notification_channel_name">Mi Band Gateway</string>
+    <string name="notification_title">Mi Band Gateway Running</string>
+    <string name="grant_android_permissions_button">Grant Android Permissions</string>
+    <string name="open_health_connect_button">Open Health Connect</string>
+    <string name="grant_permissions_button">Grant Health Permissions</string>
+    <string name="start_gateway_button">Start Gateway</string>
+    <string name="stop_gateway_button">Stop Gateway</string>
 </resources>

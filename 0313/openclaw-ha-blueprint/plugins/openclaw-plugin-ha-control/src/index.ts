@@ -3,9 +3,15 @@ import WebSocket from "ws";
 import {
   buildEcosystemRegistry,
   listCapabilities,
+  resolveIntentDispatchPlan,
   resolveIntentExecution,
+  type RoutePreference,
   type HaControlConfig,
 } from "./ecosystem.ts";
+import {
+  executeDirectAdapter,
+  getDirectAdapterAvailability,
+} from "./direct-adapters.ts";
 
 type ToolContent = { type: "text"; text: string };
 
@@ -405,6 +411,13 @@ export default function register(api: PluginApi) {
         intent: Type.String(),
         value: Type.Optional(Type.Any()),
         confirmed: Type.Optional(Type.Boolean()),
+        route: Type.Optional(
+          Type.Union([
+            Type.Literal("auto"),
+            Type.Literal("home_assistant"),
+            Type.Literal("direct_adapter"),
+          ]),
+        ),
       }),
       async execute(
         _id: string,
@@ -414,26 +427,56 @@ export default function register(api: PluginApi) {
           intent: string;
           value?: unknown;
           confirmed?: boolean;
+          route?: RoutePreference;
         },
       ) {
         const cfg = getCfg(api);
         const registry = buildEcosystemRegistry(cfg);
-        const resolved = resolveIntentExecution(registry, {
+        const plan = resolveIntentDispatchPlan(registry, {
           deviceId: params.device_id,
           alias: params.alias,
           intent: params.intent,
           value: params.value,
           confirmed: params.confirmed,
+          route: params.route,
         });
+        const directAvailability = getDirectAdapterAvailability(api, plan);
+
+        if (plan.dispatch.target === "direct_adapter" && directAvailability.supported) {
+          const result = await executeDirectAdapter(api, plan);
+          return asTextContent({
+            ok: true,
+            ...plan,
+            dispatch: {
+              ...plan.dispatch,
+              executed: "direct_adapter",
+              fallback: false,
+            },
+            result,
+          });
+        }
+
+        if (params.route === "direct_adapter") {
+          throw new Error(
+            `Requested direct adapter route is unavailable: ${directAvailability.reason ?? "unsupported direct adapter"}`,
+          );
+        }
+
         const result = await callService(
           cfg,
-          resolved.serviceCall.domain,
-          resolved.serviceCall.service,
-          resolved.serviceCall.data,
+          plan.serviceCall.domain,
+          plan.serviceCall.service,
+          plan.serviceCall.data,
         );
         return asTextContent({
           ok: true,
-          ...resolved,
+          ...plan,
+          dispatch: {
+            ...plan.dispatch,
+            executed: "home_assistant",
+            fallback: plan.dispatch.target === "direct_adapter",
+            directAdapter: plan.dispatch.directAdapter,
+          },
           result,
         });
       },

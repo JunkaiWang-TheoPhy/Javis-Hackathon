@@ -24,7 +24,8 @@ Use this skill whenever the task is about Home Assistant devices, presence-aware
 - Prefer the plugin tools over browser automation for steady-state control.
 - Prefer `home_execute_intent` over raw `ha_call_service` when the target device is represented in the configured ecosystem registry.
 - Treat HomeKit as HA-first in this repository: use HomeKit Bridge or HomeKit Device paths instead of inventing a fake direct cloud API.
-- Treat Hue and Google/Nest as HA-first for now, while keeping `directAdapter` metadata available for a future direct adapter plugin.
+- Hue can now route through the configured `directAdapter` path from `home_execute_intent` when the Hue plugin is enabled and bridge IDs are present.
+- Treat Google/Nest, Lutron, and SmartThings as HA-first for now, while keeping `directAdapter` metadata available for future direct adapter work.
 - If the user asks for a direct device action and the entity ID is already known, use `ha_call_service` instead of free-form conversation.
 - For heart-rate alerts, always prefer `home_handle_hr_event` so the configured thresholds, dedupe window, notification path, and cooling logic stay consistent.
 - For "I'm home and hot after a workout" style requests, prefer `home_run_cooling_scene`.
@@ -73,11 +74,15 @@ Use `home_execute_intent` with:
 Additional examples:
 
 ```json
-{"alias":"hue light","intent":"turn_on","confirmed":true}
+{"alias":"hue light","intent":"turn_on","route":"auto","confirmed":true}
 ```
 
 ```json
 {"alias":"nest thermostat","intent":"set_temperature","value":23,"confirmed":true}
+```
+
+```json
+{"alias":"hue evening scene","intent":"activate","route":"direct_adapter","confirmed":true}
 ```
 
 ## High heart rate event

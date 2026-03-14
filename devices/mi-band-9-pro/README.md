@@ -26,26 +26,59 @@ The band is paired to the phone, not directly to this computer. The gateway stra
 ## macOS / Windows Workflow
 
 1. Connect the `Xiaomi 12X` over USB with `adb` authorized.
-2. Start the Android gateway app on the phone.
-3. Expose the phone-local gateway port to the desktop:
+2. Install and open the Android gateway app in `gateway/android-app/`.
+3. On first run, tap:
+   - `Grant Android Permissions`
+   - `Open Health Connect`
+   - `Grant Health Permissions`
+   - `Start Gateway`
+4. Expose the phone-local gateway port to the desktop:
 
 ```bash
-adb reverse tcp:8765 tcp:8765
+cd devices/mi-band-9-pro/gateway/desktop
+./start_gateway_tunnel.sh
 ```
 
-Fallback:
+Windows PowerShell:
+
+```powershell
+cd devices/mi-band-9-pro/gateway/desktop
+.\start_gateway_tunnel.ps1
+```
+
+5. Read snapshot data:
+
+```bash
+python3 devices/mi-band-9-pro/gateway/desktop/poll_gateway.py
+python3 devices/mi-band-9-pro/gateway/desktop/stream_gateway.py
+```
+
+Fallback tunnel only:
 
 ```bash
 adb forward tcp:8765 tcp:8765
 ```
 
-4. Read snapshot data:
+## Verified Runtime Status
 
-```bash
-curl http://127.0.0.1:8765/status
-curl http://127.0.0.1:8765/health/latest
-curl -N http://127.0.0.1:8765/events
-```
+The gateway app has been built, installed, and started on the `Xiaomi 12X`, and this Mac has already verified:
+
+- `GET /status`
+- `GET /health/latest`
+- `GET /debug/source`
+
+Current observed values on `2026-03-15`:
+
+- `health_connect_ready = false`
+- `bluetooth_ready = false`
+- `health_connect_status = provider_update_required`
+- `band_status = bluetooth_off`
+
+So the bridge itself is running and reachable, but the phone still needs:
+
+- Android runtime permission approval inside the app
+- Health Connect provider installation or update on Android 13
+- Health Connect data permission approval
 
 ## Known Limits
 

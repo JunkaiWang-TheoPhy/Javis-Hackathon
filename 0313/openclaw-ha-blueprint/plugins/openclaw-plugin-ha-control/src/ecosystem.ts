@@ -120,6 +120,8 @@ export type IntentExecutionRequest = {
   confirmed?: boolean;
 };
 
+export type RoutePreference = "auto" | "home_assistant" | "direct_adapter";
+
 export type IntentExecution = {
   ecosystemId: string;
   vendor: string;
@@ -130,6 +132,20 @@ export type IntentExecution = {
     domain: string;
     service: string;
     data: Record<string, unknown>;
+  };
+};
+
+export type IntentDispatchPlan = IntentExecution & {
+  intent: string;
+  value?: unknown;
+  dispatch: {
+    requested: RoutePreference;
+    target: "home_assistant" | "direct_adapter";
+    connectionMode?: string;
+    directAdapter?: string;
+    externalIds?: Record<string, string>;
+    entityId?: string;
+    kind: string;
   };
 };
 
@@ -288,6 +304,40 @@ export function resolveIntentExecution(
       domain: capability.domain,
       service: capability.service,
       data,
+    },
+  };
+}
+
+export function resolveIntentDispatchPlan(
+  registry: EcosystemRegistry,
+  request: IntentExecutionRequest & { route?: RoutePreference },
+): IntentDispatchPlan {
+  const device = findDevice(registry, request);
+  const resolved = resolveIntentExecution(registry, request);
+  const requested = request.route ?? "auto";
+
+  if (requested === "direct_adapter" && !device.directAdapter) {
+    throw new Error(`Device '${device.deviceId}' does not have a configured direct adapter.`);
+  }
+
+  const target = requested === "home_assistant"
+    ? "home_assistant"
+    : device.directAdapter
+      ? "direct_adapter"
+      : "home_assistant";
+
+  return {
+    ...resolved,
+    intent: request.intent,
+    value: request.value,
+    dispatch: {
+      requested,
+      target,
+      connectionMode: device.connectionMode,
+      directAdapter: device.directAdapter,
+      externalIds: device.externalIds,
+      entityId: device.entityId,
+      kind: device.kind,
     },
   };
 }

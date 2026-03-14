@@ -370,6 +370,84 @@
                   "capabilities": []
                 }
               ]
+            },
+            {
+              "id": "lutron-home",
+              "vendor": "lutron",
+              "integration": "home_assistant",
+              "connectionMode": "bridge",
+              "directAdapter": "lutron-leap",
+              "devices": [
+                {
+                  "id": "lutron-living-room-dimmer",
+                  "entityId": "light.lutron_living_room_dimmer",
+                  "kind": "light",
+                  "area": "living_room",
+                  "aliases": ["lutron dimmer", "living room lutron"],
+                  "externalIds": {
+                    "lutronDeviceId": "12",
+                    "lutronBridgeId": "lutron-main"
+                  },
+                  "capabilities": [
+                    {
+                      "intent": "turn_on",
+                      "domain": "light",
+                      "service": "turn_on",
+                      "riskTier": "side_effect"
+                    },
+                    {
+                      "intent": "turn_off",
+                      "domain": "light",
+                      "service": "turn_off",
+                      "riskTier": "side_effect"
+                    },
+                    {
+                      "intent": "set_brightness",
+                      "domain": "light",
+                      "service": "turn_on",
+                      "dataTemplate": {
+                        "brightness_pct": "{{value}}"
+                      },
+                      "requiresConfirmation": true,
+                      "riskTier": "side_effect"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "smartthings-home",
+              "vendor": "smartthings",
+              "integration": "home_assistant",
+              "connectionMode": "cloud_api",
+              "directAdapter": "smartthings-api",
+              "devices": [
+                {
+                  "id": "smartthings-bedroom-switch",
+                  "entityId": "switch.smartthings_bedroom_switch",
+                  "kind": "switch",
+                  "area": "bedroom",
+                  "aliases": ["smartthings switch", "bedroom smartthings switch"],
+                  "externalIds": {
+                    "smartthingsDeviceId": "st-device-1",
+                    "smartthingsLocationId": "st-location-1"
+                  },
+                  "capabilities": [
+                    {
+                      "intent": "turn_on",
+                      "domain": "switch",
+                      "service": "turn_on",
+                      "riskTier": "side_effect"
+                    },
+                    {
+                      "intent": "turn_off",
+                      "domain": "switch",
+                      "service": "turn_off",
+                      "riskTier": "side_effect"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
@@ -400,6 +478,32 @@
           "clientSecret": "replace-me-google-client-secret",
           "redirectUri": "https://example.com/oauth/google-home/callback",
           "platforms": ["ios", "web"],
+          "homeApiEnabled": false
+        }
+      },
+      "lutron": {
+        "enabled": false,
+        "config": {
+          "systemType": "caseta",
+          "bridgeHost": "192.168.1.20",
+          "bridgeId": "replace-me-lutron-bridge-id",
+          "keyFile": "/run/secrets/lutron.key",
+          "certFile": "/run/secrets/lutron.crt",
+          "caCertFile": "/run/secrets/lutron-ca.crt",
+          "port": 8081,
+          "connectTimeoutMs": 5000,
+          "leapEnabled": false
+        }
+      },
+      "smartthings": {
+        "enabled": false,
+        "config": {
+          "baseUrl": "https://api.smartthings.com",
+          "personalAccessToken": "replace-me-smartthings-pat",
+          "locationId": "replace-me-smartthings-location-id",
+          "clientId": "replace-me-smartthings-client-id",
+          "clientSecret": "replace-me-smartthings-client-secret",
+          "redirectUri": "https://example.com/oauth/smartthings/callback",
           "homeApiEnabled": false
         }
       }

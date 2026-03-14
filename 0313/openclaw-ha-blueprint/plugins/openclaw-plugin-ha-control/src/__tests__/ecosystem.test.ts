@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   buildEcosystemRegistry,
   listCapabilities,
+  resolveIntentDispatchPlan,
   resolveIntentExecution,
   type HaControlConfig,
 } from "../ecosystem.ts";
@@ -70,6 +71,40 @@ function buildConfig(): HaControlConfig {
               {
                 intent: "turn_on",
                 domain: "light",
+                service: "turn_on",
+                riskTier: "side_effect",
+              },
+              {
+                intent: "turn_off",
+                domain: "light",
+                service: "turn_off",
+                riskTier: "side_effect",
+              },
+              {
+                intent: "set_brightness",
+                domain: "light",
+                service: "turn_on",
+                dataTemplate: {
+                  brightness_pct: "{{value}}",
+                },
+                requiresConfirmation: true,
+                riskTier: "side_effect",
+              },
+            ],
+          },
+          {
+            id: "hue-evening-scene",
+            entityId: "scene.hue_evening",
+            kind: "scene",
+            area: "living_room",
+            aliases: ["hue evening scene", "evening lights"],
+            externalIds: {
+              hueSceneId: "scene-1",
+            },
+            capabilities: [
+              {
+                intent: "activate",
+                domain: "scene",
                 service: "turn_on",
                 riskTier: "side_effect",
               },
@@ -254,6 +289,24 @@ test("resolveIntentExecution rejects unknown aliases", () => {
       }),
     /No configured device matches/,
   );
+});
+
+test("resolveIntentDispatchPlan prefers a configured Hue direct adapter in auto mode", () => {
+  const registry = buildEcosystemRegistry(buildConfig());
+
+  const plan = resolveIntentDispatchPlan(registry, {
+    alias: "hue light",
+    intent: "turn_on",
+    confirmed: true,
+    route: "auto",
+  });
+
+  assert.equal(plan.dispatch.target, "direct_adapter");
+  assert.equal(plan.dispatch.directAdapter, "hue-local");
+  assert.deepEqual(plan.dispatch.externalIds, {
+    hueLightId: "7",
+    hueBridgeId: "bridge-1",
+  });
 });
 
 test("listCapabilities exposes future-compatible metadata for Hue and Google/Nest", () => {
