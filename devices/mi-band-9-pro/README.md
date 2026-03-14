@@ -20,6 +20,7 @@ The band is paired to the phone, not directly to this computer. The gateway stra
 
 - [device-profile.json](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/devices/mi-band-9-pro/device-profile.json): stable device and phone identity
 - [connection-notes.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/devices/mi-band-9-pro/connection-notes.md): pairing facts, limits, and routing notes
+- [progress-2026-03-15.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/devices/mi-band-9-pro/progress-2026-03-15.md): implementation and verification progress snapshot
 - [gateway/desktop/README.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/devices/mi-band-9-pro/gateway/desktop/README.md): desktop-side tunnel and client usage
 - [tmp/wearablelog/1773510602684log](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/tmp/wearablelog/1773510602684log): captured Xiaomi Fitness logs
 
@@ -61,22 +62,25 @@ adb forward tcp:8765 tcp:8765
 
 ## Verified Runtime Status
 
-The gateway app has been built, installed, and started on the `Xiaomi 12X`, and this Mac has already verified:
+The gateway app has been built, installed, and reinstalled on the `Xiaomi 12X`, and this Mac has already verified these endpoints over `adb forward`:
 
 - `GET /status`
 - `GET /health/latest`
 - `GET /debug/source`
+- `GET /events`
 
-Current observed values on `2026-03-15`:
+The current progress is tracked in [progress-2026-03-15.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/devices/mi-band-9-pro/progress-2026-03-15.md). The latest observed blocker state on `2026-03-15` is:
 
-- `health_connect_ready = false`
-- `bluetooth_ready = false`
-- `health_connect_status = provider_update_required`
-- `band_status = bluetooth_off`
+- the Xiaomi Fitness flow is still focused on `com.mi.health/com.xiaomi.fitness.access.health_connect.HealthConnectPrivacyActivity`
+- `android.permission.BLUETOOTH_CONNECT = granted=false`
+- `android.permission.POST_NOTIFICATIONS = granted=false`
+- Health Connect provider package is still not visible via `pm list packages`
+- the gateway can respond when started, but it will not produce non-null metrics until the phone-side consent flow is completed
 
-So the bridge itself is running and reachable, but the phone still needs:
+So the bridge implementation exists and the transport has been validated, but the phone still needs:
 
-- Android runtime permission approval inside the app
+- Xiaomi Fitness privacy and Health Connect consent completion
+- Android runtime permission approval inside the gateway app
 - Health Connect provider installation or update on Android 13
 - Health Connect data permission approval
 

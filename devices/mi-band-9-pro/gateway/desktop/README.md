@@ -73,5 +73,12 @@ Current phone-side state:
   - `health_connect_status = provider_update_required`
   - `bluetooth_enabled = false`
   - `band_status = bluetooth_off`
+- the gateway app runtime permissions are still:
+  - `android.permission.BLUETOOTH_CONNECT = granted=false`
+  - `android.permission.POST_NOTIFICATIONS = granted=false`
+- the phone is currently blocked in Xiaomi Fitness on:
+  - `com.mi.health/com.xiaomi.fitness.access.health_connect.HealthConnectPrivacyActivity`
 
 That means the HTTP bridge works, but the phone still needs Android runtime permissions and a Health Connect provider update or install before heart rate, SpO2, steps, and live connection status can become non-null.
+
+See [progress-2026-03-15.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/devices/mi-band-9-pro/progress-2026-03-15.md) for the latest verification snapshot.
