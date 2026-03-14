@@ -1,0 +1,16 @@
+default_config:
+api:
+conversation:
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+logger:
+  default: info
+
+input_boolean:
+  demo_fan_requested:
+    name: Demo Fan Requested
+  demo_ac_requested:
+    name: Demo AC Requested

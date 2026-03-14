@@ -1,0 +1,7 @@
+- id: demo_cooling_after_workout
+  name: Demo Cooling After Workout
+  entities:
+    input_boolean.demo_fan_requested:
+      state: "on"
+    input_boolean.demo_ac_requested:
+      state: "on"

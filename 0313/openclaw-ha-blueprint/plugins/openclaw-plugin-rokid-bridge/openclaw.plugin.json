@@ -1,0 +1,27 @@
+{
+  "id": "rokid-bridge",
+  "name": "Rokid Bridge",
+  "description": "Typed Rokid observation tools plus Home Assistant dispatch for OpenClaw.",
+  "version": "0.1.0",
+  "skills": [
+    "skills"
+  ],
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "homeAssistantBaseUrl": {
+        "type": "string",
+        "description": "Home Assistant base URL, e.g. http://homeassistant:8123"
+      },
+      "homeAssistantToken": {
+        "type": "string",
+        "description": "Home Assistant long-lived access token"
+      },
+      "defaultArea": {
+        "type": "string",
+        "description": "Optional default area for spatial prompts"
+      }
+    }
+  }
+}

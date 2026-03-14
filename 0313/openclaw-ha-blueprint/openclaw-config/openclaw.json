@@ -1,0 +1,83 @@
+{
+  "gateway": {
+    "mode": "local",
+    "bind": "lan"
+  },
+  "agents": {
+    "defaults": {
+      "workspace": "~/.openclaw/workspace-home",
+      "userTimezone": "Asia/Shanghai",
+      "sandbox": {
+        "mode": "off"
+      },
+      "model": "ollama/glm-4.7-flash"
+    }
+  },
+  "models": {
+    "providers": {
+      "ollama": {
+        "apiKey": "ollama-local",
+        "baseUrl": "http://ollama:11434",
+        "api": "ollama"
+      }
+    }
+  },
+  "tools": {
+    "allow": [
+      "ha-control",
+      "rokid-bridge"
+    ]
+  },
+  "plugins": {
+    "enabled": true,
+    "allow": [
+      "ha-control",
+      "rokid-bridge"
+    ],
+    "entries": {
+      "ha-control": {
+        "enabled": true,
+        "config": {
+          "baseUrl": "http://homeassistant:8123",
+          "token": "REPLACE_ME_HA_LONG_LIVED_TOKEN",
+          "webhookSecret": "change-me-ha-control-secret",
+          "presenceEntityId": "device_tracker.demo_user",
+          "coolingSceneEntityId": "scene.demo_cooling_after_workout",
+          "targetTemperatureC": 23,
+          "climateHvacMode": "cool",
+          "notification": {
+            "domain": "persistent_notification",
+            "service": "create",
+            "title": "OpenClaw Home Assistant"
+          },
+          "mechanicalSwitch": {
+            "thirdRealityEntityId": "switch.third_reality_wall_switch",
+            "switchBotEntityId": "switch.switchbot_bot",
+            "onHighHeartRate": true,
+            "onArrivalCooling": true
+          },
+          "mirrorEntities": {
+            "latestHeartRate": "sensor.openclaw_latest_heart_rate",
+            "recentHighHr": "binary_sensor.openclaw_recent_high_hr",
+            "presence": "sensor.openclaw_presence_cache"
+          },
+          "policies": {
+            "highHrThresholdBpm": 110,
+            "highHrSustainSec": 300,
+            "recentHrWindowSec": 1800,
+            "dedupeWindowSec": 180,
+            "autoCoolOnHighHrAtHome": true
+          }
+        }
+      },
+      "rokid-bridge": {
+        "enabled": true,
+        "config": {
+          "homeAssistantBaseUrl": "http://homeassistant:8123",
+          "homeAssistantToken": "REPLACE_ME_HA_LONG_LIVED_TOKEN",
+          "defaultArea": "kitchen"
+        }
+      }
+    }
+  }
+}

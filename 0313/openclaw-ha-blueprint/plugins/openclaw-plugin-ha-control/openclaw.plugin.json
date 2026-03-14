@@ -1,0 +1,72 @@
+{
+  "id": "ha-control",
+  "name": "Home Assistant Control",
+  "description": "Typed Home Assistant tools plus wearable/presence orchestration for OpenClaw.",
+  "version": "0.1.0",
+  "skills": ["skills"],
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["baseUrl", "token"],
+    "properties": {
+      "baseUrl": { "type": "string", "description": "Home Assistant base URL, e.g. http://homeassistant:8123" },
+      "token": { "type": "string", "description": "Home Assistant long-lived access token" },
+      "webhookSecret": { "type": "string", "description": "Shared secret for wearable webhook route" },
+      "presenceEntityId": { "type": "string", "description": "Entity that changes to home/away, e.g. device_tracker.demo_user or person.me" },
+      "coolingSceneEntityId": { "type": "string", "description": "Optional Home Assistant scene to run for cooling" },
+      "fanEntityId": { "type": "string" },
+      "climateEntityId": { "type": "string" },
+      "targetTemperatureC": { "type": "number", "default": 23 },
+      "climateHvacMode": { "type": "string", "default": "cool" },
+      "notification": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "domain": { "type": "string" },
+          "service": { "type": "string" },
+          "title": { "type": "string" },
+          "extraData": { "type": "object", "additionalProperties": true }
+        }
+      },
+      "mechanicalSwitch": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "thirdRealityEntityId": { "type": "string" },
+          "switchBotEntityId": { "type": "string" },
+          "onHighHeartRate": { "type": "boolean", "default": false },
+          "onArrivalCooling": { "type": "boolean", "default": true }
+        }
+      },
+      "mirrorEntities": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "latestHeartRate": { "type": "string", "default": "sensor.openclaw_latest_heart_rate" },
+          "recentHighHr": { "type": "string", "default": "binary_sensor.openclaw_recent_high_hr" },
+          "presence": { "type": "string", "default": "sensor.openclaw_presence_cache" }
+        }
+      },
+      "policies": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "highHrThresholdBpm": { "type": "number", "default": 110 },
+          "highHrSustainSec": { "type": "number", "default": 300 },
+          "recentHrWindowSec": { "type": "number", "default": 1800 },
+          "dedupeWindowSec": { "type": "number", "default": 300 },
+          "autoCoolOnHighHrAtHome": { "type": "boolean", "default": true }
+        }
+      }
+    }
+  },
+  "uiHints": {
+    "token": { "label": "Home Assistant Token", "sensitive": true },
+    "webhookSecret": { "label": "Webhook Secret", "sensitive": true },
+    "baseUrl": { "label": "HA Base URL", "placeholder": "http://homeassistant:8123" },
+    "presenceEntityId": { "label": "Presence Entity", "placeholder": "device_tracker.demo_user" },
+    "coolingSceneEntityId": { "label": "Cooling Scene", "placeholder": "scene.demo_cooling_after_workout" },
+    "fanEntityId": { "label": "Fan Entity", "placeholder": "fan.living_room" },
+    "climateEntityId": { "label": "Climate Entity", "placeholder": "climate.living_room" }
+  }
+}
