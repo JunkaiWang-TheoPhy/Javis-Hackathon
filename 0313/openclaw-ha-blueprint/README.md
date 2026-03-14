@@ -18,7 +18,7 @@
 最近这份蓝图已经补了一个更明确的“多生态兼容”落地方向，当前状态是：
 
 - `openclaw-plugin-ha-control` 已经从单一 demo 控制面扩成了 `HA-first` 的多生态 registry
-- 已有样例生态：`xiaomi`、`matter`、`aqara`、`tuya`、`switchbot`、`hue`、`homekit`、`google / nest`、`lutron`、`smartthings`
+- 已有样例生态 / 支持清单：`xiaomi`、`matter`、`aqara`、`tuya`、`switchbot`、`hue`、`apple home / homekit`、`amazon alexa`、`google home / nest`、`lutron`、`smartthings`
 - 新增了 `plugins/openclaw-plugin-hue/`
   - 可直接连本地 Hue bridge
   - 支持状态、灯列表、场景列表、灯光控制、场景激活
@@ -32,7 +32,8 @@
   - 还能输出本地 bridge session 的摘要信息与证书元数据
 - 新增了 `plugins/openclaw-plugin-smartthings/`
   - 目前只做 readiness / cloud prerequisites checklist
-- `homekit` 目前仍然只走 `Home Assistant` 路径，不提供伪直连 API
+- `apple home / homekit` 目前仍然只走 `Home Assistant` 路径，不提供伪直连 API
+- `amazon alexa` 目前先作为生态支持项写入文档层，不声明已完成直连插件
 
 进展汇总见：
 

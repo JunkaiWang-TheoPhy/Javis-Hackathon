@@ -1,5 +1,6 @@
 import type {
   ActionEnvelope,
+  AmbientVisionEvent,
   HomeAssistantServiceAction,
   VisualObservationEvent,
 } from "../../../../packages/contracts/src/index.ts";
@@ -80,6 +81,44 @@ export function buildNoopEnvelope(
       {
         kind: "noop",
         reason,
+      },
+    ],
+  };
+}
+
+export function buildAmbientEscalationEnvelope(
+  observation: AmbientVisionEvent,
+  escalation: "snap" | "clip",
+): ActionEnvelope {
+  const title =
+    escalation === "clip" ? "Ambient activity detected" : "Ambient scene change detected";
+  const body =
+    escalation === "clip"
+      ? "Meaningful motion was detected. Capture a short camera clip if more context is needed."
+      : "A meaningful visual change was detected. Capture a fresh snapshot if more context is needed.";
+  const speech =
+    escalation === "clip"
+      ? "I detected sustained activity on the Mac webcam. A short clip may help."
+      : "I detected a meaningful change on the Mac webcam. A fresh snapshot may help.";
+
+  return {
+    schemaVersion: "0.1.0",
+    envelopeId: `env-${observation.observationId}-ambient-${escalation}`,
+    sessionId: observation.sessionId,
+    correlationId: observation.observationId,
+    createdAt: new Date().toISOString(),
+    safetyTier: "inform",
+    actions: [
+      {
+        kind: "overlay_panel",
+        panelId: "ambient-panel-1",
+        title,
+        body,
+      },
+      {
+        kind: "speech",
+        text: speech,
+        interrupt: false,
       },
     ],
   };

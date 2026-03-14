@@ -1,5 +1,6 @@
 import http from "node:http";
 
+import { handleAmbientObserveRequest } from "./routes/ambientObserve.ts";
 import { handleConfirmRequest } from "./routes/confirm.ts";
 import { handleObserveRequest } from "./routes/observe.ts";
 import { TransientMemoryStore } from "./store/transientMemory.ts";
@@ -89,6 +90,12 @@ export function createBridgeServer(options: BridgeServerOptions = {}) {
 
       if (req.method === "POST" && url.pathname === "/v1/observe") {
         const result = await handleObserveRequest(await readJson(req), store);
+        writeJson(res, result.status, result.body);
+        return;
+      }
+
+      if (req.method === "POST" && url.pathname === "/v1/ambient/observe") {
+        const result = await handleAmbientObserveRequest(await readJson(req));
         writeJson(res, result.status, result.body);
         return;
       }

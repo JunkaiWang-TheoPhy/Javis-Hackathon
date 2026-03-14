@@ -9,6 +9,8 @@ The `0313/openclaw-ha-blueprint` repo now has a clearer multi-ecosystem home-con
 - `Home Assistant` remains the primary device plane
 - `openclaw-plugin-ha-control` now carries a HA-first ecosystem registry
 - `Philips Hue` now has both a direct bridge plugin and an active `directAdapter` route from `ha-control`
+- `Amazon Alexa` is now included in the repo's ecosystem support inventory
+- `Apple Home / HomeKit` is now called out more explicitly in the repo's ecosystem support inventory
 - `Google Home / Nest` has a readiness-only plugin that validates setup but does not pretend to offer live control yet
 - `Lutron` now has a local bridge session diagnostic layer on top of its HA-first skeleton, including a summarized session-info tool
 - `SmartThings` still has a readiness-only HA-first and direct-compatible skeleton
@@ -17,7 +19,7 @@ The `0313/openclaw-ha-blueprint` repo now has a clearer multi-ecosystem home-con
 ## Completed
 
 - Added multi-ecosystem registry metadata to `plugins/openclaw-plugin-ha-control`
-- Added sample ecosystem entries for `xiaomi`, `matter`, `aqara`, `tuya`, `switchbot`, `hue`, `homekit`, `google / nest`, `lutron`, and `smartthings`
+- Added sample ecosystem entries and support listings covering `xiaomi`, `matter`, `aqara`, `tuya`, `switchbot`, `hue`, `apple home / homekit`, `amazon alexa`, `google / nest`, `lutron`, and `smartthings`
 - Added direct-adapter routing in `ha-control` for supported Hue devices in `auto` and `direct_adapter` modes
 - Added `plugins/openclaw-plugin-hue/` with:
   - `hue_status`
@@ -47,10 +49,12 @@ Use `plugins/openclaw-plugin-ha-control/` as the default route for:
 - Tuya
 - SwitchBot
 - Hue through Home Assistant or the direct adapter route
-- HomeKit through Home Assistant
+- Apple Home / HomeKit through Home Assistant
 - Google / Nest through Home Assistant-backed entities
 - Lutron through Home Assistant-backed entities
 - SmartThings through Home Assistant-backed entities
+
+`Amazon Alexa` is currently included at the support-inventory level in this repo.
 
 ### Direct plugin path
 
@@ -79,7 +83,7 @@ Examples:
 - `lutron`
 - `smartthings`
 
-`homekit` does not have a direct plugin in this repo. Keep it under the HA-first ecosystem registry.
+`apple home / homekit` does not have a direct plugin in this repo. Keep it under the HA-first ecosystem registry.
 
 ## Still Pending
 
