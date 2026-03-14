@@ -16,6 +16,7 @@
 - `openclaw-config/` 仍然是 OpenClaw 配置面
 - `plugins/openclaw-plugin-ha-control/` 仍然负责现有 HA 控制逻辑
 - 新增 `packages/contracts/`、`services/rokid-bridge-gateway/`、`apps/rokid-companion/`、`plugins/openclaw-plugin-rokid-bridge/`
+- 新增 `apps/rokid-android-companion/`，用于对接 Rokid 官方 `CXR-M 1.0.9` Android SDK
 
 ### 总体架构图
 
@@ -80,6 +81,8 @@ openclaw-ha-blueprint/
   - 提供 `rokid_bridge_status`
 - `apps/rokid-companion/`
   - 提供 Rokid companion 边界骨架与 coffee demo client
+- `apps/rokid-android-companion/`
+  - 提供 Rokid 官方 Android companion 最小样例，包含 Maven 接入、`.lc` 占位配置和 `CxrApi` 蓝牙连接边界
 
 ## 当前版本的能力边界
 
@@ -234,6 +237,52 @@ capture
 
 ```text
 scene.turn_on -> scene.morning_coffee
+```
+
+## Wired Rokid photo capture via ADB
+
+如果你只是想按 PDF 的思路做“有线连接下定时拍照并把照片拉回本机”，可以直接运行：
+
+```bash
+./scripts/rokid-wired-photo-capture.sh
+```
+
+默认行为：
+
+- 使用 `adb shell input keyevent 27` 触发快门
+- 每 30 秒拍 1 张
+- 共拍 10 张
+- 每轮只拉回当次新增的照片
+- 默认保存到 `~/Pictures/RokidCaptures/<timestamp>/`
+
+前置条件：
+
+- 眼镜已通过 USB 连上电脑，并且 `adb devices` 能看到设备
+- 相机应用保持前台
+- 屏幕保持常亮
+
+常用覆盖参数：
+
+```bash
+ROKID_CAPTURE_SERIAL=1901092534014036 \
+ROKID_CAPTURE_OUTPUT_DIR="$HOME/Desktop/rokid-captures" \
+./scripts/rokid-wired-photo-capture.sh
+```
+
+如果按键触发无效，也可以改成坐标点击快门：
+
+```bash
+ROKID_CAPTURE_SERIAL=1901092534014036 \
+ROKID_CAPTURE_TRIGGER=tap \
+ROKID_CAPTURE_TAP_X=240 \
+ROKID_CAPTURE_TAP_Y=560 \
+./scripts/rokid-wired-photo-capture.sh
+```
+
+测试脚本在：
+
+```bash
+./scripts/tests/rokid-wired-photo-capture.test.sh
 ```
 
 你可以通过 `docker-compose.yml` 中的：
