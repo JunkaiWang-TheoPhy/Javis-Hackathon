@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+. "$script_dir/localpc-camera-common.sh"
+
+exec "$localpc_pwsh" "& $(ps_quote "$localpc_script_dir\\win-camera-list.ps1") | ConvertTo-Json -Compress -Depth 5"
