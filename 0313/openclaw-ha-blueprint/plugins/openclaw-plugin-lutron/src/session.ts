@@ -12,6 +12,38 @@ export type LutronSessionConfig = {
   connectTimeoutMs?: number;
 };
 
+export type LutronSessionHandshake = {
+  connected: true;
+  authorized: boolean;
+  authorizationError: string | null;
+  remoteAddress: string | undefined;
+  remotePort: number | undefined;
+  alpnProtocol: string | false | undefined;
+  peerCertificate: Record<string, unknown>;
+};
+
+export type LutronSessionInfo = {
+  plugin: "lutron";
+  bridgeHost: string | null;
+  bridgeId: string | null;
+  port: number;
+  servername: string | null;
+  setupReady: boolean;
+  missingSetup: string[];
+  sessionReady: true;
+  authorized: boolean;
+  authorizationError: string | null;
+  remoteAddress: string | undefined;
+  remotePort: number | undefined;
+  alpnProtocol: string | false | undefined;
+  peerCertificateSummary: {
+    subjectCN: string | null;
+    issuerCN: string | null;
+    validTo: string | null;
+    fingerprint256: string | null;
+  };
+};
+
 type SessionDeps = {
   readFile: (path: string) => Promise<string | Buffer>;
   connect: (options: ConnectionOptions) => TLSSocketLike;
@@ -58,7 +90,22 @@ export function buildSessionChecklist(cfg: LutronSessionConfig) {
   };
 }
 
-export async function testLocalBridgeSession(cfg: LutronSessionConfig) {
+function summarizePeerCertificate(peerCertificate: Record<string, unknown>) {
+  const subject = peerCertificate.subject as Record<string, unknown> | undefined;
+  const issuer = peerCertificate.issuer as Record<string, unknown> | undefined;
+
+  return {
+    subjectCN: typeof subject?.CN === "string" ? subject.CN : null,
+    issuerCN: typeof issuer?.CN === "string" ? issuer.CN : null,
+    validTo: typeof peerCertificate.valid_to === "string" ? peerCertificate.valid_to : null,
+    fingerprint256:
+      typeof peerCertificate.fingerprint256 === "string" ? peerCertificate.fingerprint256 : null,
+  };
+}
+
+export async function testLocalBridgeSession(
+  cfg: LutronSessionConfig,
+): Promise<LutronSessionHandshake> {
   const checklist = buildSessionChecklist(cfg);
   if (!checklist.ready) {
     throw new Error(`Lutron session config is incomplete: ${checklist.missing.join(", ")}`);
@@ -76,15 +123,7 @@ export async function testLocalBridgeSession(cfg: LutronSessionConfig) {
   const connectTimeoutMs = cfg.connectTimeoutMs ?? 5000;
   const servername = cfg.servername ?? host;
 
-  return new Promise<{
-    connected: true;
-    authorized: boolean;
-    authorizationError: string | null;
-    remoteAddress: string | undefined;
-    remotePort: number | undefined;
-    alpnProtocol: string | false | undefined;
-    peerCertificate: Record<string, unknown>;
-  }>((resolve, reject) => {
+  return new Promise<LutronSessionHandshake>((resolve, reject) => {
     const socket = deps.connect({
       host,
       port,
@@ -131,4 +170,28 @@ export async function testLocalBridgeSession(cfg: LutronSessionConfig) {
     socket.once("secureConnect", onSecureConnect);
     socket.once("error", onError);
   });
+}
+
+export async function listLocalBridgeSessionInfo(
+  cfg: LutronSessionConfig,
+): Promise<LutronSessionInfo> {
+  const checklist = buildSessionChecklist(cfg);
+  const handshake = await testLocalBridgeSession(cfg);
+
+  return {
+    plugin: "lutron",
+    bridgeHost: cfg.bridgeHost ?? null,
+    bridgeId: cfg.bridgeId ?? null,
+    port: cfg.port ?? 8081,
+    servername: cfg.servername ?? cfg.bridgeHost ?? null,
+    setupReady: checklist.ready,
+    missingSetup: checklist.missing,
+    sessionReady: handshake.connected,
+    authorized: handshake.authorized,
+    authorizationError: handshake.authorizationError,
+    remoteAddress: handshake.remoteAddress,
+    remotePort: handshake.remotePort,
+    alpnProtocol: handshake.alpnProtocol,
+    peerCertificateSummary: summarizePeerCertificate(handshake.peerCertificate),
+  };
 }

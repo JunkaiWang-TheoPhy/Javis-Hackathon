@@ -10,7 +10,7 @@ The `0313/openclaw-ha-blueprint` repo now has a clearer multi-ecosystem home-con
 - `openclaw-plugin-ha-control` now carries a HA-first ecosystem registry
 - `Philips Hue` now has both a direct bridge plugin and an active `directAdapter` route from `ha-control`
 - `Google Home / Nest` has a readiness-only plugin that validates setup but does not pretend to offer live control yet
-- `Lutron` now has a local bridge session diagnostic layer on top of its HA-first skeleton
+- `Lutron` now has a local bridge session diagnostic layer on top of its HA-first skeleton, including a summarized session-info tool
 - `SmartThings` still has a readiness-only HA-first and direct-compatible skeleton
 - `HomeKit` remains HA-first only in this repo
 
@@ -30,7 +30,7 @@ The `0313/openclaw-ha-blueprint` repo now has a clearer multi-ecosystem home-con
   - `google_home_config_summary`
   - `google_home_validate_config`
   - `google_home_oauth_checklist`
-- Added `plugins/openclaw-plugin-lutron/` with readiness, config validation, and local bridge session testing
+- Added `plugins/openclaw-plugin-lutron/` with readiness, config validation, local bridge session testing, and summarized session-info output
 - Added `plugins/openclaw-plugin-smartthings/` with readiness and config validation tools
 - Updated `scripts/bootstrap-openclaw-plugin.sh` to install the new brand plugins
 - Added tests for direct routing, the new brand plugins, and bootstrap script coverage
@@ -58,7 +58,7 @@ Use `plugins/openclaw-plugin-hue/` when you explicitly want local Hue bridge acc
 
 Use `plugins/openclaw-plugin-google-home/` only for setup and readiness checks. It does not expose live Google device control yet.
 
-Use `plugins/openclaw-plugin-lutron/` for readiness checks and local bridge session diagnostics. It still does not expose live device control yet.
+Use `plugins/openclaw-plugin-lutron/` for readiness checks and local bridge session diagnostics, including summarized session info. It still does not expose live device control yet.
 
 Use `plugins/openclaw-plugin-smartthings/` for readiness checks only. It does not expose live device control yet.
 
@@ -94,7 +94,7 @@ Examples:
 Fresh verification on 2026-03-15:
 
 - `npm test` in `0313/openclaw-ha-blueprint`
-- Result: `37/37` tests passed
+- Result: `40/40` tests passed
 
 ## Key Files
 

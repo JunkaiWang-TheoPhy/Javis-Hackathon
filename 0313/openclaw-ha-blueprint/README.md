@@ -29,6 +29,7 @@
 - 新增了 `plugins/openclaw-plugin-lutron/`
   - 现在能做 readiness / LEAP prerequisites checklist
   - 还能测试本地 bridge TLS session
+  - 还能输出本地 bridge session 的摘要信息与证书元数据
 - 新增了 `plugins/openclaw-plugin-smartthings/`
   - 目前只做 readiness / cloud prerequisites checklist
 - `homekit` 目前仍然只走 `Home Assistant` 路径，不提供伪直连 API

@@ -1,5 +1,6 @@
 import {
   buildSessionChecklist,
+  listLocalBridgeSessionInfo,
   testLocalBridgeSession,
 } from "./session.ts";
 
@@ -138,6 +139,22 @@ export default function register(api: PluginApi) {
       },
       async execute() {
         return asTextContent(await testLocalBridgeSession(getCfg(api)));
+      },
+    },
+    { optional: true },
+  );
+
+  api.registerTool(
+    {
+      name: "lutron_list_session_info",
+      description:
+        "Return a sanitized summary of the configured local Lutron bridge TLS session.",
+      parameters: {
+        type: "object",
+        properties: {},
+      },
+      async execute() {
+        return asTextContent(await listLocalBridgeSessionInfo(getCfg(api)));
       },
     },
     { optional: true },
