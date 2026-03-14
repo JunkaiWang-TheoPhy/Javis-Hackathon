@@ -258,6 +258,115 @@ MEDIA:/tmp/openclaw/openclaw-camera-snap-front-b24c0ad3-d5a1-4ef4-aab7-72d416516
 
 - app 安装成功
 - remote tunnel 成功
+- gateway allowlist 配置正确
+
+### 12. Added ambient sidecar design and implementation plan
+
+这轮没有直接写脚本，而是先把设计和执行计划落到 repo：
+
+- `0313/openclaw-ha-blueprint/docs/plans/2026-03-15-macos-camera-sidecar-design.md`
+- `0313/openclaw-ha-blueprint/docs/superpowers/plans/2026-03-15-macos-camera-sidecar.md`
+
+设计确定了三件事：
+
+- 默认路径是“后台静默自动拍摄”
+- 本地只做低频采样和 cheap gate
+- 云端只收结构化 ambient event，按需再升级到 `camera.snap / camera.clip`
+
+### 13. Added a separate ambient contract and route
+
+没有复用现有 `rokid_glasses` 合同，而是新增了：
+
+- `packages/contracts/src/ambient-vision.ts`
+- `POST /v1/ambient/observe`
+
+验证通过：
+
+- ambient contract tests 通过
+- bridge route tests 通过
+
+### 14. Added the macOS sidecar scripts
+
+新增目录：
+
+- `0313/openclaw-ha-blueprint/scripts/macos-camera/local-macos/`
+- `0313/openclaw-ha-blueprint/scripts/macos-camera/devbox/`
+
+其中本地 sidecar 已实现：
+
+- `mac-camera-list`
+- `mac-camera-shot`
+- `mac-camera-loop`
+- `mac-camera-start`
+- `mac-camera-stop`
+- `mac-camera-status`
+- `mac-camera-emit-event`
+
+本地 cache 路径：
+
+- `~/.openclaw/workspace/.cache/localmac-camera/latest.jpg`
+- `~/.openclaw/workspace/.cache/localmac-camera/latest.json`
+- `~/.openclaw/workspace/.cache/localmac-camera/state.json`
+
+这条链已经被实际跑通：
+
+- `mac-camera-shot` 可以把 node 抓拍结果落到本地 cache
+- `mac-camera-emit-event` 可以成功 POST 到 `/v1/ambient/observe`
+
+### 15. Enabled OpenClaw hooks for real workflow entry
+
+除了 ambient route，还在远端 `devbox` 上启用了 OpenClaw HTTP hooks：
+
+- `hooks.enabled = true`
+- `hooks.allowedAgentIds = ["main"]`
+- `hooks.allowRequestSessionKey = false`
+- `hooks.defaultSessionKey = "hook:mac-camera"`
+- 使用了单独的 hook token，没有复用 gateway token
+
+实际验证：
+
+- 直接 `POST /hooks/agent` 已返回真实 `runId`
+- `mac-camera-emit-event` 现在支持在 ambient route 成功后，再可选地打 `POST /hooks/agent`
+
+这意味着这条链现在已经真正接进了 Claw 工作流，而不只是本地 demo。
+
+### 16. Enabled `camera.clip` policy, but runtime is still unstable
+
+远端 gateway 已经把 node allowlist 从：
+
+- `["camera.snap"]`
+
+扩成：
+
+- `["camera.snap", "camera.clip"]`
+
+这一步已经成功，策略层面不再阻止短视频。
+
+但实际运行时验证发现：
+
+- 调 `camera.clip` 时 node 会掉线
+- 本机 `OpenClaw.app` 日志出现 `AVCaptureMovieFileOutput` 压缩器错误
+- 之后需要重启 app 和重连节点，`camera.snap` 才能恢复
+
+所以截至当前的真实结论是：
+
+- `camera.snap`：稳定可用
+- `camera.clip`：策略已放开，但当前 `OpenClaw.app v2026.3.12` 在这台 Mac 上不稳定
+
+### 17. Recovered the node after clip instability
+
+在 `camera.clip` 触发 node disconnect 后，做了恢复：
+
+- 重启 `OpenClaw.app`
+- 重建本地到 `devbox` 的 `18789` 隧道
+- 再次检查 node 状态
+
+恢复后结果：
+
+- node 回到 `paired · connected`
+- `camera.snap` 再次成功
+
+因此当前环境被恢复到了“抓拍可用、clip 实验性”的状态，没有把你的现有 app 配置留在损坏状态。
 - node pairing 成功
 - gateway policy 已放通
 - 远端确实已经能抓取本机摄像头

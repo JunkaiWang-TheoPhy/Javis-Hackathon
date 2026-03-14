@@ -18,7 +18,7 @@ Do this once on the `Xiaomi 12X`:
 1. Open the `Mi Band Gateway` app.
 2. Tap `Grant Android Permissions` and allow `Nearby devices` and notification access if prompted.
 3. Tap `Open Health Connect`.
-4. Install or update the Health Connect provider if the phone is still on Android 13 and the app reports `provider_update_required`.
+4. If the phone does not already have official Google Health Connect, install or update `com.google.android.apps.healthdata`.
 5. Tap `Grant Health Permissions`.
 6. Tap `Start Gateway`.
 
@@ -70,15 +70,14 @@ Current phone-side state:
 - `/status` responds successfully
 - `/health/latest` responds successfully
 - `/debug/source` currently reports:
-  - `health_connect_status = provider_update_required`
-  - `bluetooth_enabled = false`
-  - `band_status = bluetooth_off`
+  - `health_connect_status = xiaomi_provider_incompatible_interface`
+  - `bluetooth_enabled = true`
+  - `band_status = bonded`
 - the gateway app runtime permissions are still:
-  - `android.permission.BLUETOOTH_CONNECT = granted=false`
-  - `android.permission.POST_NOTIFICATIONS = granted=false`
-- the phone is currently blocked in Xiaomi Fitness on:
-  - `com.mi.health/com.xiaomi.fitness.access.health_connect.HealthConnectPrivacyActivity`
+  - `android.permission.BLUETOOTH_CONNECT = granted=true`
+  - `android.permission.POST_NOTIFICATIONS = granted=true`
+- the gateway is stable when the app activity is foregrounded, but health metrics stay `null` on this ROM because Xiaomi's built-in health service does not match Jetpack `HealthConnectClient`
 
-That means the HTTP bridge works, but the phone still needs Android runtime permissions and a Health Connect provider update or install before heart rate, SpO2, steps, and live connection status can become non-null.
+That means the HTTP bridge works and live band connection state is available today. To make heart rate, SpO2, and steps become non-null on the current code path, the phone needs a compatible official Google Health Connect provider and Xiaomi Fitness sync into it.
 
 See [progress-2026-03-15.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/devices/mi-band-9-pro/progress-2026-03-15.md) for the latest verification snapshot.

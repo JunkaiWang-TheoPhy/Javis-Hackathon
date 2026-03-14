@@ -1255,6 +1255,38 @@ openclaw nodes camera snap --node <nodeId>
 
 也就是说，A 路线不是最终架构，但非常适合做**权限与节点链路的 first proof**。
 
+### 20.6 这条路线已经接入 ambient sidecar 和 OpenClaw webhook
+
+在 first proof 的基础上，仓库里现在已经补上了 macOS sidecar 这一层：
+
+- 新增了 `packages/contracts/src/ambient-vision.ts`
+- 新增了 `POST /v1/ambient/observe`
+- 新增了 `scripts/macos-camera/`
+- `mac-camera-shot` 会把抓拍结果写到：
+  - `~/.openclaw/workspace/.cache/localmac-camera/latest.jpg`
+  - `~/.openclaw/workspace/.cache/localmac-camera/latest.json`
+- `mac-camera-emit-event` 会：
+  - 先把结构化事件发到 `/v1/ambient/observe`
+  - 如果配置了 `OPENCLAW_HOOK_URL` 和 `OPENCLAW_HOOK_TOKEN`，再继续打 `POST /hooks/agent`
+
+也就是说，现在这条链已经不是单纯的 `camera.snap` 验证，而是：
+
+```text
+Mac webcam
+  -> local sidecar
+  -> ambient event
+  -> bridge route
+  -> optional OpenClaw hook
+  -> Claw workflow
+```
+
+当前验证结论：
+
+- `camera.snap`：稳定可用
+- ambient route：已通过
+- `POST /hooks/agent`：已通过
+- `camera.clip`：远端 allowlist 已放开，但当前 `OpenClaw.app v2026.3.12` 在这台 Mac 上仍不稳定，调用时会触发 node disconnect；应视为实验能力而不是稳定能力
+
 ---
 
 ## 21. 本地测试

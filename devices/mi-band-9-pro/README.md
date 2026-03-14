@@ -71,18 +71,18 @@ The gateway app has been built, installed, and reinstalled on the `Xiaomi 12X`, 
 
 The current progress is tracked in [progress-2026-03-15.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/devices/mi-band-9-pro/progress-2026-03-15.md). The latest observed blocker state on `2026-03-15` is:
 
-- the Xiaomi Fitness flow is still focused on `com.mi.health/com.xiaomi.fitness.access.health_connect.HealthConnectPrivacyActivity`
-- `android.permission.BLUETOOTH_CONNECT = granted=false`
-- `android.permission.POST_NOTIFICATIONS = granted=false`
-- Health Connect provider package is still not visible via `pm list packages`
-- the gateway can respond when started, but it will not produce non-null metrics until the phone-side consent flow is completed
+- `android.permission.BLUETOOTH_CONNECT = granted=true`
+- `android.permission.POST_NOTIFICATIONS = granted=true`
+- `/status` reports `bluetooth_ready = true`
+- `/debug/source` reports `health_connect_status = xiaomi_provider_incompatible_interface`
+- `/health/latest` reports the band as `bonded`, but `heart_rate_bpm`, `spo2_percent`, and `steps` are still `null`
+- the phone still does not expose the official Google Health Connect package `com.google.android.apps.healthdata`
 
-So the bridge implementation exists and the transport has been validated, but the phone still needs:
+So the bridge implementation exists, Bluetooth status polling works, and desktop transport has been validated. The remaining blocker is provider compatibility:
 
-- Xiaomi Fitness privacy and Health Connect consent completion
-- Android runtime permission approval inside the gateway app
-- Health Connect provider installation or update on Android 13
-- Health Connect data permission approval
+- Xiaomi Fitness exposes its own health permission pages on this ROM
+- but the Xiaomi health binder interface does not match the interface expected by Jetpack `androidx.health.connect:connect-client`
+- to make the current reader path return metrics, the phone still needs a compatible official Health Connect provider plus Xiaomi Fitness sync into that provider
 
 ## Known Limits
 
@@ -90,3 +90,4 @@ So the bridge implementation exists and the transport has been validated, but th
 - Xiaomi Fitness remains the source-of-truth pairing app.
 - Health data is expected to be near-real-time, not raw BLE live telemetry.
 - Xiaomi/HyperOS background restrictions can stop long-running collection unless the gateway app is allowed to run in foreground and ignore battery optimization.
+- On this `Xiaomi 12X / HyperOS` setup, Xiaomi's built-in health service is not wire-compatible with Jetpack `HealthConnectClient`, so the current gateway only guarantees band connection state unless a compatible Google Health Connect provider is installed.

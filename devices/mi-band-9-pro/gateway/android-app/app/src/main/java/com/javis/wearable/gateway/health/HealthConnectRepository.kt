@@ -41,9 +41,9 @@ class HealthConnectRepository(
         val providerSelection = resolveProvider()
         return HealthAvailability(
             sdkStatus = providerSelection.sdkStatus,
-            available = providerSelection.sdkStatus == HealthConnectClient.SDK_AVAILABLE,
+            available = isReadable(providerSelection),
             providerPackage = providerSelection.packageName,
-            message = statusMessage(providerSelection.sdkStatus)
+            message = availabilityMessage(providerSelection)
         )
     }
 
@@ -113,12 +113,29 @@ class HealthConnectRepository(
     }
 
     private fun resolveProvider(): HealthConnectProviderSelection {
-        val sdkStatusesByPackage = mapOf(
-            HealthConnectCompat.googleProviderPackage to
-                HealthConnectClient.sdkStatus(context, HealthConnectCompat.googleProviderPackage),
-            HealthConnectCompat.xiaomiProviderPackage to xiaomiProviderStatus()
+        val googleStatus = HealthConnectClient.sdkStatus(
+            context,
+            HealthConnectCompat.googleProviderPackage
         )
-        return HealthConnectCompat.selectProvider(sdkStatusesByPackage)
+        if (googleStatus == HealthConnectClient.SDK_AVAILABLE) {
+            return HealthConnectProviderSelection(
+                packageName = HealthConnectCompat.googleProviderPackage,
+                sdkStatus = googleStatus
+            )
+        }
+
+        val xiaomiStatus = xiaomiProviderStatus()
+        if (xiaomiStatus == HealthConnectClient.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED) {
+            return HealthConnectProviderSelection(
+                packageName = HealthConnectCompat.xiaomiProviderPackage,
+                sdkStatus = xiaomiStatus
+            )
+        }
+
+        return HealthConnectProviderSelection(
+            packageName = HealthConnectCompat.googleProviderPackage,
+            sdkStatus = googleStatus
+        )
     }
 
     private fun xiaomiProviderStatus(): Int {
@@ -132,48 +149,14 @@ class HealthConnectRepository(
                 bindAction = HealthConnectCompat.xiaomiPlatformBindAction
             )
         ) {
-            HealthConnectClient.SDK_AVAILABLE
-        } else {
             HealthConnectClient.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED
+        } else {
+            HealthConnectClient.SDK_UNAVAILABLE
         }
     }
 
     private fun createClient(providerPackage: String): HealthConnectClient {
-        return if (providerPackage == HealthConnectCompat.xiaomiProviderPackage) {
-            createXiaomiClient(providerPackage)
-        } else {
-            HealthConnectClient.getOrCreate(context, providerPackage)
-        }
-    }
-
-    private fun createXiaomiClient(providerPackage: String): HealthConnectClient {
-        val serviceClass = Class.forName("androidx.health.platform.client.HealthDataService")
-        val serviceInstance = serviceClass.getField("INSTANCE").get(null)
-        val getClient = serviceClass.getMethod(
-            "getClient",
-            Context::class.java,
-            String::class.java,
-            String::class.java,
-            String::class.java
-        )
-        val delegate = getClient.invoke(
-            serviceInstance,
-            context,
-            HealthConnectCompat.healthClientName,
-            providerPackage,
-            HealthConnectCompat.xiaomiPlatformBindAction
-        )
-        val clientImplClass =
-            Class.forName("androidx.health.connect.client.impl.HealthConnectClientImpl")
-        val constructor = clientImplClass.getDeclaredConstructor(
-            Class.forName("androidx.health.platform.client.HealthDataAsyncClient"),
-            List::class.java
-        )
-        constructor.isAccessible = true
-        return constructor.newInstance(
-            delegate,
-            HealthPermissions.requiredPermissions.toList()
-        ) as HealthConnectClient
+        return HealthConnectClient.getOrCreate(context, providerPackage)
     }
 
     private fun isPackageInstalled(packageName: String): Boolean {
@@ -188,6 +171,21 @@ class HealthConnectRepository(
     private fun hasBindableService(packageName: String, bindAction: String): Boolean {
         val bindIntent = Intent(bindAction).setPackage(packageName)
         return context.packageManager.queryIntentServices(bindIntent, 0).isNotEmpty()
+    }
+
+    private fun isReadable(providerSelection: HealthConnectProviderSelection): Boolean {
+        return providerSelection.packageName != HealthConnectCompat.xiaomiProviderPackage &&
+            providerSelection.sdkStatus == HealthConnectClient.SDK_AVAILABLE
+    }
+
+    private fun availabilityMessage(providerSelection: HealthConnectProviderSelection): String {
+        return if (providerSelection.packageName == HealthConnectCompat.xiaomiProviderPackage &&
+            providerSelection.sdkStatus == HealthConnectClient.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED
+        ) {
+            "xiaomi_provider_incompatible_interface"
+        } else {
+            statusMessage(providerSelection.sdkStatus)
+        }
     }
 
     private suspend fun readLatestHeartRate(
