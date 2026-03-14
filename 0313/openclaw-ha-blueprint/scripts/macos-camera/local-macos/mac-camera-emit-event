@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+. "$script_dir/mac-camera-common.sh"
+
+ensure_cache_dir
+require_file "$latest_json_path"
+
+should_emit="$(node - "$latest_json_path" <<'NODE'
+const fs = require("node:fs");
+const payload = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
+process.stdout.write(String(Boolean(payload.local?.emitDue)));
+NODE
+)"
+
+if [[ "${MAC_CAMERA_FORCE_EMIT:-0}" != "1" && "$should_emit" != "true" ]]; then
+  printf '%s\n' '{"ok":true,"skipped":true,"reason":"emit not due"}'
+  exit 0
+fi
+
+observation_payload="$(node - "$latest_json_path" <<'NODE'
+const fs = require("node:fs");
+const payload = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
+delete payload.local;
+process.stdout.write(JSON.stringify(payload));
+NODE
+)"
+
+response_file="$(mktemp)"
+http_code="$(
+  curl -sS -o "$response_file" -w "%{http_code}" -X POST "$ambient_bridge_url" \
+    -H "Content-Type: application/json" \
+    -d "{\"observation\":${observation_payload}}"
+)"
+response="$(cat "$response_file")"
+rm -f "$response_file"
+
+if [[ "$http_code" =~ ^2 ]]; then
+  write_json_file "$state_json_path" "$(node - "$state_json_path" <<'NODE'
+const fs = require("node:fs");
+const path = process.argv[2];
+const state = fs.existsSync(path) ? JSON.parse(fs.readFileSync(path, "utf8")) : {};
+state.lastEmittedAt = new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
+process.stdout.write(JSON.stringify(state, null, 2));
+NODE
+)"
+else
+  printf '%s\n' "$response" >&2
+  echo "ambient bridge returned HTTP $http_code" >&2
+  exit 1
+fi
+
+if [[ -n "${OPENCLAW_HOOK_URL:-}" && -n "${OPENCLAW_HOOK_TOKEN:-}" ]]; then
+  hook_message="$(node - "$latest_json_path" <<'NODE'
+const fs = require("node:fs");
+const payload = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
+const reasons = Array.isArray(payload.event?.reasons) ? payload.event.reasons.join(", ") : "unknown";
+const activityState = payload.event?.activityState ?? "unknown";
+const changeScore = payload.event?.changeScore ?? "unknown";
+const frameRef = payload.capture?.frameRef ?? "unknown";
+const message = [
+  "Mac ambient event detected.",
+  `activityState=${activityState}`,
+  `changeScore=${changeScore}`,
+  `reasons=${reasons}`,
+  `frameRef=${frameRef}`,
+].join(" ");
+process.stdout.write(message);
+NODE
+)"
+
+  hook_payload="$(node -e 'const payload = {message: process.argv[1], name: process.argv[2] || "MacCamera", agentId: process.argv[3] || "main", wakeMode: process.argv[4] || "now"}; process.stdout.write(JSON.stringify(payload));' \
+    "$hook_message" \
+    "${OPENCLAW_HOOK_NAME:-MacCamera}" \
+    "${OPENCLAW_HOOK_AGENT_ID:-main}" \
+    "${OPENCLAW_HOOK_WAKE_MODE:-now}")"
+
+  hook_response_file="$(mktemp)"
+  hook_http_code="$(
+    curl -sS -o "$hook_response_file" -w "%{http_code}" -X POST "$OPENCLAW_HOOK_URL" \
+      -H "Authorization: Bearer $OPENCLAW_HOOK_TOKEN" \
+      -H "Content-Type: application/json" \
+      -d "$hook_payload"
+  )"
+  hook_response="$(cat "$hook_response_file")"
+  rm -f "$hook_response_file"
+
+  if [[ ! "$hook_http_code" =~ ^2 ]]; then
+    printf '%s\n' "$hook_response" >&2
+    echo "OpenClaw hook returned HTTP $hook_http_code" >&2
+    exit 1
+  fi
+fi
+
+printf '%s\n' "$response"

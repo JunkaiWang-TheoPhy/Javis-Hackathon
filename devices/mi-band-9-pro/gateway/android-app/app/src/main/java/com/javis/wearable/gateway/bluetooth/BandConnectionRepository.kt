@@ -80,13 +80,24 @@ class BandConnectionRepository(
     }
 
     private fun isConnected(manager: BluetoothManager, device: BluetoothDevice): Boolean {
-        val profiles = listOf(BluetoothProfile.GATT, BluetoothProfile.A2DP, BluetoothProfile.HEADSET)
-        return profiles.any { profile ->
-            manager.getConnectionState(device, profile) == BluetoothProfile.STATE_CONNECTED
+        // Xiaomi wearables use BLE/GATT. Querying classic profiles can throw on some stacks.
+        return hasConnectedProfile(listOf(BluetoothProfile.GATT)) { profile ->
+            manager.getConnectionState(device, profile)
         }
     }
 
     companion object {
+        fun hasConnectedProfile(
+            profiles: Iterable<Int>,
+            connectionStateProvider: (Int) -> Int
+        ): Boolean {
+            return profiles.any { profile ->
+                runCatching {
+                    connectionStateProvider(profile) == BluetoothProfile.STATE_CONNECTED
+                }.getOrDefault(false)
+            }
+        }
+
         fun resolveState(
             deviceMac: String,
             bonded: Boolean,

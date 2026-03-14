@@ -8,7 +8,7 @@ import androidx.health.connect.client.records.OxygenSaturationRecord
 import androidx.health.connect.client.records.StepsRecord
 
 object HealthPermissions {
-    const val providerPackageName = "com.google.android.apps.healthdata"
+    const val defaultProviderPackageName = HealthConnectCompat.googleProviderPackage
 
     val requiredPermissions: Set<String> = setOf(
         HealthPermission.getReadPermission(HeartRateRecord::class),
@@ -16,8 +16,10 @@ object HealthPermissions {
         HealthPermission.getReadPermission(StepsRecord::class)
     )
 
-    fun requestPermissionContract(): ActivityResultContract<Set<String>, Set<String>> {
-        return PermissionController.createRequestPermissionResultContract()
+    fun requestPermissionContract(
+        providerPackageName: String = defaultProviderPackageName
+    ): ActivityResultContract<Set<String>, Set<String>> {
+        return PermissionController.createRequestPermissionResultContract(providerPackageName)
     }
 
     fun hasAll(grantedPermissions: Set<String>): Boolean {

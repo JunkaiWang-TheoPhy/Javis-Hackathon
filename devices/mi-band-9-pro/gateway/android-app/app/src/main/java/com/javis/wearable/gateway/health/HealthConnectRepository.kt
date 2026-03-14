@@ -1,5 +1,7 @@
 package com.javis.wearable.gateway.health
 
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.Context
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.records.HeartRateRecord
@@ -16,7 +18,7 @@ import kotlin.math.roundToInt
 data class HealthAvailability(
     val sdkStatus: Int,
     val available: Boolean,
-    val providerPackage: String = HealthPermissions.providerPackageName,
+    val providerPackage: String = HealthPermissions.defaultProviderPackageName,
     val message: String
 )
 
@@ -36,11 +38,12 @@ class HealthConnectRepository(
     private val clock: Clock = Clock.systemDefaultZone()
 ) {
     fun availability(): HealthAvailability {
-        val sdkStatus = HealthConnectClient.sdkStatus(context)
+        val providerSelection = resolveProvider()
         return HealthAvailability(
-            sdkStatus = sdkStatus,
-            available = sdkStatus == HealthConnectClient.SDK_AVAILABLE,
-            message = statusMessage(sdkStatus)
+            sdkStatus = providerSelection.sdkStatus,
+            available = providerSelection.sdkStatus == HealthConnectClient.SDK_AVAILABLE,
+            providerPackage = providerSelection.packageName,
+            message = statusMessage(providerSelection.sdkStatus)
         )
     }
 
@@ -60,7 +63,7 @@ class HealthConnectRepository(
             )
         }
 
-        val client = HealthConnectClient.getOrCreate(context)
+        val client = createClient(availability.providerPackage)
         val grantedPermissions = client.permissionController.getGrantedPermissions()
         if (!HealthPermissions.hasAll(grantedPermissions)) {
             return HealthMetrics(
@@ -101,11 +104,90 @@ class HealthConnectRepository(
     }
 
     private fun clientOrNull(): HealthConnectClient? {
-        return if (HealthConnectClient.sdkStatus(context) == HealthConnectClient.SDK_AVAILABLE) {
-            HealthConnectClient.getOrCreate(context)
+        val availability = availability()
+        return if (availability.available) {
+            createClient(availability.providerPackage)
         } else {
             null
         }
+    }
+
+    private fun resolveProvider(): HealthConnectProviderSelection {
+        val sdkStatusesByPackage = mapOf(
+            HealthConnectCompat.googleProviderPackage to
+                HealthConnectClient.sdkStatus(context, HealthConnectCompat.googleProviderPackage),
+            HealthConnectCompat.xiaomiProviderPackage to xiaomiProviderStatus()
+        )
+        return HealthConnectCompat.selectProvider(sdkStatusesByPackage)
+    }
+
+    private fun xiaomiProviderStatus(): Int {
+        if (!isPackageInstalled(HealthConnectCompat.xiaomiProviderPackage)) {
+            return HealthConnectClient.SDK_UNAVAILABLE
+        }
+
+        return if (
+            hasBindableService(
+                packageName = HealthConnectCompat.xiaomiProviderPackage,
+                bindAction = HealthConnectCompat.xiaomiPlatformBindAction
+            )
+        ) {
+            HealthConnectClient.SDK_AVAILABLE
+        } else {
+            HealthConnectClient.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED
+        }
+    }
+
+    private fun createClient(providerPackage: String): HealthConnectClient {
+        return if (providerPackage == HealthConnectCompat.xiaomiProviderPackage) {
+            createXiaomiClient(providerPackage)
+        } else {
+            HealthConnectClient.getOrCreate(context, providerPackage)
+        }
+    }
+
+    private fun createXiaomiClient(providerPackage: String): HealthConnectClient {
+        val serviceClass = Class.forName("androidx.health.platform.client.HealthDataService")
+        val serviceInstance = serviceClass.getField("INSTANCE").get(null)
+        val getClient = serviceClass.getMethod(
+            "getClient",
+            Context::class.java,
+            String::class.java,
+            String::class.java,
+            String::class.java
+        )
+        val delegate = getClient.invoke(
+            serviceInstance,
+            context,
+            HealthConnectCompat.healthClientName,
+            providerPackage,
+            HealthConnectCompat.xiaomiPlatformBindAction
+        )
+        val clientImplClass =
+            Class.forName("androidx.health.connect.client.impl.HealthConnectClientImpl")
+        val constructor = clientImplClass.getDeclaredConstructor(
+            Class.forName("androidx.health.platform.client.HealthDataAsyncClient"),
+            List::class.java
+        )
+        constructor.isAccessible = true
+        return constructor.newInstance(
+            delegate,
+            HealthPermissions.requiredPermissions.toList()
+        ) as HealthConnectClient
+    }
+
+    private fun isPackageInstalled(packageName: String): Boolean {
+        return try {
+            context.packageManager.getPackageInfo(packageName, 0)
+            true
+        } catch (_: PackageManager.NameNotFoundException) {
+            false
+        }
+    }
+
+    private fun hasBindableService(packageName: String, bindAction: String): Boolean {
+        val bindIntent = Intent(bindAction).setPackage(packageName)
+        return context.packageManager.queryIntentServices(bindIntent, 0).isNotEmpty()
     }
 
     private suspend fun readLatestHeartRate(

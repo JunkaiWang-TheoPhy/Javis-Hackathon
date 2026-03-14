@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+. "$script_dir/mac-camera-common.sh"
+
+ensure_cache_dir
+
+pid=""
+running=false
+if [[ -f "$loop_pid_path" ]]; then
+  pid="$(cat "$loop_pid_path" 2>/dev/null || true)"
+  if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null; then
+    running=true
+  fi
+fi
+
+state_payload='{}'
+latest_payload='{}'
+if [[ -f "$state_json_path" ]]; then
+  state_payload="$(cat "$state_json_path")"
+fi
+if [[ -f "$latest_json_path" ]]; then
+  latest_payload="$(cat "$latest_json_path")"
+fi
+
+node - "$running" "$pid" "$latest_image_path" "$latest_json_path" "$state_payload" "$latest_payload" <<'NODE'
+const [running, pid, latestImagePath, latestJsonPath, statePayload, latestPayload] = process.argv.slice(2);
+const payload = {
+  ok: true,
+  running: running === "true",
+  pid: pid || null,
+  latestImagePath,
+  latestJsonPath,
+  state: JSON.parse(statePayload),
+  latest: JSON.parse(latestPayload),
+};
+process.stdout.write(JSON.stringify(payload, null, 2));
+NODE

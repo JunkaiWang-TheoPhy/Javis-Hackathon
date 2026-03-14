@@ -14,6 +14,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import com.javis.wearable.gateway.health.HealthConnectCompat
+import com.javis.wearable.gateway.health.HealthConnectSettingsDestination
 import com.javis.wearable.gateway.health.HealthConnectRepository
 import com.javis.wearable.gateway.health.HealthPermissions
 import com.javis.wearable.gateway.service.GatewayForegroundService
@@ -22,20 +24,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
-    private val healthConnectSettingsAction = "androidx.health.ACTION_HEALTH_CONNECT_SETTINGS"
-
     private lateinit var healthRepository: HealthConnectRepository
     private lateinit var statusView: TextView
 
-    private val permissionLauncher = registerForActivityResult(
-        HealthPermissions.requestPermissionContract()
+    private val googleHealthPermissionLauncher = registerForActivityResult(
+        HealthPermissions.requestPermissionContract(HealthConnectCompat.googleProviderPackage)
     ) { grantedPermissions ->
-        val status = if (HealthPermissions.hasAll(grantedPermissions)) {
-            "Health Connect permissions granted."
-        } else {
-            "Health Connect permissions are still missing."
-        }
-        refreshStatus(status)
+        handleHealthPermissionResult(grantedPermissions)
     }
 
     private val runtimePermissionLauncher = registerForActivityResult(
@@ -46,6 +41,15 @@ class MainActivity : AppCompatActivity() {
             "Bluetooth and notification permissions granted."
         } else {
             "Missing Android permissions: ${missing.joinToString(", ")}"
+        }
+        refreshStatus(status)
+    }
+
+    private fun handleHealthPermissionResult(grantedPermissions: Set<String>) {
+        val status = if (HealthPermissions.hasAll(grantedPermissions)) {
+            "Health Connect permissions granted."
+        } else {
+            "Health Connect permissions are still missing."
         }
         refreshStatus(status)
     }
@@ -92,7 +96,7 @@ class MainActivity : AppCompatActivity() {
                 addView(Button(context).apply {
                     text = getString(R.string.grant_permissions_button)
                     setOnClickListener {
-                        permissionLauncher.launch(HealthPermissions.requiredPermissions)
+                        requestHealthPermissions()
                     }
                 })
 
@@ -151,10 +155,59 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openHealthConnectSettings() {
+        openCompatibleActivity(
+            destinations = HealthConnectCompat.getSettingsDestinations(),
+            missingActivityStatus =
+                "No compatible Health Connect settings activity was found on this phone."
+        )
+    }
+
+    private fun requestHealthPermissions() {
+        when (healthRepository.availability().providerPackage) {
+            HealthConnectCompat.xiaomiProviderPackage -> {
+                openCompatibleActivity(
+                    destinations = HealthConnectCompat.getPermissionDestinations(),
+                    missingActivityStatus =
+                        "No compatible Xiaomi Fitness health permission page was found on this phone.",
+                    openedStatus =
+                        "Opened Xiaomi Fitness health permission page. Complete the flow there and return."
+                )
+            }
+
+            else -> {
+                googleHealthPermissionLauncher.launch(HealthPermissions.requiredPermissions)
+            }
+        }
+    }
+
+    private fun openCompatibleActivity(
+        destinations: List<HealthConnectSettingsDestination>,
+        missingActivityStatus: String,
+        openedStatus: String? = null
+    ) {
+        val destination = destinations.firstOrNull { candidate ->
+            buildIntent(candidate).resolveActivity(packageManager) != null
+        }
+
+        if (destination == null) {
+            refreshStatus(missingActivityStatus)
+            return
+        }
+
         try {
-            startActivity(Intent(healthConnectSettingsAction))
+            startActivity(buildIntent(destination))
+            if (openedStatus != null) {
+                refreshStatus(openedStatus)
+            }
         } catch (_: ActivityNotFoundException) {
-            refreshStatus("Health Connect settings activity is not available on this phone.")
+            refreshStatus(missingActivityStatus)
+        }
+    }
+
+    private fun buildIntent(destination: HealthConnectSettingsDestination): Intent {
+        return when {
+            destination.action != null -> Intent(destination.action)
+            else -> Intent().setClassName(destination.packageName!!, destination.className!!)
         }
     }
 
@@ -170,6 +223,7 @@ class MainActivity : AppCompatActivity() {
                 appendLine("DID: ${BandConfig.bandDid}")
                 appendLine("Gateway: http://127.0.0.1:${BandConfig.gatewayPort}")
                 appendLine("Android runtime permissions ready: ${hasRuntimePermissions()}")
+                appendLine("Provider: ${availability.providerPackage}")
                 appendLine("Health Connect: ${availability.message}")
                 appendLine(
                     "Permissions: ${grantedPermissions.intersect(HealthPermissions.requiredPermissions).size}/${HealthPermissions.requiredPermissions.size}"
