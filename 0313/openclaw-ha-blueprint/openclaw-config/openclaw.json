@@ -381,6 +381,27 @@
           "homeAssistantToken": "REPLACE_ME_HA_LONG_LIVED_TOKEN",
           "defaultArea": "kitchen"
         }
+      },
+      "hue": {
+        "enabled": false,
+        "config": {
+          "baseUrl": "http://hue-bridge.local",
+          "applicationKey": "REPLACE_ME_HUE_APPLICATION_KEY",
+          "bridgeId": "REPLACE_ME_HUE_BRIDGE_ID",
+          "defaultTransitionMs": 800
+        }
+      },
+      "google-home": {
+        "enabled": false,
+        "config": {
+          "projectId": "replace-me-google-project-id",
+          "projectNumber": "replace-me-google-project-number",
+          "clientId": "replace-me-google-client-id",
+          "clientSecret": "replace-me-google-client-secret",
+          "redirectUri": "https://example.com/oauth/google-home/callback",
+          "platforms": ["ios", "web"],
+          "homeApiEnabled": false
+        }
       }
     }
   }

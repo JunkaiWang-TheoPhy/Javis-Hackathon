@@ -1,0 +1,37 @@
+{
+  "band": {
+    "name": "Xiaomi Smart Band 9 Pro A094",
+    "mac": "D0:AE:05:0D:A0:94",
+    "did": "940134049",
+    "model": "miwear.watch.n67cn",
+    "firmware": "3.1.171",
+    "bluetooth_device_name": "Xiaomi Smart Band 9 Pro A094"
+  },
+  "phone": {
+    "adb_serial": "4722a997",
+    "model": "Xiaomi 12X",
+    "bluetooth_name": "春风沂水的Xiaomi 12X",
+    "packages": {
+      "xiaomi_fitness": "com.mi.health",
+      "hm_watch_manager": "com.huami.watch.hmwatchmanager"
+    }
+  },
+  "gateway": {
+    "host": "127.0.0.1",
+    "port": 8765,
+    "transport": [
+      "http",
+      "sse"
+    ],
+    "desktop_tunnel": [
+      "adb reverse tcp:8765 tcp:8765",
+      "adb forward tcp:8765 tcp:8765"
+    ]
+  },
+  "metric_sources": {
+    "heart_rate": "health_connect",
+    "spo2": "health_connect",
+    "steps": "health_connect",
+    "connection": "bluetooth_manager"
+  }
+}

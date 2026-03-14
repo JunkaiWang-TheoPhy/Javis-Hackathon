@@ -1,0 +1,32 @@
+{
+  "id": "google-home",
+  "name": "Google Home / Nest",
+  "description": "Future-compatible Google Home / Nest plugin skeleton for OpenClaw.",
+  "version": "0.1.0",
+  "skills": ["skills"],
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "projectId": { "type": "string", "description": "Google Cloud project ID" },
+      "projectNumber": { "type": "string", "description": "Google Cloud project number" },
+      "clientId": { "type": "string", "description": "OAuth client ID" },
+      "clientSecret": { "type": "string", "description": "OAuth client secret" },
+      "redirectUri": { "type": "string", "description": "OAuth redirect URI" },
+      "homeApiEnabled": { "type": "boolean", "default": false },
+      "platforms": {
+        "type": "array",
+        "description": "Client platforms expected to participate in Google Home auth flows",
+        "items": { "type": "string" }
+      }
+    }
+  },
+  "uiHints": {
+    "projectId": { "label": "Google Project ID" },
+    "projectNumber": { "label": "Google Project Number" },
+    "clientId": { "label": "Google Client ID" },
+    "clientSecret": { "label": "Google Client Secret", "sensitive": true },
+    "redirectUri": { "label": "Google Redirect URI" },
+    "platforms": { "label": "Client Platforms" }
+  }
+}
