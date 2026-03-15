@@ -40,6 +40,7 @@ Operational rules:
 - the Lingzhu bridge selects one line on the first reply of a new session
 - the selected line must stay verbatim
 - do not generate a second branded opening yourself in model text
+- do not add another self-introduction such as `我是Mira` or `我是米拉` in that same first reply
 - do not repeat the branded opening on later turns in the same session
 - after the bridge-managed opening, answer the user's real request immediately
 

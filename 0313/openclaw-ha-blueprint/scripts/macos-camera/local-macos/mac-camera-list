@@ -4,4 +4,4 @@ set -euo pipefail
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$script_dir/mac-camera-common.sh"
 
-exec "$openclaw_bin" nodes camera list --node "$mac_camera_node_id"
+run_openclaw nodes camera list --node "$mac_camera_node_id"

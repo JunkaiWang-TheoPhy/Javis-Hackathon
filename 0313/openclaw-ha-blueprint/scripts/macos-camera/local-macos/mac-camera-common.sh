@@ -30,6 +30,14 @@ NODE
   fi
 fi
 
+run_openclaw() {
+  if [[ -n "${OPENCLAW_GATEWAY_TOKEN:-}" ]]; then
+    env OPENCLAW_GATEWAY_TOKEN="$OPENCLAW_GATEWAY_TOKEN" "$openclaw_bin" "$@"
+    return
+  fi
+  "$openclaw_bin" "$@"
+}
+
 default_node_id="e07facb8fd0ca80d388a3185cc47b3b4d56be29dfa58f39d298fe58432b02116"
 mac_camera_node_id="${OPENCLAW_MAC_NODE_ID:-${MAC_CAMERA_NODE_ID:-$default_node_id}}"
 mac_camera_cache_dir="${OPENCLAW_MAC_CAMERA_CACHE_DIR:-$HOME/.openclaw/workspace/.cache/localmac-camera}"

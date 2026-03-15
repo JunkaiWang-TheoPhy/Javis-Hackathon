@@ -5,4 +5,4 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$script_dir/localmac-camera-common.sh"
 
 delay_ms="${MAC_CAMERA_DELAY_MS:-1000}"
-"$openclaw_bin" nodes camera snap --node "$mac_camera_node_id" --facing front --delay-ms "$delay_ms"
+run_openclaw nodes camera snap --node "$mac_camera_node_id" --facing front --delay-ms "$delay_ms"
