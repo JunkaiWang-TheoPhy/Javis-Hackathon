@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+. "$script_dir/comic-camera-common.sh"
+. "$script_dir/localpc-camera-common.sh"
+
+ensure_comic_dirs
+
+"$localpc_pwsh" "& '$localpc_script_dir\\win-camera-shot.ps1'"
+"$script_dir/localpc-cam-pull" "$localpc_cache_dir"
+
+input_path="$localpc_cache_dir/latest.jpg"
+metadata_path="$localpc_cache_dir/latest.json"
+
+require_file "$input_path"
+require_file "$metadata_path"
+
+run_comic_renderer "localpc" "$input_path" "$metadata_path"

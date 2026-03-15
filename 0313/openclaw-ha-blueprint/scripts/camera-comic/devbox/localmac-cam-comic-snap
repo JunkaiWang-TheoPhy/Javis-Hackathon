@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+. "$script_dir/comic-camera-common.sh"
+
+openclaw_bin="${OPENCLAW_BIN:-$(command -v openclaw || true)}"
+if [[ -z "$openclaw_bin" ]]; then
+  openclaw_bin="/home/devbox/.nvm/versions/node/v22.22.1/bin/openclaw"
+fi
+
+if [[ ! -x "$openclaw_bin" ]]; then
+  echo "openclaw CLI not found: $openclaw_bin" >&2
+  exit 1
+fi
+
+default_mac_node_id="e07facb8fd0ca80d388a3185cc47b3b4d56be29dfa58f39d298fe58432b02116"
+mac_camera_node_id="${OPENCLAW_MAC_NODE_ID:-${MAC_CAMERA_NODE_ID:-$default_mac_node_id}}"
+delay_ms="${MAC_CAMERA_DELAY_MS:-1000}"
+
+ensure_comic_dirs
+
+capture_output="$("$openclaw_bin" nodes camera snap --node "$mac_camera_node_id" --facing front --delay-ms "$delay_ms" 2>&1)"
+media_path="$(extract_media_path "$capture_output")"
+
+if [[ -z "$media_path" ]]; then
+  printf '%s\n' "$capture_output" >&2
+  echo "camera command did not return a MEDIA path" >&2
+  exit 1
+fi
+
+require_file "$media_path"
+
+input_path="$localmac_cache_dir/latest.jpg"
+metadata_path="$localmac_cache_dir/latest.json"
+
+cp "$media_path" "$input_path"
+write_capture_metadata "$metadata_path" "localmac" "$media_path"
+
+run_comic_renderer "localmac" "$input_path" "$metadata_path"

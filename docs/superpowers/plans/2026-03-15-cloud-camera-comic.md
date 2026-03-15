@@ -37,7 +37,7 @@ Expected: the new cloud camera comic design and plan files are listed
 - [ ] **Step 2: Write a test for output naming and sidecar path generation**
 - [ ] **Step 3: Run the test file and verify it fails because the renderer module does not exist yet**
 
-Run: `python3 -m unittest 0313.openclaw-ha-blueprint.scripts.camera-comic.tests.test_generate_camera_comic`
+Run: `python3 -m unittest discover -s 0313/openclaw-ha-blueprint/scripts/camera-comic/tests -p 'test_*.py'`
 Expected: FAIL with import or missing function errors
 
 ### Task 3: Implement the shared renderer
@@ -51,7 +51,7 @@ Expected: FAIL with import or missing function errors
 - [ ] **Step 4: Implement CLI arguments for source, input, metadata, and output dir**
 - [ ] **Step 5: Re-run the test file**
 
-Run: `python3 -m unittest 0313.openclaw-ha-blueprint.scripts.camera-comic.tests.test_generate_camera_comic`
+Run: `python3 -m unittest discover -s 0313/openclaw-ha-blueprint/scripts/camera-comic/tests -p 'test_*.py'`
 Expected: PASS
 
 ## Chunk 3: Cloud Wrapper Commands

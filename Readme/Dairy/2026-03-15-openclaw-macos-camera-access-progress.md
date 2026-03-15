@@ -367,6 +367,92 @@ MEDIA:/tmp/openclaw/openclaw-camera-snap-front-b24c0ad3-d5a1-4ef4-aab7-72d416516
 - `camera.snap` 再次成功
 
 因此当前环境被恢复到了“抓拍可用、clip 实验性”的状态，没有把你的现有 app 配置留在损坏状态。
+
+### 18. Added launchd-managed persistent tunnel, bridge, and sidecar
+
+为了把本地这条链路从“依赖当前终端”改成“登录后自动恢复”，新增了：
+
+- `0313/openclaw-ha-blueprint/scripts/macos-camera/launchd/`
+
+并实际安装了 3 个用户级 LaunchAgents：
+
+- `ai.javis.openclaw-devbox-tunnel`
+- `ai.javis.rokid-bridge-gateway`
+- `ai.javis.mac-camera-sidecar`
+
+分别负责：
+
+- `127.0.0.1:18789 -> devbox:127.0.0.1:18789` 的 SSH tunnel
+- 本地 `127.0.0.1:3301` 的 ambient bridge gateway
+- 本地 `mac-camera-loop` 静默 sidecar
+
+### 19. Had to work around macOS launchd access restrictions
+
+第一次直接让 launchd 执行 repo 里的脚本时失败了。
+
+典型报错是：
+
+- `Operation not permitted`
+- `getcwd: cannot access parent directories`
+
+根因是：
+
+- repo 位于 `Documents/`
+- launchd 背景 agent 直接执行该目录中的脚本时，会碰到 macOS 的受保护目录访问限制
+
+解决方式：
+
+- 安装脚本不再让 launchd 直接跑 repo 脚本
+- 改成把运行时文件复制到：
+  - `~/.openclaw/workspace/.cache/localmac-camera/launchd/runtime/`
+- 同时把 SSH identity 复制到：
+  - `~/.openclaw/workspace/.config/macos-camera-launchd/devbox_id_ed25519`
+
+之后 launchd plists 改为指向这些 runtime 副本，而不再指向 repo 原路径。
+
+### 20. Verified launchd-owned health checks
+
+重新安装后，以下链路已实测成功：
+
+```bash
+curl http://127.0.0.1:18789/health
+curl http://127.0.0.1:3301/v1/health
+```
+
+这证明：
+
+- devbox SSH tunnel 已经由 launchd 接管
+- 本地 ambient bridge gateway 已经由 launchd 接管
+
+也就是说，这两个服务不再依赖手工开终端。
+
+### 21. Remaining dependency: `OpenClaw.app` still supplies the actual camera node
+
+虽然基础设施已经常驻，但 sidecar 真实抓拍仍然取决于 `OpenClaw.app` 是否在线并成功把 node 挂到远端 gateway。
+
+验证中观察到：
+
+- 当 `OpenClaw.app` 不在运行时：
+  - `mac-camera-shot` 会报 `GatewayClientRequestError: node not connected`
+- 重新拉起 app 后，失败模式变成：
+  - `TIMEOUT: node invoke timed out`
+
+因此当前的真实状态应表述为：
+
+```text
+launchd 已经托管了 tunnel / bridge / sidecar 进程
+OpenClaw.app 仍然决定 camera node 是否真正可用
+```
+
+所以这轮工作已经完成了：
+
+- 本地 SSH 隧道常驻
+- 本地 bridge 常驻
+- 本地 sidecar 常驻
+
+但尚未完成：
+
+- `OpenClaw.app` 自身的登录自启动与稳定 node reattach
 - node pairing 成功
 - gateway policy 已放通
 - 远端确实已经能抓取本机摄像头

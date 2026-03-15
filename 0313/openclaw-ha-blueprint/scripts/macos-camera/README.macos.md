@@ -16,6 +16,18 @@ Mac webcam
 ```text
 scripts/macos-camera/
   README.macos.md
+  launchd/
+    launchd-common.sh
+    install-user-launch-agents.sh
+    uninstall-user-launch-agents.sh
+    status-user-launch-agents.sh
+    run-openclaw-devbox-tunnel.sh
+    run-rokid-bridge-gateway.sh
+    run-mac-camera-sidecar.sh
+    templates/
+      ai.javis.openclaw-devbox-tunnel.plist.template
+      ai.javis.rokid-bridge-gateway.plist.template
+      ai.javis.mac-camera-sidecar.plist.template
   local-macos/
     mac-camera-common.sh
     mac-camera-list
@@ -45,6 +57,69 @@ As of `2026-03-15`:
 - direct `POST /hooks/agent` smoke test returned a real `runId`
 - combined path `shot -> emit-event -> /hooks/agent` was validated
 - `localmac-cam-snap` works through the local CLI to the remote gateway
+- user launch agents were installed for:
+  - `ai.javis.openclaw-devbox-tunnel`
+  - `ai.javis.rokid-bridge-gateway`
+  - `ai.javis.mac-camera-sidecar`
+- launchd-managed health checks were verified:
+  - `http://127.0.0.1:18789/health`
+  - `http://127.0.0.1:3301/v1/health`
+- runtime files are copied to:
+  - `~/.openclaw/workspace/.cache/localmac-camera/launchd/runtime/`
+- the SSH identity used by launchd is copied to:
+  - `~/.openclaw/workspace/.config/macos-camera-launchd/devbox_id_ed25519`
+
+## launchd Persistent Runtime
+
+The persistent local stack is now intended to be:
+
+```text
+login
+  -> ai.javis.openclaw-devbox-tunnel
+  -> ai.javis.rokid-bridge-gateway
+  -> ai.javis.mac-camera-sidecar
+```
+
+Install or refresh the user LaunchAgents:
+
+```bash
+./scripts/macos-camera/launchd/install-user-launch-agents.sh
+```
+
+Inspect job state:
+
+```bash
+./scripts/macos-camera/launchd/status-user-launch-agents.sh
+```
+
+Remove them:
+
+```bash
+./scripts/macos-camera/launchd/uninstall-user-launch-agents.sh
+```
+
+The installer deliberately does **not** execute directly from the repo at runtime.
+
+Why:
+
+- this repo lives under `Documents/`
+- macOS launchd background jobs hit `Operation not permitted` / `getcwd` failures when trying to execute scripts directly from protected folders
+- the installer therefore copies the runtime scripts and the `devbox` SSH identity into:
+  - `~/.openclaw/workspace/.cache/localmac-camera/launchd/runtime/`
+  - `~/.openclaw/workspace/.config/macos-camera-launchd/`
+
+The tunnel is now launchd-owned:
+
+```text
+127.0.0.1:18789 -> devbox:127.0.0.1:18789
+```
+
+Verified after installation:
+
+```bash
+curl http://127.0.0.1:18789/health
+curl http://127.0.0.1:3301/v1/health
+```
 
 ## Current Runtime Caveat
 
@@ -188,3 +263,28 @@ Try a short clip through the paired node:
 ```
 
 Treat the clip wrapper as experimental until the macOS runtime issue is resolved.
+
+## launchd Caveat: sidecar still depends on `OpenClaw.app`
+
+The tunnel, bridge gateway, and sidecar loop can now stay up without a terminal.
+
+But the actual macOS camera node is still provided by `OpenClaw.app`.
+
+That means:
+
+- launchd now owns the infrastructure
+- `OpenClaw.app` still owns node connectivity and the real camera capture path
+
+Observed during validation:
+
+- when `OpenClaw.app` is not running:
+  - `mac-camera-shot` fails with `GatewayClientRequestError: node not connected`
+- after relaunching `OpenClaw.app`, the failure mode improved to:
+  - `TIMEOUT: node invoke timed out`
+
+So the persistent stack is partially complete:
+
+- `SSH tunnel`: persistent and verified
+- `ambient bridge gateway`: persistent and verified
+- `camera sidecar loop`: persistent and verified as a process
+- `end-to-end capture loop`: still depends on `OpenClaw.app` being online and attached to the remote gateway
