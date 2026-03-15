@@ -45,6 +45,8 @@ mac_camera_interval_sec="${MAC_CAMERA_INTERVAL_SEC:-3}"
 mac_camera_change_threshold="${MAC_CAMERA_CHANGE_THRESHOLD:-0.18}"
 mac_camera_heartbeat_sec="${MAC_CAMERA_HEARTBEAT_SEC:-60}"
 mac_camera_delay_ms="${MAC_CAMERA_DELAY_MS:-1000}"
+mac_camera_retry_attempts="${MAC_CAMERA_RETRY_ATTEMPTS:-4}"
+mac_camera_retry_sleep_sec="${MAC_CAMERA_RETRY_SLEEP_SEC:-5}"
 ambient_bridge_url="${AMBIENT_BRIDGE_URL:-http://127.0.0.1:3301/v1/ambient/observe}"
 
 latest_image_path="$mac_camera_cache_dir/latest.jpg"
@@ -105,4 +107,45 @@ write_json_file() {
   local path="$1"
   local content="$2"
   printf '%s\n' "$content" > "$path"
+}
+
+is_transient_camera_snap_error() {
+  local output="${1:-}"
+  [[ "$output" == *"gateway closed"* ]] && return 0
+  [[ "$output" == *"unknown node:"* ]] && return 0
+  [[ "$output" == *"TIMEOUT"* ]] && return 0
+  return 1
+}
+
+refresh_mac_camera_node() {
+  run_openclaw nodes camera list --node "$mac_camera_node_id" >/dev/null 2>&1 || true
+}
+
+capture_mac_camera_snap_json() {
+  local attempt=1
+  local output=""
+  local rc=1
+
+  while (( attempt <= mac_camera_retry_attempts )); do
+    if output="$(run_openclaw nodes camera snap --node "$mac_camera_node_id" --facing front --delay-ms "$mac_camera_delay_ms" --json 2>&1)"; then
+      printf '%s\n' "$output"
+      return 0
+    fi
+
+    rc=$?
+    if ! is_transient_camera_snap_error "$output" || (( attempt == mac_camera_retry_attempts )); then
+      printf '%s\n' "$output" >&2
+      return "$rc"
+    fi
+
+    printf 'transient camera snap failure on attempt %s/%s; retrying\n' "$attempt" "$mac_camera_retry_attempts" >&2
+    refresh_mac_camera_node
+    if [[ "$mac_camera_retry_sleep_sec" != "0" ]]; then
+      sleep "$mac_camera_retry_sleep_sec"
+    fi
+    attempt=$((attempt + 1))
+  done
+
+  printf '%s\n' "$output" >&2
+  return "$rc"
 }

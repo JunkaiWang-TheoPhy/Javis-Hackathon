@@ -701,6 +701,42 @@ And the current blocker is external:
 
 ---
 
+## Retry Hardening for `mac-camera-shot`
+
+在 launchd 常驻链路跑起来之后，仍然观察到单次抓拍会被瞬时 websocket / node 抖动打断，典型报错包括：
+
+- `gateway closed (1006 abnormal closure (no close frame))`
+- `gateway closed (1012): service restart`
+- `unknown node: e07facb8fd0ca80d388a3185cc47b3b4d56be29dfa58f39d298fe58432b02116`
+
+为此又补了一轮最小修复，范围只在本地 shell 脚本层：
+
+- `scripts/macos-camera/local-macos/mac-camera-common.sh`
+- `scripts/macos-camera/local-macos/mac-camera-shot`
+- `scripts/tests/mac-camera-shot-retry.test.sh`
+
+具体做法：
+
+1. 给 `mac-camera-shot` 加了有界重试
+2. 把 `gateway closed`、`unknown node`、`TIMEOUT` 视为瞬时错误
+3. 每次重试前先跑一条轻量 `nodes camera list --node ...` 做 node refresh
+4. 默认最多重试 `4` 次，每次间隔 `5s`
+
+验证结果：
+
+- shell 语法检查通过
+- 新回归测试先红后绿
+- 安装器已把更新同步到 launchd runtime
+- fresh live validation 成功
+
+最新 live shot 后，本地缓存文件时间戳更新为：
+
+- `~/.openclaw/workspace/.cache/localmac-camera/latest.jpg` -> `2026-03-15 09:09:26`
+- `~/.openclaw/workspace/.cache/localmac-camera/latest.json` -> `2026-03-15 09:09:26`
+- `~/.openclaw/workspace/.cache/localmac-camera/state.json` -> `2026-03-15 09:09:26`
+
+---
+
 ## Final Result
 
 这轮工作的最终结论是：

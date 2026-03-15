@@ -1,0 +1,132 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+wrapper_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+camera_script_dir="$(cd "$wrapper_dir/../../macos-camera/local-macos" && pwd)"
+launchd_script_dir="$(cd "$wrapper_dir/../../macos-camera/launchd" && pwd)"
+helper_script="$(cd "$wrapper_dir/.." && pwd)/push_camera_comic_to_devbox.py"
+
+. "$camera_script_dir/mac-camera-common.sh"
+. "$launchd_script_dir/launchd-common.sh"
+
+ssh_target="${OPENCLAW_COMIC_SSH_TARGET:-devbox}"
+ssh_identity="${OPENCLAW_COMIC_SSH_IDENTITY:-}"
+ssh_port="${OPENCLAW_COMIC_SSH_PORT:-}"
+remote_workspace="${OPENCLAW_COMIC_REMOTE_WORKSPACE:-/home/devbox/.openclaw/workspace}"
+tunnel_local_port="${OPENCLAW_COMIC_TUNNEL_LOCAL_PORT:-$devbox_tunnel_local_port}"
+tunnel_remote_host="${OPENCLAW_COMIC_TUNNEL_REMOTE_HOST:-$devbox_tunnel_remote_host}"
+tunnel_remote_port="${OPENCLAW_COMIC_TUNNEL_REMOTE_PORT:-$devbox_tunnel_remote_port}"
+tunnel_identity="${OPENCLAW_COMIC_TUNNEL_IDENTITY:-$devbox_ssh_identity}"
+tunnel_user="${OPENCLAW_COMIC_TUNNEL_USER:-$devbox_ssh_user}"
+tunnel_host="${OPENCLAW_COMIC_TUNNEL_HOST:-$devbox_ssh_host}"
+tunnel_port="${OPENCLAW_COMIC_TUNNEL_PORT:-$devbox_ssh_port}"
+ssh_bin_local="${OPENCLAW_COMIC_TUNNEL_SSH_BIN:-$ssh_bin}"
+capture_retry_count="${OPENCLAW_COMIC_CAPTURE_RETRIES:-3}"
+capture_retry_delay_sec="${OPENCLAW_COMIC_CAPTURE_RETRY_DELAY_SEC:-3}"
+
+ensure_gateway_tunnel() {
+  local health_url="http://127.0.0.1:${tunnel_local_port}/health"
+  local listeners
+  local attempt
+  local tunnel_output
+
+  if curl -fsS "$health_url" >/dev/null 2>&1; then
+    return
+  fi
+
+  listeners="$(lsof -tiTCP:"$tunnel_local_port" -sTCP:LISTEN 2>/dev/null || true)"
+  if [[ -n "$listeners" ]]; then
+    for _ in $(seq 1 3); do
+      if curl -fsS "$health_url" >/dev/null 2>&1; then
+        return
+      fi
+      sleep 1
+    done
+    printf '%s\n' "$listeners" | xargs -r kill
+    sleep 1
+  fi
+
+  for attempt in $(seq 1 2); do
+    if tunnel_output="$(
+      "$ssh_bin_local" \
+        -fN \
+        -L "${tunnel_local_port}:${tunnel_remote_host}:${tunnel_remote_port}" \
+        -o ExitOnForwardFailure=yes \
+        -o ServerAliveInterval=30 \
+        -o ServerAliveCountMax=3 \
+        -o TCPKeepAlive=yes \
+        -o IdentitiesOnly=yes \
+        -o StrictHostKeyChecking=accept-new \
+        -i "$tunnel_identity" \
+        -p "$tunnel_port" \
+        "${tunnel_user}@${tunnel_host}" 2>&1
+    )"; then
+      break
+    fi
+
+    if [[ "$tunnel_output" == *"Address already in use"* ]] && (( attempt < 2 )); then
+      listeners="$(lsof -tiTCP:"$tunnel_local_port" -sTCP:LISTEN 2>/dev/null || true)"
+      if [[ -n "$listeners" ]]; then
+        printf '%s\n' "$listeners" | xargs -r kill
+        sleep 1
+        continue
+      fi
+    fi
+
+    printf '%s\n' "$tunnel_output" >&2
+    exit 1
+  done
+
+  for _ in $(seq 1 10); do
+    if curl -fsS "$health_url" >/dev/null 2>&1; then
+      return
+    fi
+    sleep 1
+  done
+
+  echo "local devbox gateway tunnel is unavailable at $health_url" >&2
+  exit 1
+}
+
+run_camera_shot_with_retry() {
+  local attempt
+  local output
+
+  for attempt in $(seq 1 "$capture_retry_count"); do
+    if output="$("$camera_script_dir/mac-camera-shot" 2>&1)"; then
+      return 0
+    fi
+
+    if [[ "$output" == *"service restart"* || "$output" == *"unknown node"* || "$output" == *"gateway closed"* ]]; then
+      if (( attempt < capture_retry_count )); then
+        ensure_gateway_tunnel
+        sleep "$capture_retry_delay_sec"
+        continue
+      fi
+    fi
+
+    printf '%s\n' "$output" >&2
+    return 1
+  done
+}
+
+ensure_gateway_tunnel
+run_camera_shot_with_retry
+
+helper_args=(
+  --source localmac
+  --input "$latest_image_path"
+  --metadata "$latest_json_path"
+  --ssh-target "$ssh_target"
+  --remote-workspace "$remote_workspace"
+)
+
+if [[ -n "$ssh_identity" ]]; then
+  helper_args+=(--ssh-identity "$ssh_identity")
+fi
+
+if [[ -n "$ssh_port" ]]; then
+  helper_args+=(--ssh-port "$ssh_port")
+fi
+
+python3 "$helper_script" "${helper_args[@]}"

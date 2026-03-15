@@ -47,6 +47,7 @@ const firstTurnOpeningSessions = new Map<string, number>();
 const FIRST_TURN_OPENING_TTL_MS = 24 * 60 * 60 * 1000;
 const MAX_FIRST_TURN_OPENING_SESSIONS = 4096;
 const FIRST_TURN_PREFIX_BUFFER_LIMIT = 120;
+const FIRST_TURN_PREFIX_MIN_BUFFER = 24;
 
 function claimFirstTurnOpening(sessionKey: string): string | null {
   const now = Date.now();
@@ -91,6 +92,10 @@ function stripRedundantFirstTurnIntro(text: string): string {
   }
 
   return normalized;
+}
+
+function isPotentialFirstTurnIntroPrefix(text: string): boolean {
+  return /^(?:你好[！!，,\s。]*)?(?:我|我是|我是M|我是Mi|我是Mir|我是Mira|我是米|我是米拉)/u.test(text.trimStart());
 }
 
 function resolveMaxImageBytes(config: LingzhuConfig): number {
@@ -912,6 +917,25 @@ export function createHttpHandler(api: any, getRuntimeState: () => LingzhuRuntim
       let firstTurnOpeningSent = false;
       let pendingFirstTurnContent = "";
       let firstTurnContentResolved = !firstTurnOpening;
+
+      if (firstTurnOpening) {
+        const openingChunkData: LingzhuSSEData = {
+          role: "agent",
+          type: "answer",
+          answer_stream: `${firstTurnOpening}\n\n`,
+          message_id: body.message_id,
+          agent_id: body.agent_id,
+          is_finish: false,
+        };
+        writeDebugLog(
+          config,
+          buildRequestLogName(body.message_id, "response.first_turn_opening"),
+          summarizeForDebug(openingChunkData, includePayload)
+        );
+        safeWrite(formatLingzhuSSE("message", openingChunkData));
+        firstTurnOpeningSent = true;
+      }
+
       const reader = openclawResponse.body?.getReader();
       if (!reader) {
         throw new Error("No response body");
@@ -958,32 +982,20 @@ export function createHttpHandler(api: any, getRuntimeState: () => LingzhuRuntim
               );
 
               if (delta?.content) {
-                if (firstTurnOpening && !firstTurnOpeningSent) {
-                  const openingChunkData: LingzhuSSEData = {
-                    role: "agent",
-                    type: "answer",
-                    answer_stream: `${firstTurnOpening}\n\n`,
-                    message_id: body.message_id,
-                    agent_id: body.agent_id,
-                    is_finish: false,
-                  };
-                  writeDebugLog(
-                    config,
-                    buildRequestLogName(body.message_id, "response.first_turn_opening"),
-                    summarizeForDebug(openingChunkData, includePayload)
-                  );
-                  safeWrite(formatLingzhuSSE("message", openingChunkData));
-                  firstTurnOpeningSent = true;
-                }
-
                 let contentToSend = delta.content;
 
                 if (!firstTurnContentResolved) {
                   pendingFirstTurnContent += delta.content;
                   const cleaned = stripRedundantFirstTurnIntro(pendingFirstTurnContent);
-                  const shouldResolve = cleaned.length > 0
-                    || pendingFirstTurnContent.length >= FIRST_TURN_PREFIX_BUFFER_LIMIT
-                    || /[。！？!?]/u.test(pendingFirstTurnContent);
+                  const sawSentenceBoundary = /[。！？!?\n]/u.test(pendingFirstTurnContent);
+                  const prefixWasStripped = cleaned !== pendingFirstTurnContent;
+                  const pendingLooksLikeIntro = isPotentialFirstTurnIntroPrefix(pendingFirstTurnContent);
+                  const shouldResolve = pendingFirstTurnContent.length >= FIRST_TURN_PREFIX_BUFFER_LIMIT
+                    || (prefixWasStripped && (cleaned.length > 0 || sawSentenceBoundary))
+                    || (
+                      pendingFirstTurnContent.length >= FIRST_TURN_PREFIX_MIN_BUFFER
+                      && !pendingLooksLikeIntro
+                    );
 
                   if (!shouldResolve) {
                     continue;

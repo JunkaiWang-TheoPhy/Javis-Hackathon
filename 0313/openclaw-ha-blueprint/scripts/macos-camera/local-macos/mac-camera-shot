@@ -6,7 +6,7 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 ensure_cache_dir
 
-command_output="$(run_openclaw nodes camera snap --node "$mac_camera_node_id" --facing front --delay-ms "$mac_camera_delay_ms" --json)"
+command_output="$(capture_mac_camera_snap_json)"
 media_path="$(node -e 'const payload = JSON.parse(process.argv[1]); const file = payload.files?.[0]?.path; if (!file) process.exit(1); process.stdout.write(file);' "$command_output")"
 require_file "$media_path"
 cp "$media_path" "$latest_image_path"

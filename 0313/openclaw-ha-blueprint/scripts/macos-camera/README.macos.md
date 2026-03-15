@@ -283,16 +283,22 @@ Current verified behavior:
 
 Current remaining instability:
 
-- one-off manual `mac-camera-shot` still showed `TIMEOUT` during validation
-- the background loop was healthier than ad hoc single-shot invocation after reattach
-- if the upstream `devbox` SSH ingress on `hzh.sealos.run:2233` starts closing connections, local camera commands degrade to:
+- the local websocket/node path can still flap with errors such as:
   - `gateway closed (1006 abnormal closure (no close frame))`
-  because the local `ws://127.0.0.1:18789` path depends on that SSH tunnel remaining healthy
+  - `gateway closed (1012): service restart`
+  - `unknown node: <mac-node-id>`
+- `mac-camera-shot` now retries those transient failures with a lightweight `nodes camera list` refresh before giving up
+- a fresh live validation after that retry hardening completed successfully and updated:
+  - `~/.openclaw/workspace/.cache/localmac-camera/latest.jpg`
+  - `~/.openclaw/workspace/.cache/localmac-camera/latest.json`
+  - `~/.openclaw/workspace/.cache/localmac-camera/state.json`
+- if the upstream `devbox` SSH ingress on `hzh.sealos.run:2233` starts closing connections for longer than the retry window, local camera commands will still fail because the local `ws://127.0.0.1:18789` path depends on that SSH tunnel remaining healthy
 
 So the current state is:
 
 ```text
 launchd now owns tunnel + bridge + sidecar + OpenClaw.app
 the background loop is working again
-single ad hoc camera invocations are still less stable than the steady-state loop
+single ad hoc camera invocations are now more resilient to short gateway and node flaps
+prolonged upstream SSH or gateway outages still break both paths
 ```

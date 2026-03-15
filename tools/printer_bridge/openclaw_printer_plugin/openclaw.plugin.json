@@ -1,0 +1,20 @@
+{
+  "id": "printer-bridge",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "bridgeBaseUrl": {
+        "type": "string",
+        "default": "http://127.0.0.1:4771"
+      },
+      "bridgeToken": {
+        "type": "string"
+      },
+      "defaultMedia": {
+        "type": "string",
+        "default": "3x3.Fullbleed"
+      }
+    }
+  }
+}
