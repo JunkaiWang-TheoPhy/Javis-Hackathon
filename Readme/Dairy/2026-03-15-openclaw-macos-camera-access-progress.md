@@ -486,6 +486,49 @@ launchd owns tunnel / bridge / sidecar / OpenClaw.app
 background ambient capture recovered
 single-shot reattach behavior is still less stable than the steady-state loop
 ```
+
+### 25. Current blocker is now clearly upstream SSH ingress instability
+
+After the local watchdog changes, the remaining repeated failure was no longer ambiguous.
+
+Fresh evidence:
+
+- local `mac-camera-shot` failures degraded to:
+  - `gateway closed (1006 abnormal closure (no close frame))`
+- tunnel stderr repeatedly showed:
+  - `Connection closed by 28.0.0.66 port 2233`
+  - `ssh: connect to host hzh.sealos.run port 2233: Undefined error: 0`
+- direct checks using the same identity also failed:
+  - `ssh devbox 'echo ok'`
+  - `/usr/bin/ssh -i ~/.openclaw/workspace/.config/macos-camera-launchd/devbox_id_ed25519 -p 2233 devbox@hzh.sealos.run 'echo ok'`
+
+Both returned:
+
+```text
+Connection closed by 28.0.0.66 port 2233
+```
+
+This is important because it means the current remaining failure is not primarily a local launchd syntax problem anymore.
+
+The current root cause is:
+
+```text
+upstream devbox SSH ingress is intermittently closing
+local tunnel health collapses
+local ws://127.0.0.1:18789 closes
+camera commands fail with 1006
+```
+
+So the local work completed in this session is:
+
+- launchd-managed tunnel watchdog
+- launchd-managed bridge
+- launchd-managed sidecar
+- launchd-managed OpenClaw.app watchdog
+
+And the current blocker is external:
+
+- the `devbox` SSH endpoint itself is not stable enough right now
 - node pairing 成功
 - gateway policy 已放通
 - 远端确实已经能抓取本机摄像头

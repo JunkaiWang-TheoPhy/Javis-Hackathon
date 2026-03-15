@@ -285,6 +285,9 @@ Current remaining instability:
 
 - one-off manual `mac-camera-shot` still showed `TIMEOUT` during validation
 - the background loop was healthier than ad hoc single-shot invocation after reattach
+- if the upstream `devbox` SSH ingress on `hzh.sealos.run:2233` starts closing connections, local camera commands degrade to:
+  - `gateway closed (1006 abnormal closure (no close frame))`
+  because the local `ws://127.0.0.1:18789` path depends on that SSH tunnel remaining healthy
 
 So the current state is:
 

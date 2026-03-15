@@ -200,18 +200,37 @@ install_runtime_tunnel_runner() {
   cat >"$runtime_devbox_tunnel_runner" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
-exec "$ssh_bin" \\
-  -N \\
-  -L "${devbox_tunnel_local_port}:${devbox_tunnel_remote_host}:${devbox_tunnel_remote_port}" \\
-  -o ExitOnForwardFailure=yes \\
-  -o ServerAliveInterval=30 \\
-  -o ServerAliveCountMax=3 \\
-  -o TCPKeepAlive=yes \\
-  -o IdentitiesOnly=yes \\
-  -o StrictHostKeyChecking=accept-new \\
-  -i "$runtime_devbox_ssh_identity" \\
-  -p "$devbox_ssh_port" \\
-  "${devbox_ssh_user}@${devbox_ssh_host}"
+while true; do
+  "$ssh_bin" \\
+    -N \\
+    -L "${devbox_tunnel_local_port}:${devbox_tunnel_remote_host}:${devbox_tunnel_remote_port}" \\
+    -o ExitOnForwardFailure=yes \\
+    -o ServerAliveInterval=30 \\
+    -o ServerAliveCountMax=3 \\
+    -o ConnectTimeout=10 \\
+    -o TCPKeepAlive=yes \\
+    -o IdentitiesOnly=yes \\
+    -o StrictHostKeyChecking=accept-new \\
+    -i "$runtime_devbox_ssh_identity" \\
+    -p "$devbox_ssh_port" \\
+    "${devbox_ssh_user}@${devbox_ssh_host}" &
+  ssh_pid=\$!
+  failed_checks=0
+  while kill -0 "\$ssh_pid" >/dev/null 2>&1; do
+    if curl -fsS --max-time 4 "http://127.0.0.1:${devbox_tunnel_local_port}/health" >/dev/null 2>&1; then
+      failed_checks=0
+    else
+      failed_checks=\$((failed_checks + 1))
+      if (( failed_checks >= 3 )); then
+        kill "\$ssh_pid" >/dev/null 2>&1 || true
+        break
+      fi
+    fi
+    sleep 10
+  done
+  wait "\$ssh_pid" || true
+  sleep 2
+done
 EOF
   chmod +x "$runtime_devbox_tunnel_runner"
 }
@@ -249,6 +268,28 @@ install_runtime_openclaw_app_runner() {
   cat >"$runtime_openclaw_app_runner" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
+canonical_target="${devbox_ssh_user}@${devbox_ssh_host}:${devbox_ssh_port}"
+
+sync_openclaw_remote_target() {
+  /usr/bin/defaults write ai.openclaw.mac 'openclaw.remoteTarget' -string "\$canonical_target" >/dev/null 2>&1 || true
+  "$node_bin_default" - <<'NODE' >/dev/null 2>&1 || true
+const fs = require("fs");
+const path = process.env.HOME + "/.openclaw/openclaw.json";
+if (!fs.existsSync(path)) {
+  process.exit(0);
+}
+const data = JSON.parse(fs.readFileSync(path, "utf8"));
+if (!data.gateway) {
+  process.exit(0);
+}
+if (!data.gateway.remote) {
+  data.gateway.remote = {};
+}
+data.gateway.remote.sshTarget = process.env.CANONICAL_TARGET;
+fs.writeFileSync(path, JSON.stringify(data, null, 2) + "\\n");
+NODE
+}
+
 while true; do
   if ! pgrep -f "$openclaw_mac_app_path" >/dev/null 2>&1; then
     for _ in {1..30}; do
@@ -257,6 +298,8 @@ while true; do
       fi
       sleep 1
     done
+    export CANONICAL_TARGET="\$canonical_target"
+    sync_openclaw_remote_target
     /usr/bin/open -gj -a "$openclaw_mac_app_bundle"
   fi
   sleep 15
