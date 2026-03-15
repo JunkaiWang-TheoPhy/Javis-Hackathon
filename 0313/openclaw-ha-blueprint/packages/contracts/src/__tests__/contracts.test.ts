@@ -4,6 +4,7 @@ import { Value } from "@sinclair/typebox/value";
 
 import {
   ActionEnvelopeSchema,
+  AmbientVisionEventSchema,
   VisualObservationEventSchema,
 } from "../index.ts";
 
@@ -61,6 +62,68 @@ test("rejects an invalid visual observation event missing ids", () => {
   };
 
   assert.equal(Value.Check(VisualObservationEventSchema, observation), false);
+});
+
+test("accepts a valid ambient vision event", () => {
+  const event = {
+    schemaVersion: "0.1.0",
+    sessionId: "sess-mac-001",
+    observationId: "amb-0001",
+    observedAt: "2026-03-15T08:00:00.000Z",
+    source: {
+      deviceFamily: "mac_webcam",
+      deviceName: "Thomas的MacBook Air",
+      appVersion: "0.1.0",
+    },
+    capture: {
+      mode: "snapshot",
+      frameRef: "cache://localmac/latest.jpg",
+      width: 1600,
+      height: 900,
+    },
+    event: {
+      changeScore: 0.32,
+      personPresent: true,
+      personCount: 1,
+      activityState: "person_present",
+      reasons: ["person_appeared", "scene_changed"],
+    },
+    privacy: {
+      retainFrame: false,
+    },
+  };
+
+  assert.equal(Value.Check(AmbientVisionEventSchema, event), true);
+});
+
+test("rejects an invalid ambient vision event with the wrong device family", () => {
+  const event = {
+    schemaVersion: "0.1.0",
+    sessionId: "sess-mac-001",
+    observationId: "amb-0001",
+    observedAt: "2026-03-15T08:00:00.000Z",
+    source: {
+      deviceFamily: "rokid_glasses",
+      deviceName: "Thomas的MacBook Air",
+      appVersion: "0.1.0",
+    },
+    capture: {
+      mode: "snapshot",
+      frameRef: "cache://localmac/latest.jpg",
+    },
+    event: {
+      changeScore: 0.32,
+      personPresent: true,
+      personCount: 1,
+      activityState: "person_present",
+      reasons: ["person_appeared"],
+    },
+    privacy: {
+      retainFrame: false,
+    },
+  };
+
+  assert.equal(Value.Check(AmbientVisionEventSchema, event), false);
 });
 
 test("accepts an action envelope with overlay and speech actions", () => {

@@ -1,5 +1,17 @@
 import { Type } from "@sinclair/typebox";
 import WebSocket from "ws";
+import {
+  buildEcosystemRegistry,
+  listCapabilities,
+  resolveIntentDispatchPlan,
+  resolveIntentExecution,
+  type RoutePreference,
+  type HaControlConfig,
+} from "./ecosystem.ts";
+import {
+  executeDirectAdapter,
+  getDirectAdapterAvailability,
+} from "./direct-adapters.ts";
 
 type ToolContent = { type: "text"; text: string };
 
@@ -20,42 +32,6 @@ type PluginApi = {
   }) => void;
   registerGatewayMethod: (name: string, handler: (ctx: any) => void) => void;
   registerService: (service: { id: string; start: () => void; stop: () => void }) => void;
-};
-
-type HaControlConfig = {
-  baseUrl: string;
-  token: string;
-  webhookSecret?: string;
-  presenceEntityId?: string;
-  coolingSceneEntityId?: string;
-  fanEntityId?: string;
-  climateEntityId?: string;
-  targetTemperatureC?: number;
-  climateHvacMode?: string;
-  notification?: {
-    domain?: string;
-    service?: string;
-    title?: string;
-    extraData?: Record<string, unknown>;
-  };
-  mechanicalSwitch?: {
-    thirdRealityEntityId?: string;
-    switchBotEntityId?: string;
-    onHighHeartRate?: boolean;
-    onArrivalCooling?: boolean;
-  };
-  mirrorEntities?: {
-    latestHeartRate?: string;
-    recentHighHr?: string;
-    presence?: string;
-  };
-  policies?: {
-    highHrThresholdBpm?: number;
-    highHrSustainSec?: number;
-    recentHrWindowSec?: number;
-    dedupeWindowSec?: number;
-    autoCoolOnHighHrAtHome?: boolean;
-  };
 };
 
 type HrPayload = {
@@ -390,6 +366,119 @@ export default function register(api: PluginApi) {
         const cfg = getCfg(api);
         const data = await processConversation(cfg, params.text, params.language ?? "en");
         return asTextContent(data);
+      },
+    },
+    { optional: true },
+  );
+
+  api.registerTool(
+    {
+      name: "home_list_capabilities",
+      description: "List configured Xiaomi, Matter, Aqara, Tuya, SwitchBot, and other ecosystem devices routed through Home Assistant.",
+      parameters: Type.Object({
+        ecosystem: Type.Optional(Type.String()),
+        vendor: Type.Optional(Type.String()),
+        area: Type.Optional(Type.String()),
+        kind: Type.Optional(Type.String()),
+      }),
+      async execute(
+        _id: string,
+        params: {
+          ecosystem?: string;
+          vendor?: string;
+          area?: string;
+          kind?: string;
+        },
+      ) {
+        const cfg = getCfg(api);
+        const registry = buildEcosystemRegistry(cfg);
+        return asTextContent({
+          ok: true,
+          capabilities: listCapabilities(registry, params),
+        });
+      },
+    },
+    { optional: true },
+  );
+
+  api.registerTool(
+    {
+      name: "home_execute_intent",
+      description: "Resolve a configured ecosystem device intent into a constrained Home Assistant service call.",
+      parameters: Type.Object({
+        device_id: Type.Optional(Type.String()),
+        alias: Type.Optional(Type.String()),
+        intent: Type.String(),
+        value: Type.Optional(Type.Any()),
+        confirmed: Type.Optional(Type.Boolean()),
+        route: Type.Optional(
+          Type.Union([
+            Type.Literal("auto"),
+            Type.Literal("home_assistant"),
+            Type.Literal("direct_adapter"),
+          ]),
+        ),
+      }),
+      async execute(
+        _id: string,
+        params: {
+          device_id?: string;
+          alias?: string;
+          intent: string;
+          value?: unknown;
+          confirmed?: boolean;
+          route?: RoutePreference;
+        },
+      ) {
+        const cfg = getCfg(api);
+        const registry = buildEcosystemRegistry(cfg);
+        const plan = resolveIntentDispatchPlan(registry, {
+          deviceId: params.device_id,
+          alias: params.alias,
+          intent: params.intent,
+          value: params.value,
+          confirmed: params.confirmed,
+          route: params.route,
+        });
+        const directAvailability = getDirectAdapterAvailability(api, plan);
+
+        if (plan.dispatch.target === "direct_adapter" && directAvailability.supported) {
+          const result = await executeDirectAdapter(api, plan);
+          return asTextContent({
+            ok: true,
+            ...plan,
+            dispatch: {
+              ...plan.dispatch,
+              executed: "direct_adapter",
+              fallback: false,
+            },
+            result,
+          });
+        }
+
+        if (params.route === "direct_adapter") {
+          throw new Error(
+            `Requested direct adapter route is unavailable: ${directAvailability.reason ?? "unsupported direct adapter"}`,
+          );
+        }
+
+        const result = await callService(
+          cfg,
+          plan.serviceCall.domain,
+          plan.serviceCall.service,
+          plan.serviceCall.data,
+        );
+        return asTextContent({
+          ok: true,
+          ...plan,
+          dispatch: {
+            ...plan.dispatch,
+            executed: "home_assistant",
+            fallback: plan.dispatch.target === "direct_adapter",
+            directAdapter: plan.dispatch.directAdapter,
+          },
+          result,
+        });
       },
     },
     { optional: true },

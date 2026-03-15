@@ -1,0 +1,3 @@
+<resources>
+    <style name="Theme.MiBandGateway" parent="Theme.AppCompat.DayNight.NoActionBar" />
+</resources>

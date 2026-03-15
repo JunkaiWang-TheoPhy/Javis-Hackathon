@@ -1,0 +1,28 @@
+{
+  "id": "smartthings",
+  "name": "SmartThings",
+  "description": "HA-first, direct-compatible SmartThings plugin skeleton for OpenClaw.",
+  "version": "0.1.0",
+  "skills": ["skills"],
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "baseUrl": { "type": "string", "description": "SmartThings API base URL" },
+      "personalAccessToken": { "type": "string", "description": "SmartThings personal access token" },
+      "locationId": { "type": "string", "description": "SmartThings location id" },
+      "clientId": { "type": "string", "description": "OAuth client id for future Home API flows" },
+      "clientSecret": { "type": "string", "description": "OAuth client secret for future Home API flows" },
+      "redirectUri": { "type": "string", "description": "OAuth redirect URI for future Home API flows" },
+      "homeApiEnabled": { "type": "boolean", "default": false }
+    }
+  },
+  "uiHints": {
+    "baseUrl": { "label": "SmartThings Base URL" },
+    "personalAccessToken": { "label": "Personal Access Token", "sensitive": true },
+    "locationId": { "label": "Location ID" },
+    "clientId": { "label": "OAuth Client ID" },
+    "clientSecret": { "label": "OAuth Client Secret", "sensitive": true },
+    "redirectUri": { "label": "OAuth Redirect URI" }
+  }
+}

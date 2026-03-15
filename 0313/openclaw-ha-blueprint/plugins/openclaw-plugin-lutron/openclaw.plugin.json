@@ -1,0 +1,36 @@
+{
+  "id": "lutron",
+  "name": "Lutron",
+  "description": "HA-first, direct-compatible Lutron plugin skeleton for OpenClaw.",
+  "version": "0.1.0",
+  "skills": ["skills"],
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "systemType": {
+        "type": "string",
+        "description": "Lutron system type, such as caseta, ra3, or qsx"
+      },
+      "bridgeHost": { "type": "string", "description": "Lutron bridge or processor host" },
+      "bridgeId": { "type": "string", "description": "Optional expected Lutron bridge identifier" },
+      "keyFile": { "type": "string", "description": "Path to the Lutron client key file" },
+      "certFile": { "type": "string", "description": "Path to the Lutron client certificate file" },
+      "caCertFile": { "type": "string", "description": "Path to the Lutron CA certificate file" },
+      "port": { "type": "number", "description": "Local bridge TLS port. Default is 8081." },
+      "servername": { "type": "string", "description": "Optional TLS servername override" },
+      "connectTimeoutMs": { "type": "number", "description": "Session connect timeout in milliseconds" },
+      "leapEnabled": { "type": "boolean", "default": false }
+    }
+  },
+  "uiHints": {
+    "systemType": { "label": "Lutron System Type" },
+    "bridgeHost": { "label": "Lutron Bridge Host" },
+    "bridgeId": { "label": "Lutron Bridge ID" },
+    "keyFile": { "label": "Key File" },
+    "certFile": { "label": "Certificate File" },
+    "caCertFile": { "label": "CA Certificate File" },
+    "port": { "label": "Bridge Port" },
+    "servername": { "label": "TLS Servername" }
+  }
+}

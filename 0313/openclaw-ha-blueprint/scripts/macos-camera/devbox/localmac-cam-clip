@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+. "$script_dir/localmac-camera-common.sh"
+
+duration="${MAC_CAMERA_CLIP_DURATION:-5s}"
+"$openclaw_bin" nodes camera clip --node "$mac_camera_node_id" --facing front --duration "$duration" --no-audio
