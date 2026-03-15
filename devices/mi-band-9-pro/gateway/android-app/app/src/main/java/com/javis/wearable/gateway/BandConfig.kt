@@ -14,4 +14,8 @@ object BandConfig {
 
     const val miFitnessPackage = "com.mi.health"
     const val wearableManagerPackage = "com.huami.watch.hmwatchmanager"
+    const val xiaomiProviderMainAuthority = "com.mi.health.provider.main"
+    const val xiaomiProviderDeviceAuthority = "com.mi.health.provider.device"
+    const val xiaomiFitnessMainLogPath = "/sdcard/Android/data/com.mi.health/files/log/XiaomiFit.main.log"
+    const val xiaomiFitnessDeviceLogPath = "/sdcard/Android/data/com.mi.health/files/log/XiaomiFit.device.log"
 }

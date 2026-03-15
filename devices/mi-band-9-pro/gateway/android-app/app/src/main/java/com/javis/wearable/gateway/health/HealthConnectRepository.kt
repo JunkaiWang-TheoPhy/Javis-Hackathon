@@ -27,11 +27,40 @@ data class HealthMetrics(
     val spo2Percent: Int? = null,
     val steps: Int? = null,
     val sourceTimestamp: Instant? = null,
+    val heartRateSource: String? = null,
+    val spo2Source: String? = null,
+    val stepsSource: String? = null,
     val sdkStatus: Int = HealthConnectClient.SDK_UNAVAILABLE,
     val available: Boolean = false,
     val permissionGranted: Boolean = false,
-    val statusMessage: String = "sdk_unavailable"
-)
+    val statusMessage: String = "sdk_unavailable",
+    val debugInfo: Map<String, String> = emptyMap()
+) {
+    fun hasAnyMetric(): Boolean {
+        return heartRateBpm != null || spo2Percent != null || steps != null
+    }
+
+    fun mergeMissingFrom(fallback: HealthMetrics): HealthMetrics {
+        return copy(
+            heartRateBpm = heartRateBpm ?: fallback.heartRateBpm,
+            spo2Percent = spo2Percent ?: fallback.spo2Percent,
+            steps = steps ?: fallback.steps,
+            sourceTimestamp = listOfNotNull(sourceTimestamp, fallback.sourceTimestamp).maxOrNull(),
+            heartRateSource = heartRateSource ?: fallback.heartRateSource,
+            spo2Source = spo2Source ?: fallback.spo2Source,
+            stepsSource = stepsSource ?: fallback.stepsSource,
+            sdkStatus = if (sdkStatus != HealthConnectClient.SDK_UNAVAILABLE) sdkStatus else fallback.sdkStatus,
+            available = available || fallback.available,
+            permissionGranted = permissionGranted || fallback.permissionGranted,
+            statusMessage = when {
+                hasAnyMetric() -> statusMessage
+                fallback.hasAnyMetric() -> fallback.statusMessage
+                else -> statusMessage
+            },
+            debugInfo = debugInfo + fallback.debugInfo
+        )
+    }
+}
 
 class HealthConnectRepository(
     private val context: Context,
@@ -59,7 +88,8 @@ class HealthConnectRepository(
                 sdkStatus = availability.sdkStatus,
                 available = false,
                 permissionGranted = false,
-                statusMessage = availability.message
+                statusMessage = availability.message,
+                debugInfo = mapOf("health_connect_status" to availability.message)
             )
         }
 
@@ -70,7 +100,8 @@ class HealthConnectRepository(
                 sdkStatus = availability.sdkStatus,
                 available = true,
                 permissionGranted = false,
-                statusMessage = "missing_permissions"
+                statusMessage = "missing_permissions",
+                debugInfo = mapOf("health_connect_status" to "missing_permissions")
             )
         }
 
@@ -88,17 +119,24 @@ class HealthConnectRepository(
                 spo2Percent = spo2?.second,
                 steps = steps?.second,
                 sourceTimestamp = sourceTimestamp,
+                heartRateSource = heartRate?.second?.let { "health_connect" },
+                spo2Source = spo2?.second?.let { "health_connect" },
+                stepsSource = steps?.second?.let { "health_connect" },
                 sdkStatus = availability.sdkStatus,
                 available = true,
                 permissionGranted = true,
-                statusMessage = "ok"
+                statusMessage = "ok",
+                debugInfo = mapOf("health_connect_status" to "ok")
             )
         }.getOrElse { error ->
             HealthMetrics(
                 sdkStatus = availability.sdkStatus,
                 available = true,
                 permissionGranted = true,
-                statusMessage = "error:${error.javaClass.simpleName}"
+                statusMessage = "error:${error.javaClass.simpleName}",
+                debugInfo = mapOf(
+                    "health_connect_status" to "error:${error.javaClass.simpleName}"
+                )
             )
         }
     }

@@ -19,6 +19,11 @@ import com.javis.wearable.gateway.health.HealthConnectRepository
 import com.javis.wearable.gateway.health.HealthMetrics
 import com.javis.wearable.gateway.http.GatewayHttpServer
 import com.javis.wearable.gateway.http.SseBroker
+import com.javis.wearable.gateway.local.CompositeMetricsSource
+import com.javis.wearable.gateway.local.GatewayMetricsSource
+import com.javis.wearable.gateway.local.XiaomiFitnessLocalSource
+import com.javis.wearable.gateway.local.XiaomiFitnessLogReader
+import com.javis.wearable.gateway.local.XiaomiFitnessProviderProbe
 import com.javis.wearable.gateway.model.ConnectionStatus
 import com.javis.wearable.gateway.model.GatewaySnapshot
 import com.javis.wearable.gateway.model.GatewayStatus
@@ -42,6 +47,7 @@ class GatewayForegroundService : Service() {
     private lateinit var sseBroker: SseBroker
     private lateinit var httpServer: GatewayHttpServer
     private lateinit var healthRepository: HealthConnectRepository
+    private lateinit var metricsSource: GatewayMetricsSource
     private lateinit var bandConnectionRepository: BandConnectionRepository
 
     @Volatile
@@ -58,6 +64,13 @@ class GatewayForegroundService : Service() {
         snapshotStore = GatewaySnapshotStore()
         sseBroker = SseBroker()
         healthRepository = HealthConnectRepository(applicationContext)
+        metricsSource = CompositeMetricsSource(
+            primary = XiaomiFitnessLocalSource(
+                providerProbe = XiaomiFitnessProviderProbe(applicationContext)::probe,
+                logReader = XiaomiFitnessLogReader()::readRecentLines
+            ),
+            fallback = GatewayMetricsSource { healthRepository.readLatestMetrics() }
+        )
         bandConnectionRepository = BandConnectionRepository(applicationContext)
         httpServer = GatewayHttpServer(
             snapshotStore = snapshotStore,
@@ -99,7 +112,7 @@ class GatewayForegroundService : Service() {
 
         serviceScope.launch {
             while (isActive) {
-                updateHealthSnapshot(healthRepository.readLatestMetrics())
+                updateHealthSnapshot(metricsSource.readLatestMetrics())
                 delay(HEALTH_POLL_MS)
             }
         }
@@ -143,9 +156,9 @@ class GatewayForegroundService : Service() {
                 gatewayTimestamp = now
             ),
             source = current.source.copy(
-                heartRate = metrics.heartRateBpm?.let { "health_connect" },
-                spo2 = metrics.spo2Percent?.let { "health_connect" },
-                steps = metrics.steps?.let { "health_connect" },
+                heartRate = metrics.heartRateSource,
+                spo2 = metrics.spo2Source,
+                steps = metrics.stepsSource,
                 connection = current.source.connection ?: "bluetooth_manager"
             )
         )
@@ -157,8 +170,12 @@ class GatewayForegroundService : Service() {
     }
 
     private fun gatewayStatus(): GatewayStatus {
+        val localSourceReady = lastHealthMetrics.debugInfo["xiaomi_log_status"] == "ok" ||
+            lastHealthMetrics.debugInfo["xiaomi_provider_status"] == "rows_available"
         return GatewayStatus(
-            healthConnectReady = lastHealthMetrics.available && lastHealthMetrics.permissionGranted,
+            healthConnectReady = lastHealthMetrics.debugInfo["health_connect_status"] == "ok",
+            localSourceReady = localSourceReady,
+            metricsReady = lastHealthMetrics.hasAnyMetric(),
             bluetoothReady = lastConnectionState.bluetoothEnabled,
             lastCollectedAt = lastCollectedAt
         )
@@ -166,12 +183,20 @@ class GatewayForegroundService : Service() {
 
     private fun debugSourceJson(): String {
         return buildJsonObject {
-            put("health_connect_status", lastHealthMetrics.statusMessage)
+            put(
+                "health_connect_status",
+                lastHealthMetrics.debugInfo["health_connect_status"] ?: lastHealthMetrics.statusMessage
+            )
             put("sdk_status", lastHealthMetrics.sdkStatus)
             put("permissions_granted", lastHealthMetrics.permissionGranted)
             put("bluetooth_enabled", lastConnectionState.bluetoothEnabled)
             put("band_status", lastConnectionState.status)
             put("band_mac", lastConnectionState.mac)
+            lastHealthMetrics.debugInfo.forEach { (key, value) ->
+                if (key != "health_connect_status") {
+                    put(key, value)
+                }
+            }
         }.toString()
     }
 

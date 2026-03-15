@@ -85,15 +85,32 @@ This note records the progress made in this session for the `Xiaomi 12X -> Mi Ba
   - `GET /debug/source`
   - `GET /events`
 
+### 9. Xiaomi-local source implementation
+
+- Added a Xiaomi-local source layer ahead of Health Connect
+- Added a structured Xiaomi log parser for:
+  - `DailyStepReport`
+  - `DailySpo2Report`
+- Added a Xiaomi provider probe for `com.mi.health.provider.main`
+- Added a composite source that prefers Xiaomi-local reads and then fills missing metrics from Health Connect
+- Added Android JVM tests for:
+  - Xiaomi log parsing
+  - local-source status handling
+  - composite source fallback behavior
+
 ## Current Observed State
 
-The implementation exists and the transport path works. The gateway now reports live Bluetooth/bonding status correctly, but health metrics are still blocked by provider compatibility on this ROM.
+The implementation exists and the transport path works. The gateway now reports live Bluetooth/bonding status correctly and exposes local-source diagnostics, but health metrics are still blocked on this ROM.
 
 Latest observed values:
 
 - `health_connect_ready = false`
+- `local_source_ready = false`
+- `metrics_ready = false`
 - `bluetooth_ready = true`
-- `health_connect_status = xiaomi_provider_incompatible_interface`
+- `health_connect_status = missing_permissions`
+- `xiaomi_provider_status = no_provider_deploy`
+- `xiaomi_log_status = inaccessible:IllegalStateException`
 - `band_status = bonded`
 - `android.permission.BLUETOOTH_CONNECT = granted=true`
 - `android.permission.POST_NOTIFICATIONS = granted=true`
@@ -102,25 +119,30 @@ This means:
 
 - the desktop bridge is live
 - the phone can expose band connection state through the gateway today
-- but Xiaomi's built-in health service does not implement the same binder interface expected by Jetpack `HealthConnectClient`
+- the gateway now probes Xiaomi-local data first
+- current guessed Xiaomi provider paths still fail with `no_provider_deploy`
+- the Xiaomi log parser exists, but the Android app cannot currently read `com.mi.health` log files from its own sandbox
+- the official Google Health Connect package is installed, but permissions are still missing
 - so `heart_rate_bpm`, `spo2_percent`, and `steps` remain `null` on the current reader path
 
 ## What Still Needs To Be Done On The Phone
 
 1. Keep `Mi Band Gateway` in foreground when starting the gateway.
-2. If available from Play Store, install official `Health Connect` (`com.google.android.apps.healthdata`).
-3. In Xiaomi Fitness, allow sync/write into Health Connect if the option appears.
-4. In `Mi Band Gateway`, tap:
+2. In `Mi Band Gateway`, tap:
    - `Grant Android Permissions`
    - `Open Health Connect`
    - `Grant Health Permissions`
    - `Start Gateway`
+3. In `Health Connect`, grant the gateway read access for heart rate, SpO2, and steps.
+4. In Xiaomi Fitness, allow sync/write into Health Connect if the option appears.
 
 ## Expected Next-State Signal
 
-If a compatible Google Health Connect provider becomes available and Xiaomi Fitness sync is enabled, the expected signals are:
+If either Xiaomi-local provider access starts working or Xiaomi Fitness syncs into granted Health Connect, the expected signals are:
 
 - `health_connect_ready = true`
+- `local_source_ready = true` or remains `false` while `health_connect_ready = true`
+- `metrics_ready = true`
 - `bluetooth_ready = true`
 - `band_status = bonded` or `connected`
 - `/health/latest` starts returning non-null:

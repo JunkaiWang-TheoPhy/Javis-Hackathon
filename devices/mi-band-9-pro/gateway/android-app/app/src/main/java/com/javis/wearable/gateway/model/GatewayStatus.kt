@@ -16,6 +16,10 @@ data class GatewayStatus(
     val bandMac: String = BandConfig.bandMac,
     @SerialName("health_connect_ready")
     val healthConnectReady: Boolean = false,
+    @SerialName("local_source_ready")
+    val localSourceReady: Boolean = false,
+    @SerialName("metrics_ready")
+    val metricsReady: Boolean = false,
     @SerialName("bluetooth_ready")
     val bluetoothReady: Boolean = false,
     @SerialName("last_collected_at")
