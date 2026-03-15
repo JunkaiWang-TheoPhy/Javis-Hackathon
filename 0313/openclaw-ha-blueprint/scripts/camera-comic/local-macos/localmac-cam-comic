@@ -3,6 +3,7 @@ set -euo pipefail
 
 wrapper_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 camera_script_dir="$(cd "$wrapper_dir/../../macos-camera/local-macos" && pwd)"
+devbox_camera_script_dir="$(cd "$wrapper_dir/../../macos-camera/devbox" && pwd)"
 launchd_script_dir="$(cd "$wrapper_dir/../../macos-camera/launchd" && pwd)"
 helper_script="$(cd "$wrapper_dir/.." && pwd)/push_camera_comic_to_devbox.py"
 
@@ -28,6 +29,7 @@ ensure_gateway_tunnel() {
   local health_url="http://127.0.0.1:${tunnel_local_port}/health"
   local listeners
   local attempt
+  local tunnel_log
   local tunnel_output
 
   if curl -fsS "$health_url" >/dev/null 2>&1; then
@@ -47,22 +49,24 @@ ensure_gateway_tunnel() {
   fi
 
   for attempt in $(seq 1 2); do
-    if tunnel_output="$(
-      "$ssh_bin_local" \
-        -fN \
-        -L "${tunnel_local_port}:${tunnel_remote_host}:${tunnel_remote_port}" \
-        -o ExitOnForwardFailure=yes \
-        -o ServerAliveInterval=30 \
-        -o ServerAliveCountMax=3 \
-        -o TCPKeepAlive=yes \
-        -o IdentitiesOnly=yes \
-        -o StrictHostKeyChecking=accept-new \
-        -i "$tunnel_identity" \
-        -p "$tunnel_port" \
-        "${tunnel_user}@${tunnel_host}" 2>&1
-    )"; then
+    tunnel_log="$(mktemp)"
+    if "$ssh_bin_local" \
+      -fN \
+      -L "${tunnel_local_port}:${tunnel_remote_host}:${tunnel_remote_port}" \
+      -o ExitOnForwardFailure=yes \
+      -o ServerAliveInterval=30 \
+      -o ServerAliveCountMax=3 \
+      -o TCPKeepAlive=yes \
+      -o IdentitiesOnly=yes \
+      -o StrictHostKeyChecking=accept-new \
+      -i "$tunnel_identity" \
+      -p "$tunnel_port" \
+      "${tunnel_user}@${tunnel_host}" 2>"$tunnel_log"; then
+      rm -f "$tunnel_log"
       break
     fi
+    tunnel_output="$(cat "$tunnel_log")"
+    rm -f "$tunnel_log"
 
     if [[ "$tunnel_output" == *"Address already in use"* ]] && (( attempt < 2 )); then
       listeners="$(lsof -tiTCP:"$tunnel_local_port" -sTCP:LISTEN 2>/dev/null || true)"
@@ -91,13 +95,44 @@ ensure_gateway_tunnel() {
 run_camera_shot_with_retry() {
   local attempt
   local output
+  local media_path
 
   for attempt in $(seq 1 "$capture_retry_count"); do
-    if output="$("$camera_script_dir/mac-camera-shot" 2>&1)"; then
+    if output="$("$devbox_camera_script_dir/localmac-cam-snap" 2>&1)"; then
+      media_path="$(
+        printf '%s\n' "$output" \
+          | perl -pe 's/\e\[[0-9;?]*[[:alpha:]]//g; s/\r//g' \
+          | sed -n 's/^MEDIA://p' \
+          | tail -n1
+      )"
+      if [[ -z "$media_path" ]]; then
+        printf '%s\n' "$output" >&2
+        return 1
+      fi
+      require_file "$media_path"
+      cp "$media_path" "$latest_image_path"
+      python3 - "$latest_json_path" "$media_path" <<'PY'
+from __future__ import annotations
+
+from datetime import datetime, timezone
+import json
+from pathlib import Path
+import sys
+
+
+metadata_path = Path(sys.argv[1])
+original_path = sys.argv[2]
+payload = {
+    "source": "localmac",
+    "originalPath": original_path,
+    "capturedAt": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+}
+metadata_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+PY
       return 0
     fi
 
-    if [[ "$output" == *"service restart"* || "$output" == *"unknown node"* || "$output" == *"gateway closed"* ]]; then
+    if [[ "$output" == *"service restart"* || "$output" == *"unknown node"* || "$output" == *"gateway closed"* || "$output" == *"UNAVAILABLE"* ]]; then
       if (( attempt < capture_retry_count )); then
         ensure_gateway_tunnel
         sleep "$capture_retry_delay_sec"

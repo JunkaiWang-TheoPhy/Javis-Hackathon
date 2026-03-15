@@ -263,6 +263,7 @@ def persist_local_memory(bridge_url: str, remote_alias: str) -> None:
         "",
         f"- bring up stack: `{ROOT / 'up.sh'}`",
         f"- redeploy remote config only: `python3 {DEPLOY_REMOTE}`",
+        f"- print one image: `python3 {ROOT / 'print_image.py'} /path/to/image.jpg --media three_inch`",
         "",
         "## Automation",
         "",

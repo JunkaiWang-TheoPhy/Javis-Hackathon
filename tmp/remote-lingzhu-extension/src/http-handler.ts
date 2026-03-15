@@ -21,6 +21,12 @@ import {
 import { buildRequestLogName, summarizeForDebug, writeDebugLog } from "./debug-log.js";
 import { cleanupImageCacheIfNeeded, ensureImageCacheDir } from "./image-cache.js";
 import { lingzhuEventBus } from "./events.js";
+import {
+  resolveFirstTurnBufferedContent,
+  selectFirstTurnOpening,
+  stripRedundantFirstTurnIntro,
+  trimLeadingPunctuationAndWhitespace,
+} from "./first-turn-opening.js";
 
 interface LingzhuRuntimeState {
   config: LingzhuConfig;
@@ -37,12 +43,6 @@ interface ValidatedRemoteImageUrl {
 
 const REMOTE_IMAGE_PROTOCOLS = new Set(["http:", "https:"]);
 const REMOTE_IMAGE_TIMEOUT_MS = 15000;
-const MIRA_FIRST_TURN_OPENINGS = [
-  "我是Mira，温暖陪伴着你",
-  "我是Mira，永远在你身后",
-  "我是Mira，和你迈向人机共生的未来",
-  "我是Mira，与你一起进化",
-] as const;
 const firstTurnOpeningSessions = new Map<string, number>();
 const FIRST_TURN_OPENING_TTL_MS = 24 * 60 * 60 * 1000;
 const MAX_FIRST_TURN_OPENING_SESSIONS = 4096;
@@ -70,32 +70,7 @@ function claimFirstTurnOpening(sessionKey: string): string | null {
   }
 
   firstTurnOpeningSessions.set(sessionKey, now);
-  const digest = crypto.createHash("sha256").update(sessionKey).digest();
-  return MIRA_FIRST_TURN_OPENINGS[digest[0]! % MIRA_FIRST_TURN_OPENINGS.length] ?? null;
-}
-
-function stripRedundantFirstTurnIntro(text: string): string {
-  let normalized = text.replace(/^\s+/, "");
-  const patterns = [
-    /^你好[！!，,\s。]*我是(?:Mira|米拉)[，,、\s]*温暖陪伴着你[。！!\s]*/u,
-    /^你好[！!，,\s。]*我是(?:Mira|米拉)[。！!\s]*/u,
-    /^我是(?:Mira|米拉)[，,、\s]*温暖陪伴着你[。！!\s]*/u,
-    /^我是(?:Mira|米拉)[。！!\s]*/u,
-  ];
-
-  for (const pattern of patterns) {
-    const next = normalized.replace(pattern, "");
-    if (next !== normalized) {
-      normalized = next;
-      break;
-    }
-  }
-
-  return normalized;
-}
-
-function isPotentialFirstTurnIntroPrefix(text: string): boolean {
-  return /^(?:你好[！!，,\s。]*)?(?:我|我是|我是M|我是Mi|我是Mir|我是Mira|我是米|我是米拉)/u.test(text.trimStart());
+  return selectFirstTurnOpening(sessionKey);
 }
 
 function resolveMaxImageBytes(config: LingzhuConfig): number {
@@ -986,16 +961,13 @@ export function createHttpHandler(api: any, getRuntimeState: () => LingzhuRuntim
 
                 if (!firstTurnContentResolved) {
                   pendingFirstTurnContent += delta.content;
-                  const cleaned = stripRedundantFirstTurnIntro(pendingFirstTurnContent);
-                  const sawSentenceBoundary = /[。！？!?\n]/u.test(pendingFirstTurnContent);
-                  const prefixWasStripped = cleaned !== pendingFirstTurnContent;
-                  const pendingLooksLikeIntro = isPotentialFirstTurnIntroPrefix(pendingFirstTurnContent);
-                  const shouldResolve = pendingFirstTurnContent.length >= FIRST_TURN_PREFIX_BUFFER_LIMIT
-                    || (prefixWasStripped && (cleaned.length > 0 || sawSentenceBoundary))
-                    || (
-                      pendingFirstTurnContent.length >= FIRST_TURN_PREFIX_MIN_BUFFER
-                      && !pendingLooksLikeIntro
-                    );
+                  const { shouldResolve, contentToSend: resolvedContent } = resolveFirstTurnBufferedContent(
+                    pendingFirstTurnContent,
+                    {
+                      bufferLimit: FIRST_TURN_PREFIX_BUFFER_LIMIT,
+                      minBuffer: FIRST_TURN_PREFIX_MIN_BUFFER,
+                    }
+                  );
 
                   if (!shouldResolve) {
                     continue;
@@ -1003,7 +975,7 @@ export function createHttpHandler(api: any, getRuntimeState: () => LingzhuRuntim
 
                   firstTurnContentResolved = true;
                   pendingFirstTurnContent = "";
-                  contentToSend = cleaned;
+                  contentToSend = resolvedContent;
                 }
 
                 if (!contentToSend) {
@@ -1064,12 +1036,14 @@ export function createHttpHandler(api: any, getRuntimeState: () => LingzhuRuntim
           pendingFirstTurnContent = "";
 
           if (cleaned) {
-            fullResponse += cleaned;
+            const contentToSend = trimLeadingPunctuationAndWhitespace(cleaned);
+            if (contentToSend) {
+            fullResponse += contentToSend;
             streamedAnswer = true;
             const answerChunkData: LingzhuSSEData = {
               role: "agent",
               type: "answer",
-              answer_stream: cleaned,
+              answer_stream: contentToSend,
               message_id: body.message_id,
               agent_id: body.agent_id,
               is_finish: false,
@@ -1080,6 +1054,7 @@ export function createHttpHandler(api: any, getRuntimeState: () => LingzhuRuntim
               summarizeForDebug(answerChunkData, includePayload)
             );
             safeWrite(formatLingzhuSSE("message", answerChunkData));
+            }
           }
         }
       } finally {

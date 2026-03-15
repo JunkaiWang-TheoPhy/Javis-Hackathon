@@ -737,6 +737,67 @@ And the current blocker is external:
 
 ---
 
+## `camera.clip` Re-check: allowlist fixed, app crash still reproduces
+
+这轮继续往下查 `camera.clip`，先把 gateway policy 层排掉，再验证真正的媒体路径。
+
+新发现：
+
+1. 第一轮 live `camera.clip` 并没有走到视频导出，先被 gateway 拒掉：
+
+   - `node command not allowed: "camera.clip" is not in the allowlist for platform "macOS 15.6.0"`
+
+2. 根因是远端 `~/.openclaw/openclaw.json` 里：
+
+   - `gateway.nodes.allowCommands = ["camera.snap"]`
+
+   还没有把 `camera.clip` 放进去。
+
+3. 已在远端把 allowlist 修成：
+
+   - `["camera.snap", "camera.clip"]`
+
+   并备份：
+
+   - `~/.openclaw/openclaw.json.bak-20260315-camera-clip-allow`
+
+4. 放开 allowlist 后再次执行 live `camera.clip`，错误从 policy 层前进到了真正的 app 运行时：
+
+   - CLI 返回：`nodes camera clip failed: GatewayClientRequestError: Error: node disconnected (camera.clip)`
+   - `OpenClaw.app` 进程 PID 从 `27656` 变成了 `76431`
+   - 说明 app 在执行 `clip` 时发生了异常退出并被 launchd watchdog 重新拉起
+
+5. 新 crash report：
+
+   - `~/Library/Logs/DiagnosticReports/OpenClaw-2026-03-15-093549.ips`
+
+   关键症状仍然和前一轮一致：
+
+   - `EXC_BAD_ACCESS`
+   - `SIGSEGV`
+   - faulting queue: `com.apple.coremedia.figassetexportsession.notifications`
+
+也就是说，现在 `camera.clip` 的真实状态已经非常清楚：
+
+- allowlist 问题：已修
+- node pairing / permissions：已排除
+- 真正剩余问题：`OpenClaw.app 2026.3.12` 的 `clip/export` 回调路径仍会崩
+
+当前唯一硬阻塞：
+
+- 本地 `openclaw-src` 已经有针对该崩溃的 workaround 改动
+- 但这台 Mac 还没有接受 Xcode license
+- 所以：
+  - `swift test --filter CameraCaptureServiceTests`
+  - `swift build`
+  都会直接以 `exit 69` 失败
+
+系统要求先执行：
+
+- `sudo xcodebuild -license accept`
+
+---
+
 ## Final Result
 
 这轮工作的最终结论是：

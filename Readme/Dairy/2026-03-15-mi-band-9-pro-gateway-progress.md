@@ -125,6 +125,59 @@ This means:
 - the official Google Health Connect package is installed, but permissions are still missing
 - so `heart_rate_bpm`, `spo2_percent`, and `steps` remain `null` on the current reader path
 
+## New Desktop ADB Bridge Path
+
+The blocked Android-side metric path is no longer the only route.
+
+Today we also implemented a desktop-side bridge under:
+
+- `tools/mi_band_desktop_bridge/`
+
+This bridge:
+
+- reads Xiaomi Fitness health data from the attached `Xiaomi 12X` over `adb`
+- parses `logcat` and readable Xiaomi Fitness external logs
+- serves a local HTTP API on the Mac
+- exposes read-only endpoints for snapshot, events, alerts, and debug evidence
+- can be consumed by the cloud `OpenClaw` runtime on `devbox`
+
+### Verified Results
+
+The desktop bridge was verified locally and through the remote bridge path on `2026-03-15`.
+
+Verified local endpoints:
+
+- `GET /health`
+- `GET /v1/band/status`
+- `GET /v1/band/latest`
+- `GET /v1/band/events`
+- `GET /v1/band/alerts`
+
+Verified non-null metrics from the local bridge:
+
+- `heart_rate_bpm = 83`
+- `spo2_percent = 97`
+- `steps = 2855`
+- `distance_m = 1801`
+- `calories_kcal = 104`
+- `connection.status = connected`
+
+Verified remote reachability:
+
+- the local bridge was exposed through a public Cloudflare tunnel
+- `devbox` fetched the same `/v1/band/latest` snapshot successfully
+- the remote OpenClaw gateway loaded the `mi-band-bridge` plugin
+- remote logs now include:
+  - `[mi-band-bridge] bridge target https://...trycloudflare.com`
+
+### Practical Outcome
+
+For this hardware and ROM, the recommended path is now:
+
+`Mi Band 9 Pro -> Xiaomi 12X -> adb collector on this Mac -> local HTTP bridge -> devbox OpenClaw`
+
+The Android gateway app remains useful for connection-state diagnostics and Xiaomi-local probing, but the desktop `adb` bridge is the first verified path in this repo that actually returns non-null heart rate, SpO2, and step data to the computer.
+
 ## What Still Needs To Be Done On The Phone
 
 1. Keep `Mi Band Gateway` in foreground when starting the gateway.

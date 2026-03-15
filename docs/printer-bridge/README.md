@@ -49,6 +49,15 @@ The script also writes a local persisted copy of the bridge facts to:
 - `~/.openclaw-printer-bridge/README.md`
 - `~/.openclaw-printer-bridge/profile.json`
 
+## High-Level Print Command
+
+Use [print_image.py](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/tools/printer_bridge/print_image.py) to submit one image print job without manually calling the bridge API.
+
+- default media alias: `three_inch`
+- bridge selection: prefer local loopback bridge, otherwise fall back to the current public tunnel URL
+- self-healing: if no healthy bridge URL is available, it can call `up.sh --skip-remote-gateway`
+- safety: `--dry-run` shows the resolved bridge URL and request metadata without sending a print job
+
 ## Launchd
 
 Use [install_launchd.py](/Users/thomasjwang/.config/superpowers/worktrees/Javis-Hackathon/printer-bridge/tools/printer_bridge/install_launchd.py) to install persistent user LaunchAgents on this Mac.
