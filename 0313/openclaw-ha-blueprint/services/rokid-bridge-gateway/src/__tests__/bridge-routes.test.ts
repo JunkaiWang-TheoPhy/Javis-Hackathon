@@ -93,6 +93,34 @@ function buildAmbientObservation(overrides: Record<string, unknown> = {}) {
 test("POST /v1/observe returns a confirm-tier coffee machine envelope", async () => {
   const server = createBridgeServer({
     dispatchHomeAssistantAction: async () => ({ ok: true }),
+    haControlConfig: {
+      baseUrl: "http://homeassistant:8123",
+      token: "test-token",
+      ecosystems: [
+        {
+          id: "demo-home",
+          vendor: "xiaomi",
+          integration: "home_assistant",
+          devices: [
+            {
+              id: "coffee-scene",
+              entityId: "scene.morning_coffee",
+              kind: "scene",
+              aliases: ["coffee machine", "coffee_machine"],
+              capabilities: [
+                {
+                  intent: "activate",
+                  domain: "scene",
+                  service: "turn_on",
+                  riskTier: "confirm",
+                  requiresConfirmation: true,
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
   });
   await server.listen(0);
   closers.push(() => server.close());
@@ -114,6 +142,13 @@ test("POST /v1/observe returns a confirm-tier coffee machine envelope", async ()
   );
   assert.equal(
     envelope.actions.some((action: { kind: string }) => action.kind === "highlight_target"),
+    true,
+  );
+  assert.equal(
+    envelope.actions.some(
+      (action: { kind: string; body?: string }) =>
+        action.kind === "overlay_panel" && /scene\.morning_coffee/.test(action.body ?? ""),
+    ),
     true,
   );
 });

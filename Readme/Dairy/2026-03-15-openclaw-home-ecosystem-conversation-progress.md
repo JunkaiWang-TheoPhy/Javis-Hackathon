@@ -161,7 +161,7 @@ This last step was kept documentation-only on purpose:
 
 - Full repo verification in `0313/openclaw-ha-blueprint` reached:
   - `npm test`
-  - result: `40/40` tests passed
+  - result: `55/55` tests passed
 - Targeted Lutron verification reached:
   - `npm test -- plugins/openclaw-plugin-lutron/src/__tests__/lutron.test.ts`
   - result: `5/5` tests passed

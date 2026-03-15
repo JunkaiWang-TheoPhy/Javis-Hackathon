@@ -472,6 +472,7 @@
       "google-home": {
         "enabled": false,
         "config": {
+          "authGatewayBaseUrl": "http://ecosystem-auth-gateway:3401",
           "projectId": "replace-me-google-project-id",
           "projectNumber": "replace-me-google-project-number",
           "clientId": "replace-me-google-client-id",
@@ -505,6 +506,17 @@
           "clientSecret": "replace-me-smartthings-client-secret",
           "redirectUri": "https://example.com/oauth/smartthings/callback",
           "homeApiEnabled": false
+        }
+      },
+      "alexa": {
+        "enabled": false,
+        "config": {
+          "skillId": "replace-me-alexa-skill-id",
+          "clientId": "replace-me-alexa-client-id",
+          "clientSecret": "replace-me-alexa-client-secret",
+          "redirectUri": "https://example.com/oauth/alexa/callback",
+          "accountLinkingEnabled": false,
+          "awsRegion": "us-east-1"
         }
       }
     }

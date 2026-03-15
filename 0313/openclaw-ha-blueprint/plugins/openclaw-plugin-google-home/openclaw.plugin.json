@@ -13,6 +13,7 @@
       "clientId": { "type": "string", "description": "OAuth client ID" },
       "clientSecret": { "type": "string", "description": "OAuth client secret" },
       "redirectUri": { "type": "string", "description": "OAuth redirect URI" },
+      "authGatewayBaseUrl": { "type": "string", "description": "Shared ecosystem auth gateway base URL" },
       "homeApiEnabled": { "type": "boolean", "default": false },
       "platforms": {
         "type": "array",
@@ -27,6 +28,7 @@
     "clientId": { "label": "Google Client ID" },
     "clientSecret": { "label": "Google Client Secret", "sensitive": true },
     "redirectUri": { "label": "Google Redirect URI" },
+    "authGatewayBaseUrl": { "label": "Auth Gateway Base URL" },
     "platforms": { "label": "Client Platforms" }
   }
 }

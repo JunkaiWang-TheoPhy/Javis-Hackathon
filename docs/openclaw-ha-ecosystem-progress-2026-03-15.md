@@ -9,11 +9,11 @@ The `0313/openclaw-ha-blueprint` repo now has a clearer multi-ecosystem home-con
 - `Home Assistant` remains the primary device plane
 - `openclaw-plugin-ha-control` now carries a HA-first ecosystem registry
 - `Philips Hue` now has both a direct bridge plugin and an active `directAdapter` route from `ha-control`
-- `Amazon Alexa` is now included in the repo's ecosystem support inventory
+- `Amazon Alexa` now has a readiness-only plugin in the repo
 - `Apple Home / HomeKit` is now called out more explicitly in the repo's ecosystem support inventory
-- `Google Home / Nest` has a readiness-only plugin that validates setup but does not pretend to offer live control yet
+- `Google Home / Nest` now has a real OAuth callback and token-flow path through a shared auth gateway, while still stopping short of broad live device control
 - `Lutron` now has a local bridge session diagnostic layer on top of its HA-first skeleton, including a summarized session-info tool
-- `SmartThings` still has a readiness-only HA-first and direct-compatible skeleton
+- `SmartThings` now has a minimal live-control surface on top of its HA-first and direct-compatible skeleton
 - `HomeKit` remains HA-first only in this repo
 
 ## Completed
@@ -32,8 +32,13 @@ The `0313/openclaw-ha-blueprint` repo now has a clearer multi-ecosystem home-con
   - `google_home_config_summary`
   - `google_home_validate_config`
   - `google_home_oauth_checklist`
+  - `google_home_auth_status`
+  - `google_home_build_auth_url`
+  - `google_home_token_summary`
 - Added `plugins/openclaw-plugin-lutron/` with readiness, config validation, local bridge session testing, and summarized session-info output
-- Added `plugins/openclaw-plugin-smartthings/` with readiness and config validation tools
+- Added `plugins/openclaw-plugin-smartthings/` with readiness plus minimal list/status/execute tools
+- Added `plugins/openclaw-plugin-alexa/` with readiness and account-linking checklist tools
+- Added `services/ecosystem-auth-gateway/` for shared OAuth callback and token handling
 - Updated `scripts/bootstrap-openclaw-plugin.sh` to install the new brand plugins
 - Added tests for direct routing, the new brand plugins, and bootstrap script coverage
 
@@ -54,17 +59,19 @@ Use `plugins/openclaw-plugin-ha-control/` as the default route for:
 - Lutron through Home Assistant-backed entities
 - SmartThings through Home Assistant-backed entities
 
-`Amazon Alexa` is currently included at the support-inventory level in this repo.
+`Amazon Alexa` now has a readiness-only plugin in this repo.
 
 ### Direct plugin path
 
 Use `plugins/openclaw-plugin-hue/` when you explicitly want local Hue bridge access.
 
-Use `plugins/openclaw-plugin-google-home/` only for setup and readiness checks. It does not expose live Google device control yet.
+Use `plugins/openclaw-plugin-google-home/` for setup, OAuth callback wiring, and token-state inspection. It still does not expose broad live Google device control yet.
 
 Use `plugins/openclaw-plugin-lutron/` for readiness checks and local bridge session diagnostics, including summarized session info. It still does not expose live device control yet.
 
-Use `plugins/openclaw-plugin-smartthings/` for readiness checks only. It does not expose live device control yet.
+Use `plugins/openclaw-plugin-smartthings/` for readiness plus narrow list/status/execute control.
+
+Use `plugins/openclaw-plugin-alexa/` for readiness and account-linking checks only.
 
 ## Enablement Notes
 
@@ -87,9 +94,7 @@ Examples:
 
 ## Still Pending
 
-- Add a real Google Home / Nest OAuth callback flow and token handling
 - Add a higher-level Lutron LEAP command layer if direct execution is needed beyond HA
-- Add a real SmartThings auth and device-control layer if HA coverage is insufficient
 - Add more vendor-direct adapters where Home Assistant coverage is insufficient
 - Add brand-specific diagnostics for HomeKit bridge/controller troubleshooting if needed
 
@@ -98,7 +103,7 @@ Examples:
 Fresh verification on 2026-03-15:
 
 - `npm test` in `0313/openclaw-ha-blueprint`
-- Result: `40/40` tests passed
+- Result: `55/55` tests passed
 
 ## Key Files
 
@@ -107,8 +112,11 @@ Fresh verification on 2026-03-15:
 - `0313/openclaw-ha-blueprint/plugins/openclaw-plugin-hue/src/index.ts`
 - `0313/openclaw-ha-blueprint/plugins/openclaw-plugin-hue/src/client.ts`
 - `0313/openclaw-ha-blueprint/plugins/openclaw-plugin-google-home/src/index.ts`
+- `0313/openclaw-ha-blueprint/plugins/openclaw-plugin-alexa/src/index.ts`
 - `0313/openclaw-ha-blueprint/plugins/openclaw-plugin-lutron/src/index.ts`
 - `0313/openclaw-ha-blueprint/plugins/openclaw-plugin-lutron/src/session.ts`
 - `0313/openclaw-ha-blueprint/plugins/openclaw-plugin-smartthings/src/index.ts`
+- `0313/openclaw-ha-blueprint/services/ecosystem-auth-gateway/src/server.ts`
+- `0313/openclaw-ha-blueprint/docs/home-ecosystem-support-matrix.md`
 - `0313/openclaw-ha-blueprint/openclaw-config/openclaw.json`
 - `0313/openclaw-ha-blueprint/scripts/bootstrap-openclaw-plugin.sh`

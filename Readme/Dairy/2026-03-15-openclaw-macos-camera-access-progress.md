@@ -430,6 +430,79 @@ MEDIA:/tmp/openclaw/openclaw-camera-snap-front-b24c0ad3-d5a1-4ef4-aab7-72d416516
 
 源码路径虽然可行，但当前机器被 Xcode license 卡住。对这类环境，直接走官方 release 包是更可靠的方案。
 
+### 4. `camera.clip` failure is in the macOS app video return path, not the bridge
+
+对 `camera.clip` 做了三轮最小复现后，结论比之前更明确：
+
+- 远端 gateway allowlist 已经放通 `camera.clip`
+- node pairing 和 camera permission 都不是阻塞点
+- 录制 `.mov` 成功
+- 导出 `.mp4` 成功
+- 失败发生在 `OpenClaw.app` 处理导出完成回调、恢复 async 结果的阶段
+
+这轮定位到的关键证据：
+
+- `openclaw nodes camera clip --duration 3s --no-audio --json`
+  - 远端返回的是 `node disconnected (camera.clip)`
+- macOS `DiagnosticReports` 新增崩溃报告：
+  - `OpenClaw-2026-03-15-075134.ips`
+- 三份 crash report 的 faulting thread 都一致：
+  - queue: `com.apple.coremedia.figassetexportsession.notifications`
+  - frame: `AVAssetExportSession ... completion handler`
+  - frame: `CheckedContinuation.resume(returning:)`
+  - exception: `EXC_BAD_ACCESS / SIGSEGV`
+- 用户级 temp 目录里能看到完整残留文件：
+  - `openclaw-camera-*.mov`
+  - `openclaw-camera-*.mp4`
+- 对残留 `mp4` 做本地校验也正常：
+  - 文件可读
+  - 可 base64 编码
+  - `ffprobe` 能识别为有效 `h264/mp4`
+
+因此当前更可信的判断是：
+
+- `AVCaptureMovieFileOutput` 的 `err=-67444 / property ID 6405` 日志是真实存在的
+- 但它不是唯一主因，因为录制和导出最后都产出了有效媒体文件
+- 真正把 node 打掉的是 `OpenClaw.app` 在 `camera.clip` 导出完成后的 async/continuation 回传链路
+
+换句话说：
+
+- `camera.snap` 路径：可用
+- `camera.clip` 路径：媒体生成成功，但 app 在结果回传阶段崩溃
+
+后续如果要修复，应该优先盯：
+
+1. `apps/macos/Sources/OpenClaw/CameraCaptureService.swift`
+   - `exportToMP4(...)`
+2. `apps/macos/Sources/OpenClaw/NodeMode/MacNodeRuntime.swift`
+   - `OpenClawCameraCommand.clip` 的回传链
+3. `AVAssetExportSession` completion 到 Swift async continuation 的桥接方式
+
+### 5. Applied a local source workaround in `openclaw-src`
+
+在本地源码 checkout：
+
+- `/Users/thomasjwang/tmp/openclaw-src/apps/macos/Sources/OpenClaw/CameraCaptureService.swift`
+- `/Users/thomasjwang/tmp/openclaw-src/apps/macos/Tests/OpenClawIPCTests/CameraCaptureServiceTests.swift`
+
+已经先落了一个最小 workaround：
+
+- 不再让 `camera.clip` 走当前的 async export completion 恢复路径
+- 改成在 `AVAssetExportSession.exportAsynchronously` 外围做 blocking wait
+- 目标是先避开 crash 栈里反复出现的：
+  - `AVAssetExportSession ... completion handler`
+  - `CheckedContinuation.resume(returning:)`
+
+同时补了一条测试意图：
+
+- `clip export uses blocking workaround bridge`
+
+当前状态要说明清楚：
+
+- **源码已修改**
+- **还没有完成本机编译和真机回归验证**
+- 阻塞原因不是代码，而是这台 Mac 还没有接受 Xcode license，`swift test` / `swift build` 都会直接被系统拦住
+
 ---
 
 ## Files and Configs Touched
