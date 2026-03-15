@@ -426,33 +426,66 @@ curl http://127.0.0.1:3301/v1/health
 
 也就是说，这两个服务不再依赖手工开终端。
 
-### 21. Remaining dependency: `OpenClaw.app` still supplies the actual camera node
+### 21. Added `OpenClaw.app` to the login-time runtime
 
-虽然基础设施已经常驻，但 sidecar 真实抓拍仍然取决于 `OpenClaw.app` 是否在线并成功把 node 挂到远端 gateway。
+To remove the previous gap where the infrastructure was up but the macOS node was still manual, the launchd stack was extended with:
 
-验证中观察到：
+- `ai.javis.openclaw-macos-app`
 
-- 当 `OpenClaw.app` 不在运行时：
-  - `mac-camera-shot` 会报 `GatewayClientRequestError: node not connected`
-- 重新拉起 app 后，失败模式变成：
-  - `TIMEOUT: node invoke timed out`
+This job starts:
 
-因此当前的真实状态应表述为：
+- `/Users/thomasjwang/Applications/OpenClaw.app/Contents/MacOS/OpenClaw`
+
+after the local `18789` tunnel becomes reachable, and keeps watching so the app can be relaunched if it disappears.
+
+This changed the persistent local stack from:
 
 ```text
-launchd 已经托管了 tunnel / bridge / sidecar 进程
-OpenClaw.app 仍然决定 camera node 是否真正可用
+tunnel + bridge + sidecar
 ```
 
-所以这轮工作已经完成了：
+to:
 
-- 本地 SSH 隧道常驻
-- 本地 bridge 常驻
-- 本地 sidecar 常驻
+```text
+tunnel + bridge + sidecar + OpenClaw.app
+```
 
-但尚未完成：
+### 22. Verified the app process under launchd
 
-- `OpenClaw.app` 自身的登录自启动与稳定 node reattach
+After reinstalling the user LaunchAgents:
+
+- `launchctl print gui/$(id -u)/ai.javis.openclaw-macos-app` showed `state = running`
+- `ps` showed the real app binary:
+  - `/Users/thomasjwang/Applications/OpenClaw.app/Contents/MacOS/OpenClaw`
+
+### 23. Sidecar loop recovered after app autostart
+
+With the app launch job in place, the background loop started progressing again.
+
+Fresh observations:
+
+- `loop.log` resumed appending new ambient observations
+- `latest.jpg`, `latest.json`, and `state.json` resumed updating
+- the sidecar again posted valid ambient envelopes to `/v1/ambient/observe`
+
+This means the steady-state background path is working again.
+
+### 24. Remaining instability is narrower now
+
+The remaining issue is no longer “node not connected forever”.
+
+The narrower remaining issue is:
+
+- ad hoc, one-off manual `mac-camera-shot` can still hit `TIMEOUT`
+- but the long-running background loop is healthier and resumed normal updates
+
+So the current state is now more accurately:
+
+```text
+launchd owns tunnel / bridge / sidecar / OpenClaw.app
+background ambient capture recovered
+single-shot reattach behavior is still less stable than the steady-state loop
+```
 - node pairing 成功
 - gateway policy 已放通
 - 远端确实已经能抓取本机摄像头

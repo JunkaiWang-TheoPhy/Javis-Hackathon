@@ -56,6 +56,7 @@ devbox_tunnel_local_port="${OPENCLAW_TUNNEL_LOCAL_PORT:-18789}"
 devbox_tunnel_remote_host="${OPENCLAW_TUNNEL_REMOTE_HOST:-127.0.0.1}"
 devbox_tunnel_remote_port="${OPENCLAW_TUNNEL_REMOTE_PORT:-18789}"
 openclaw_mac_app_path="${OPENCLAW_MAC_APP_PATH:-$HOME/Applications/OpenClaw.app/Contents/MacOS/OpenClaw}"
+openclaw_mac_app_bundle="${OPENCLAW_MAC_APP_BUNDLE:-$HOME/Applications/OpenClaw.app}"
 
 ensure_launchd_dirs() {
   mkdir -p \

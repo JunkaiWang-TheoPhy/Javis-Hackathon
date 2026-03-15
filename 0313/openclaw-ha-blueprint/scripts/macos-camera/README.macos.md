@@ -24,7 +24,9 @@ scripts/macos-camera/
     run-openclaw-devbox-tunnel.sh
     run-rokid-bridge-gateway.sh
     run-mac-camera-sidecar.sh
+    run-openclaw-app.sh
     templates/
+      ai.javis.openclaw-macos-app.plist.template
       ai.javis.openclaw-devbox-tunnel.plist.template
       ai.javis.rokid-bridge-gateway.plist.template
       ai.javis.mac-camera-sidecar.plist.template
@@ -61,6 +63,7 @@ As of `2026-03-15`:
   - `ai.javis.openclaw-devbox-tunnel`
   - `ai.javis.rokid-bridge-gateway`
   - `ai.javis.mac-camera-sidecar`
+  - `ai.javis.openclaw-macos-app`
 - launchd-managed health checks were verified:
   - `http://127.0.0.1:18789/health`
   - `http://127.0.0.1:3301/v1/health`
@@ -78,6 +81,7 @@ login
   -> ai.javis.openclaw-devbox-tunnel
   -> ai.javis.rokid-bridge-gateway
   -> ai.javis.mac-camera-sidecar
+  -> ai.javis.openclaw-macos-app
 ```
 
 Install or refresh the user LaunchAgents:
@@ -264,27 +268,28 @@ Try a short clip through the paired node:
 
 Treat the clip wrapper as experimental until the macOS runtime issue is resolved.
 
-## launchd Caveat: sidecar still depends on `OpenClaw.app`
+## launchd Caveat: `OpenClaw.app` is now started automatically, but ad hoc capture is still less stable than the loop
 
-The tunnel, bridge gateway, and sidecar loop can now stay up without a terminal.
+The launchd stack now also runs a watchdog-style `OpenClaw.app` starter on login, which means the paired macOS node is no longer purely manual.
 
-But the actual macOS camera node is still provided by `OpenClaw.app`.
-
-That means:
-
-- launchd now owns the infrastructure
-- `OpenClaw.app` still owns node connectivity and the real camera capture path
-
-Observed during validation:
-
-- when `OpenClaw.app` is not running:
-  - `mac-camera-shot` fails with `GatewayClientRequestError: node not connected`
-- after relaunching `OpenClaw.app`, the failure mode improved to:
-  - `TIMEOUT: node invoke timed out`
-
-So the persistent stack is partially complete:
+Current verified behavior:
 
 - `SSH tunnel`: persistent and verified
 - `ambient bridge gateway`: persistent and verified
-- `camera sidecar loop`: persistent and verified as a process
-- `end-to-end capture loop`: still depends on `OpenClaw.app` being online and attached to the remote gateway
+- `camera sidecar loop`: persistent and verified
+- `OpenClaw.app`: persistent and verified as a launchd-managed process
+- background sidecar loop resumed writing `latest.jpg`, `latest.json`, and `state.json`
+- background sidecar loop resumed posting ambient events to `/v1/ambient/observe`
+
+Current remaining instability:
+
+- one-off manual `mac-camera-shot` still showed `TIMEOUT` during validation
+- the background loop was healthier than ad hoc single-shot invocation after reattach
+
+So the current state is:
+
+```text
+launchd now owns tunnel + bridge + sidecar + OpenClaw.app
+the background loop is working again
+single ad hoc camera invocations are still less stable than the steady-state loop
+```

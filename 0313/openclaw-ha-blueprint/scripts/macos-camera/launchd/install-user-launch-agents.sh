@@ -249,13 +249,18 @@ install_runtime_openclaw_app_runner() {
   cat >"$runtime_openclaw_app_runner" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
-for _ in {1..30}; do
-  if curl -fsS "http://127.0.0.1:${devbox_tunnel_local_port}/health" >/dev/null 2>&1; then
-    break
+while true; do
+  if ! pgrep -f "$openclaw_mac_app_path" >/dev/null 2>&1; then
+    for _ in {1..30}; do
+      if curl -fsS "http://127.0.0.1:${devbox_tunnel_local_port}/health" >/dev/null 2>&1; then
+        break
+      fi
+      sleep 1
+    done
+    /usr/bin/open -gj -a "$openclaw_mac_app_bundle"
   fi
-  sleep 1
+  sleep 15
 done
-exec "$openclaw_mac_app_path"
 EOF
   chmod +x "$runtime_openclaw_app_runner"
 }
