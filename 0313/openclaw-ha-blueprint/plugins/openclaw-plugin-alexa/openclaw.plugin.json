@@ -1,0 +1,26 @@
+{
+  "id": "alexa",
+  "name": "Amazon Alexa",
+  "description": "Readiness-only Amazon Alexa smart-home plugin for OpenClaw.",
+  "version": "0.1.0",
+  "skills": ["skills"],
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "skillId": { "type": "string", "description": "Alexa smart-home skill id" },
+      "clientId": { "type": "string", "description": "Account-linking client id" },
+      "clientSecret": { "type": "string", "description": "Account-linking client secret" },
+      "redirectUri": { "type": "string", "description": "Alexa account-linking redirect URI" },
+      "accountLinkingEnabled": { "type": "boolean", "default": false },
+      "awsRegion": { "type": "string", "description": "Primary AWS region for the skill" }
+    }
+  },
+  "uiHints": {
+    "skillId": { "label": "Alexa Skill ID" },
+    "clientId": { "label": "Alexa Client ID" },
+    "clientSecret": { "label": "Alexa Client Secret", "sensitive": true },
+    "redirectUri": { "label": "Alexa Redirect URI" },
+    "awsRegion": { "label": "AWS Region" }
+  }
+}

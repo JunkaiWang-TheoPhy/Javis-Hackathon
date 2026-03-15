@@ -76,7 +76,8 @@ This note records the progress made in this session for the `Xiaomi 12X -> Mi Ba
 
 - Built the debug APK
 - Installed the APK on the `Xiaomi 12X`
-- Started the gateway service
+- Verified the gateway activity stays stable in foreground
+- Fixed a device-specific Bluetooth crash caused by unsupported profile queries on this Xiaomi stack
 - Verified desktop access over `adb forward tcp:8765 tcp:8765`
 - Verified these endpoints successfully responded from this Mac:
   - `GET /status`
@@ -86,37 +87,38 @@ This note records the progress made in this session for the `Xiaomi 12X -> Mi Ba
 
 ## Current Observed State
 
-The implementation exists and the transport path works, but live health data is still blocked by unfinished phone-side permissions and consent.
+The implementation exists and the transport path works. The gateway now reports live Bluetooth/bonding status correctly, but health metrics are still blocked by provider compatibility on this ROM.
 
 Latest observed values:
 
 - `health_connect_ready = false`
-- `bluetooth_ready = false`
-- `health_connect_status = provider_update_required`
-- `band_status = bluetooth_off`
-- `android.permission.BLUETOOTH_CONNECT = granted=false`
-- `android.permission.POST_NOTIFICATIONS = granted=false`
+- `bluetooth_ready = true`
+- `health_connect_status = xiaomi_provider_incompatible_interface`
+- `band_status = bonded`
+- `android.permission.BLUETOOTH_CONNECT = granted=true`
+- `android.permission.POST_NOTIFICATIONS = granted=true`
 
-Latest foreground activity observed on phone:
+This means:
 
-- `com.mi.health/com.xiaomi.fitness.access.health_connect.HealthConnectPrivacyActivity`
-
-This means the phone is still blocked in the Xiaomi Fitness / Health Connect consent flow.
+- the desktop bridge is live
+- the phone can expose band connection state through the gateway today
+- but Xiaomi's built-in health service does not implement the same binder interface expected by Jetpack `HealthConnectClient`
+- so `heart_rate_bpm`, `spo2_percent`, and `steps` remain `null` on the current reader path
 
 ## What Still Needs To Be Done On The Phone
 
-1. Finish the Xiaomi Fitness privacy and Health Connect consent flow.
-2. Return to the `Mi Band Gateway` app.
-3. Tap `Grant Android Permissions`.
-4. Allow:
-   - `Nearby devices`
-   - notification permission
-5. Tap `Grant Health Permissions`.
-6. Tap `Start Gateway`.
+1. Keep `Mi Band Gateway` in foreground when starting the gateway.
+2. If available from Play Store, install official `Health Connect` (`com.google.android.apps.healthdata`).
+3. In Xiaomi Fitness, allow sync/write into Health Connect if the option appears.
+4. In `Mi Band Gateway`, tap:
+   - `Grant Android Permissions`
+   - `Open Health Connect`
+   - `Grant Health Permissions`
+   - `Start Gateway`
 
 ## Expected Next-State Signal
 
-Once the phone-side flow is completed, the expected signals are:
+If a compatible Google Health Connect provider becomes available and Xiaomi Fitness sync is enabled, the expected signals are:
 
 - `health_connect_ready = true`
 - `bluetooth_ready = true`

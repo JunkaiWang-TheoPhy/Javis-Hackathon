@@ -55,11 +55,48 @@ Observed behavior:
 - the command is no longer blocked by policy
 - invoking `camera.clip` can disconnect the node
 - macOS logs show `AVCaptureMovieFileOutput` compressor errors
+- the macOS app can crash after export completes
 
 So the current state is:
 
 - `camera.snap`: verified and usable
 - `camera.clip`: allowed by policy, wrapper exists, but runtime is unstable and should be treated as experimental
+
+## `camera.clip` Root-Cause Notes
+
+The current failure is narrower than a generic "camera clip does not work".
+
+Validated facts:
+
+- `camera.clip` is accepted by the remote gateway policy
+- the paired macOS node receives the command
+- a `.mov` recording is produced in the user temp directory
+- an `.mp4` export is also produced in the user temp directory
+- the exported `mp4` is valid and readable
+
+What fails is the macOS app after export completion:
+
+- `OpenClaw.app` crashes with `EXC_BAD_ACCESS / SIGSEGV`
+- crash reports consistently point at:
+  - queue: `com.apple.coremedia.figassetexportsession.notifications`
+  - frames including:
+    - `AVAssetExportSession ... completion handler`
+    - `CheckedContinuation.resume(returning:)`
+
+This means the current strongest hypothesis is:
+
+- not a gateway policy problem
+- not a camera permission problem
+- not a file-generation problem
+- not a payload-size problem for these short test clips
+- but a runtime bug in the macOS app's `camera.clip` export completion / async result bridge
+
+Relevant source paths in the OpenClaw macOS app checkout:
+
+- `apps/macos/Sources/OpenClaw/CameraCaptureService.swift`
+- `apps/macos/Sources/OpenClaw/NodeMode/MacNodeRuntime.swift`
+
+Until that path is fixed upstream or patched locally, use `camera.snap` for productionized flows and treat `camera.clip` as diagnostic-only.
 
 ## Prerequisites
 

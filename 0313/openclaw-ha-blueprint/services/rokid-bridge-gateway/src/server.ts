@@ -2,6 +2,8 @@ import http from "node:http";
 
 import { handleAmbientObserveRequest } from "./routes/ambientObserve.ts";
 import { handleConfirmRequest } from "./routes/confirm.ts";
+import { type HaControlConfig } from "../../../plugins/openclaw-plugin-ha-control/src/ecosystem.ts";
+import { DeterministicOpenClawClient } from "./orchestration/openclawClient.ts";
 import { handleObserveRequest } from "./routes/observe.ts";
 import { TransientMemoryStore } from "./store/transientMemory.ts";
 
@@ -12,6 +14,7 @@ type BridgeServerOptions = {
     entityId?: string;
     data?: Record<string, unknown>;
   }) => Promise<unknown>;
+  haControlConfig?: HaControlConfig;
 };
 
 async function defaultDispatchHomeAssistantAction(action: {
@@ -75,6 +78,7 @@ function writeJson(res: http.ServerResponse, status: number, body: unknown) {
 
 export function createBridgeServer(options: BridgeServerOptions = {}) {
   const store = new TransientMemoryStore();
+  const client = new DeterministicOpenClawClient(options.haControlConfig);
   const dispatchHomeAssistantAction =
     options.dispatchHomeAssistantAction ??
     defaultDispatchHomeAssistantAction;
@@ -89,7 +93,7 @@ export function createBridgeServer(options: BridgeServerOptions = {}) {
       }
 
       if (req.method === "POST" && url.pathname === "/v1/observe") {
-        const result = await handleObserveRequest(await readJson(req), store);
+        const result = await handleObserveRequest(await readJson(req), store, client);
         writeJson(res, result.status, result.body);
         return;
       }
@@ -105,6 +109,7 @@ export function createBridgeServer(options: BridgeServerOptions = {}) {
           await readJson(req),
           store,
           dispatchHomeAssistantAction,
+          client,
         );
         writeJson(res, result.status, result.body);
         return;

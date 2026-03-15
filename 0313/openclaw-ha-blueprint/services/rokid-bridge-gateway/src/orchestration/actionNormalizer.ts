@@ -43,6 +43,50 @@ export function buildCoffeeConfirmEnvelope(
   };
 }
 
+export function buildCapabilityConfirmEnvelope(
+  observation: VisualObservationEvent,
+  summary: {
+    label: string;
+    deviceId: string;
+    domain: string;
+    service: string;
+    entityId?: string;
+  },
+): ActionEnvelope {
+  return {
+    schemaVersion: "0.1.0",
+    envelopeId: `env-${observation.observationId}-confirm`,
+    sessionId: observation.sessionId,
+    correlationId: observation.observationId,
+    createdAt: new Date().toISOString(),
+    safetyTier: "confirm",
+    actions: [
+      {
+        kind: "highlight_target",
+        targetDetectionId: observation.selectedDetectionId ?? observation.detections[0]?.id ?? "unknown",
+        style: "pulse",
+      },
+      {
+        kind: "overlay_panel",
+        panelId: "panel-1",
+        title: summary.label,
+        body: `Matched this object to ${summary.domain}.${summary.service} on ${summary.entityId ?? summary.deviceId}. Confirm execution?`,
+        anchorDetectionId: observation.selectedDetectionId,
+        buttons: [
+          { id: "start_scene", label: "Start", role: "primary" },
+          { id: "show_steps", label: "Steps", role: "secondary" },
+          { id: "dismiss", label: "Dismiss", role: "dismiss" },
+        ],
+      },
+      {
+        kind: "speech",
+        text: `I matched this to ${summary.label}. Do you want me to continue?`,
+        interrupt: false,
+      },
+    ],
+  };
+}
+
 export function buildConfirmedServiceEnvelope(
   observation: VisualObservationEvent,
   serviceAction: HomeAssistantServiceAction,
@@ -59,6 +103,34 @@ export function buildConfirmedServiceEnvelope(
       {
         kind: "speech",
         text: "Starting the coffee machine scene now.",
+        interrupt: true,
+      },
+    ],
+  };
+}
+
+export function buildCapabilityConfirmedEnvelope(
+  observation: VisualObservationEvent,
+  serviceAction: HomeAssistantServiceAction,
+  summary: {
+    label: string;
+    domain: string;
+    service: string;
+    entityId?: string;
+  },
+): ActionEnvelope {
+  return {
+    schemaVersion: "0.1.0",
+    envelopeId: `env-${observation.observationId}-side-effect`,
+    sessionId: observation.sessionId,
+    correlationId: observation.observationId,
+    createdAt: new Date().toISOString(),
+    safetyTier: "side_effect",
+    actions: [
+      serviceAction,
+      {
+        kind: "speech",
+        text: `Running ${summary.domain}.${summary.service} for ${summary.label}${summary.entityId ? ` on ${summary.entityId}` : ""}.`,
         interrupt: true,
       },
     ],

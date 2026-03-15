@@ -8,6 +8,7 @@ type GoogleHomeConfig = {
   redirectUri?: string;
   homeApiEnabled?: boolean;
   platforms?: string[];
+  authGatewayBaseUrl?: string;
 };
 
 type PluginApi = {
@@ -41,6 +42,23 @@ function normalizePlatforms(cfg: GoogleHomeConfig): string[] {
     : [];
 }
 
+function normalizeBaseUrl(value: string | undefined) {
+  return (value ?? "http://ecosystem-auth-gateway:3401").replace(/\/+$/, "");
+}
+
+async function fetchGatewayJson<T>(cfg: GoogleHomeConfig, pathname: string): Promise<T | null> {
+  const baseUrl = cfg.authGatewayBaseUrl;
+  if (!baseUrl) {
+    return null;
+  }
+
+  const response = await fetch(`${normalizeBaseUrl(baseUrl)}${pathname}`);
+  if (!response.ok) {
+    throw new Error(`Google auth gateway request failed (${response.status}).`);
+  }
+  return (await response.json()) as T;
+}
+
 function buildChecklist(cfg: GoogleHomeConfig) {
   const platforms = normalizePlatforms(cfg);
   const steps = [
@@ -68,6 +86,7 @@ function exportStatus(cfg: GoogleHomeConfig) {
     configured: Boolean(cfg.projectId),
     controlReady: false,
     authMode: "oauth_required",
+    authGatewayBaseUrl: cfg.authGatewayBaseUrl ?? null,
     projectId: cfg.projectId ?? null,
     projectNumber: cfg.projectNumber ?? null,
     hasClientId: Boolean(cfg.clientId),
@@ -94,7 +113,16 @@ export default function register(api: PluginApi) {
         properties: {},
       },
       async execute() {
-        return asTextContent(exportStatus(getCfg(api)));
+        const cfg = getCfg(api);
+        const auth = await fetchGatewayJson<Record<string, unknown>>(cfg, "/v1/google-home/auth/status");
+        const base = exportStatus(cfg);
+        return asTextContent({
+          ...base,
+          authMode: auth?.connected ? "oauth_connected" : base.authMode,
+          hasAccessToken: auth?.hasAccessToken ?? false,
+          hasRefreshToken: auth?.hasRefreshToken ?? false,
+          expiresAt: auth?.expiresAt ?? null,
+        });
       },
     },
     { optional: true },
@@ -169,6 +197,75 @@ export default function register(api: PluginApi) {
             ? "Implement or connect the auth callback flow before attempting live control."
             : "Complete the missing project and OAuth prerequisites first.",
         });
+      },
+    },
+    { optional: true },
+  );
+
+  api.registerTool(
+    {
+      name: "google_home_auth_status",
+      description: "Return the current OAuth callback and token status for Google Home / Nest.",
+      parameters: {
+        type: "object",
+        properties: {},
+      },
+      async execute() {
+        const cfg = getCfg(api);
+        return asTextContent(
+          (await fetchGatewayJson(cfg, "/v1/google-home/auth/status")) ?? {
+            ok: true,
+            provider: PLUGIN_ID,
+            configured: false,
+            connected: false,
+            reason: "auth gateway is not configured",
+          },
+        );
+      },
+    },
+    { optional: true },
+  );
+
+  api.registerTool(
+    {
+      name: "google_home_build_auth_url",
+      description: "Build a Google Home OAuth authorization URL through the shared auth gateway.",
+      parameters: {
+        type: "object",
+        properties: {},
+      },
+      async execute() {
+        const cfg = getCfg(api);
+        return asTextContent(
+          (await fetchGatewayJson(cfg, "/v1/google-home/oauth/start")) ?? {
+            ok: false,
+            provider: PLUGIN_ID,
+            error: "auth gateway is not configured",
+          },
+        );
+      },
+    },
+    { optional: true },
+  );
+
+  api.registerTool(
+    {
+      name: "google_home_token_summary",
+      description: "Return sanitized Google Home OAuth token metadata from the shared auth gateway.",
+      parameters: {
+        type: "object",
+        properties: {},
+      },
+      async execute() {
+        const cfg = getCfg(api);
+        return asTextContent(
+          (await fetchGatewayJson(cfg, "/v1/google-home/token/summary")) ?? {
+            ok: true,
+            provider: PLUGIN_ID,
+            connected: false,
+            reason: "auth gateway is not configured",
+          },
+        );
       },
     },
     { optional: true },

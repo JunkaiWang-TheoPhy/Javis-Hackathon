@@ -7,4 +7,5 @@ docker compose exec openclaw-cli openclaw plugins install /project/plugins/openc
 docker compose exec openclaw-cli openclaw plugins install /project/plugins/openclaw-plugin-google-home
 docker compose exec openclaw-cli openclaw plugins install /project/plugins/openclaw-plugin-lutron
 docker compose exec openclaw-cli openclaw plugins install /project/plugins/openclaw-plugin-smartthings
+docker compose exec openclaw-cli openclaw plugins install /project/plugins/openclaw-plugin-alexa
 docker compose restart openclaw-gateway

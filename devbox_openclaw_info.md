@@ -2,7 +2,7 @@
 
 Sensitive file. Contains connection details and gateway credentials.
 
-Last updated: 2026-03-14
+Last updated: 2026-03-15
 
 ## SSH / Remote Server
 
@@ -74,6 +74,8 @@ ssh devbox
 - Feishu enabled: `true`
 - Feishu default account: `main`
 - Agent workspace: `/home/devbox/.openclaw/workspace`
+- OpenClaw default user timezone: `Asia/Shanghai` (`UTC+8`)
+- Current server OS timezone: `UTC` (`/etc/localtime -> Etc/UTC`)
 
 ### OpenClaw Credentials
 
