@@ -121,6 +121,27 @@ def get_expected_token() -> str:
     return os.environ.get(str(cfg["token_env_var"]), "")
 
 
+def build_root_payload() -> dict[str, Any]:
+    cfg = load_bridge_config()
+    return {
+        "ok": True,
+        "service": "openclaw-printer-bridge",
+        "message": "Use /health for liveness. Prefer OpenClaw printer tools for status and print actions.",
+        "queue_name": cfg["queue_name"],
+        "health_path": "/health",
+        "status_path": "/v1/printers/default",
+        "print_image_path": "/v1/printers/default/print-image",
+        "print_pdf_path": "/v1/printers/default/print-pdf",
+        "cancel_path": "/v1/jobs/cancel",
+        "preferred_tools": [
+            "printer_get_status",
+            "printer_print_image",
+            "printer_print_pdf",
+            "printer_cancel_job",
+        ],
+    }
+
+
 def build_status_payload() -> dict[str, Any]:
     cfg = load_bridge_config()
     printer = run_command(["lpstat", "-p", str(cfg["queue_name"]), "-l"])
@@ -191,6 +212,10 @@ class BridgeHandler(BaseHTTPRequestHandler):
         return False
 
     def do_GET(self) -> None:
+        if self.path == "/":
+            self._write_json(HTTPStatus.OK, build_root_payload())
+            return
+
         if self.path == "/health":
             self._write_json(
                 HTTPStatus.OK,

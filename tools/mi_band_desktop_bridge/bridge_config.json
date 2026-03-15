@@ -4,8 +4,15 @@
   "poll_seconds": 60,
   "event_limit": 200,
   "token_env_var": "OPENCLAW_MI_BAND_BRIDGE_TOKEN",
+  "adb_target_env_var": "OPENCLAW_MI_BAND_ADB_TARGET",
   "adb_path": "/Users/thomasjwang/Library/Android/sdk/platform-tools/adb",
   "adb_serial": "4722a997",
+  "wireless_adb": {
+    "enabled": false,
+    "host": "",
+    "port": 5555,
+    "pair_port": 0
+  },
   "phone": {
     "model": "Xiaomi 12X"
   },

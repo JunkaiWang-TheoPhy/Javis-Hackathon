@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import json
+import shutil
 import subprocess
 import time
 import urllib.error
@@ -28,6 +29,7 @@ TUNNEL_STATE_PATH = Path.home() / ".openclaw-printer-bridge-tunnel.json"
 REMOTE_GATEWAY_BIN = "/home/devbox/.nvm/versions/node/v22.22.1/bin/openclaw"
 REMOTE_GATEWAY_LOG = "/home/devbox/.openclaw/gateway-printer-bridge.log"
 REMOTE_GATEWAY_PORT = 18789
+PUBLIC_TUNNEL_HEALTH_TIMEOUT_SECONDS = 120.0
 
 
 def load_bridge_config() -> dict:
@@ -131,7 +133,25 @@ def load_local_bridge_url() -> str:
     return f"http://{cfg['listen_host']}:{cfg['listen_port']}"
 
 
+def build_health_check_command(url: str, timeout_seconds: float) -> list[str]:
+    return [
+        "curl",
+        "-fsS",
+        "--max-time",
+        str(timeout_seconds),
+        f"{url}/health",
+    ]
+
+
 def url_is_healthy(url: str, timeout_seconds: float = 5.0) -> bool:
+    if shutil.which("curl"):
+        result = run(
+            build_health_check_command(url, timeout_seconds),
+            check=False,
+            capture_output=True,
+        )
+        return result.returncode == 0
+
     try:
         with urllib.request.urlopen(f"{url}/health", timeout=timeout_seconds) as response:
             return response.status == 200
@@ -171,7 +191,7 @@ def ensure_tunnel(force_restart: bool) -> str:
     time.sleep(1.0)
     start_detached(["zsh", str(START_TUNNEL)], TUNNEL_LOG)
     public_url = wait_for_public_bridge_url(TUNNEL_STATE_PATH, timeout_seconds=45.0, poll_interval=1.0)
-    wait_for_health(public_url, timeout_seconds=30.0)
+    wait_for_health(public_url, timeout_seconds=PUBLIC_TUNNEL_HEALTH_TIMEOUT_SECONDS)
     return public_url
 
 
@@ -230,6 +250,7 @@ def persist_local_memory(bridge_url: str, remote_alias: str) -> None:
             "entrypoint": str(ROOT / "up.sh"),
             "bootstrap": str(ROOT / "bootstrap_stack.py"),
             "deploy_remote": str(DEPLOY_REMOTE),
+            "launchd_runtime": str(STATE_DIR / "runtime"),
         },
     }
     LOCAL_PROFILE_PATH.write_text(
@@ -269,6 +290,7 @@ def persist_local_memory(bridge_url: str, remote_alias: str) -> None:
         "",
         f"- launchd bridge label: `{BRIDGE_LABEL}`",
         f"- launchd sync label: `{SYNC_LABEL}`",
+        f"- launchd runtime directory: `{STATE_DIR / 'runtime'}`",
         "- launchd sync job reruns bridge refresh every 5 minutes",
     ]
     LOCAL_README_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")

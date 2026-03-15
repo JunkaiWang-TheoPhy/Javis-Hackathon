@@ -61,6 +61,8 @@ If you are willing, starting today, let me try to understand you a little earlie
   `感知氛围`: 从对话线索、可穿戴状态和家居环境中理解日常节奏。
 - `Respond through the home`: connect OpenClaw with Home Assistant and multi-ecosystem home-control plugins.  
   `借由家庭回应`: 通过 OpenClaw、Home Assistant 与多生态插件联动家庭设备。
+- `Print through the bridge`: route image printing from cloud OpenClaw to the local Xiaomi 1S photo printer.  
+  `通过桥接去打印`: 把云端 OpenClaw 的图片打印请求桥接到本地的小米 1S 照片打印机。
 - `Live inside glasses`: expose Mira through Rokid Lingzhu as a glasses-side companion experience.  
   `住进眼镜里`: 通过 Rokid 灵珠把 Mira 带入眼镜侧交互体验。
 - `Listen through wearable bridges`: read health and status signals through the Mi Band / Android gateway experiments in this repo.  
@@ -119,6 +121,7 @@ It currently combines:
 - [Rokid Lingzhu integration status](docs/rokid-lingzhu-progress-2026-03-15.md)
 - [Windows camera to cloud OpenClaw scripts](0313/openclaw-ha-blueprint/scripts/windows-camera/README.windows.md)
 - [Mi Band 9 Pro gateway notes](devices/mi-band-9-pro/README.md)
+- [Printer bridge notes](docs/printer-bridge/README.md)
 - [Vision Pro development notes](Readme/ChatGPT-Vision%20Pro%20开发指南.md)
 
 - [OpenClaw HA 主蓝图文档](0313/openclaw-ha-blueprint/README.md)
@@ -126,6 +129,7 @@ It currently combines:
 - [Rokid 灵珠集成状态](docs/rokid-lingzhu-progress-2026-03-15.md)
 - [Windows 摄像头到云端 OpenClaw 脚本](0313/openclaw-ha-blueprint/scripts/windows-camera/README.windows.md)
 - [Mi Band 9 Pro 网关说明](devices/mi-band-9-pro/README.md)
+- [打印桥说明](docs/printer-bridge/README.md)
 - [Vision Pro 开发笔记](Readme/ChatGPT-Vision%20Pro%20开发指南.md)
 
 ## Where the Prototype Stands | 原型走到哪里了
@@ -134,11 +138,13 @@ It currently combines:
 - Rokid Lingzhu plugin is installed and its health endpoint is working.
 - Home ecosystem support has expanded beyond a single Home Assistant demo path.
 - The wearable gateway already exposes a working desktop-access path over ADB forwarding.
+- The printer bridge now lets cloud OpenClaw submit image print jobs to the local Xiaomi 1S printer.
 
 - 云端 OpenClaw devbox 与 gateway 当前可连通，健康检查正常。
 - Rokid 灵珠插件已经安装完成，健康接口可用。
 - 智能家居生态支持已经从单一路径扩展到多生态插件形态。
 - 可穿戴网关已经具备通过 ADB 转发进行桌面侧访问的工作链路。
+- 打印桥已经打通，云端 OpenClaw 可以把图片打印任务提交到本地小米 1S 打印机。
 
 ## Vision | 愿景
 

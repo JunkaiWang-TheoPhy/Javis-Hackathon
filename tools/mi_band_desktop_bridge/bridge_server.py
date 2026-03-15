@@ -41,14 +41,46 @@ def get_expected_token(config: dict[str, Any]) -> str:
     return os.environ.get(env_var, "")
 
 
+def get_adb_target_env_var(config: dict[str, Any]) -> str:
+    return str(config.get("adb_target_env_var", "OPENCLAW_MI_BAND_ADB_TARGET"))
+
+
+def resolve_wireless_adb_target(config: dict[str, Any]) -> str | None:
+    wireless = config.get("wireless_adb", {})
+    host = str(wireless.get("host", "")).strip()
+    port = int(wireless.get("port", 5555) or 5555)
+    if not host:
+        return None
+    return f"{host}:{port}"
+
+
+def resolve_adb_target(config: dict[str, Any]) -> str:
+    env_target = os.environ.get(get_adb_target_env_var(config), "").strip()
+    if env_target:
+        return env_target
+
+    wireless = config.get("wireless_adb", {})
+    wireless_target = resolve_wireless_adb_target(config)
+    if bool(wireless.get("enabled")) and wireless_target:
+        return wireless_target
+
+    return str(config["adb_serial"])
+
+
+def resolve_adb_transport(config: dict[str, Any]) -> str:
+    target = resolve_adb_target(config)
+    return "wireless" if ":" in target else "usb"
+
+
 class AdbCollector:
     def __init__(self, config: dict[str, Any]) -> None:
         self.config = config
         self.adb_path = str(config["adb_path"])
-        self.adb_serial = str(config["adb_serial"])
+        self.adb_target = resolve_adb_target(config)
+        self.adb_transport = resolve_adb_transport(config)
 
     def run(self, args: list[str], timeout: float = 20.0) -> subprocess.CompletedProcess[str]:
-        command = [self.adb_path, "-s", self.adb_serial, *args]
+        command = [self.adb_path, "-s", self.adb_target, *args]
         return subprocess.run(command, check=False, capture_output=True, text=True, timeout=timeout)
 
     def shell(self, command: str, timeout: float = 20.0) -> subprocess.CompletedProcess[str]:
@@ -137,7 +169,9 @@ class AdbCollector:
             "ok": True,
             "device": self.config["band"],
             "phone": {
-                "adb_serial": self.adb_serial,
+                "adb_serial": str(self.config["adb_serial"]),
+                "adb_target": self.adb_target,
+                "adb_transport": self.adb_transport,
                 "model": self.config["phone"]["model"],
             },
             "connection": {
@@ -160,6 +194,8 @@ class AdbCollector:
             "ok": True,
             "service": "openclaw-mi-band-bridge",
             "adb_ready": adb_state == "device",
+            "adb_target": self.adb_target,
+            "adb_transport": self.adb_transport,
             "bluetooth_ready": bluetooth["bluetooth_enabled"],
             "metrics_ready": all(
                 snapshot["metrics"][key] is not None for key in ("heart_rate_bpm", "spo2_percent", "steps")
@@ -211,7 +247,12 @@ class BridgeRuntime:
         self.snapshot: dict[str, Any] = {
             "ok": True,
             "device": config["band"],
-            "phone": {"adb_serial": config["adb_serial"], "model": config["phone"]["model"]},
+            "phone": {
+                "adb_serial": config["adb_serial"],
+                "adb_target": resolve_adb_target(config),
+                "adb_transport": resolve_adb_transport(config),
+                "model": config["phone"]["model"],
+            },
             "connection": {"status": "unknown", "last_seen_at": None},
             "metrics": {
                 "heart_rate_bpm": None,
@@ -230,6 +271,8 @@ class BridgeRuntime:
             "ok": True,
             "service": "openclaw-mi-band-bridge",
             "adb_ready": False,
+            "adb_target": resolve_adb_target(config),
+            "adb_transport": resolve_adb_transport(config),
             "bluetooth_ready": False,
             "metrics_ready": False,
             "local_source_ready": False,

@@ -19,6 +19,17 @@ def load_bridge_module():
 
 
 class BridgeServerTest(unittest.TestCase):
+    def test_build_root_payload_exposes_health_and_tool_hints(self) -> None:
+        module = load_bridge_module()
+
+        payload = module.build_root_payload()
+
+        self.assertTrue(payload["ok"])
+        self.assertEqual(payload["service"], "openclaw-printer-bridge")
+        self.assertEqual(payload["health_path"], "/health")
+        self.assertEqual(payload["status_path"], "/v1/printers/default")
+        self.assertIn("printer_get_status", payload["preferred_tools"])
+
     def test_resolve_media_alias_maps_three_inch(self) -> None:
         module = load_bridge_module()
         self.assertEqual(module.resolve_media_alias("three_inch"), "3x3.Fullbleed")

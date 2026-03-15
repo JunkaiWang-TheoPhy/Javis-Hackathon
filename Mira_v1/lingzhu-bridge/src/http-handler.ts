@@ -27,6 +27,12 @@ import {
   stripRedundantFirstTurnIntro,
   trimLeadingPunctuationAndWhitespace,
 } from "./first-turn-opening.js";
+import {
+  buildCachedImageFileName,
+  extractFallbackUserText,
+  IMAGE_ONLY_FALLBACK_TEXT,
+  inferMimeTypeFromPath,
+} from "./image-message-utils.js";
 
 interface LingzhuRuntimeState {
   config: LingzhuConfig;
@@ -91,14 +97,6 @@ function normalizeContext(metadata: LingzhuRequest["metadata"]): LingzhuContext 
   }
 
   return metadata as LingzhuContext;
-}
-
-function extractFallbackUserText(messages: LingzhuRequest["message"]): string {
-  return messages
-    .map((message) => message.text || message.content || "")
-    .filter(Boolean)
-    .join(" ")
-    .trim();
 }
 
 function buildSessionKey(config: LingzhuConfig, body: LingzhuRequest): string {
@@ -199,19 +197,9 @@ async function downloadImageToFile(imageUrl: string, maxBytes: number): Promise<
       return null;
     }
 
-    const ext = contentType.includes("png")
-      ? ".png"
-      : contentType.includes("jpeg") || contentType.includes("jpg")
-        ? ".jpg"
-        : contentType.includes("gif")
-          ? ".gif"
-          : contentType.includes("webp")
-            ? ".webp"
-            : ".img";
-
     const cacheDir = await ensureImageCacheDir();
     const hash = crypto.createHash("md5").update(imageUrl).digest("hex").slice(0, 12);
-    const fileName = `img_${Date.now()}_${hash}${ext}`;
+    const fileName = buildCachedImageFileName({ hash, mimeType: contentType });
     const filePath = path.join(cacheDir, fileName);
     const fileStream = createWriteStream(filePath, { flags: "wx" });
     let totalBytes = 0;
@@ -288,39 +276,12 @@ async function saveDataUrlToFile(dataUrl: string, maxBytes: number): Promise<str
     return null;
   }
 
-  const ext = mimeType.includes("png")
-    ? ".png"
-    : mimeType.includes("jpeg") || mimeType.includes("jpg")
-      ? ".jpg"
-      : mimeType.includes("gif")
-        ? ".gif"
-        : mimeType.includes("webp")
-          ? ".webp"
-          : ".img";
-
   const cacheDir = await ensureImageCacheDir();
   const hash = crypto.createHash("md5").update(payload).digest("hex").slice(0, 12);
-  const fileName = `img_${Date.now()}_${hash}${ext}`;
+  const fileName = buildCachedImageFileName({ hash, mimeType });
   const filePath = path.join(cacheDir, fileName);
   await fs.writeFile(filePath, buffer);
   return `file://${filePath}`;
-}
-
-function inferMimeTypeFromPath(filePath: string): string {
-  const ext = path.extname(filePath).toLowerCase();
-  switch (ext) {
-    case ".png":
-      return "image/png";
-    case ".jpg":
-    case ".jpeg":
-      return "image/jpeg";
-    case ".gif":
-      return "image/gif";
-    case ".webp":
-      return "image/webp";
-    default:
-      return "application/octet-stream";
-  }
 }
 
 async function localImagePathToDataUrl(localPath: string, maxBytes: number): Promise<string | null> {
@@ -575,7 +536,7 @@ async function preprocessOpenAIMessages(
     if (hasImagePart && !hasTextPart) {
       normalizedParts.unshift({
         type: "text",
-        text: "请查看这张图片，并结合当前对话上下文回答。",
+        text: IMAGE_ONLY_FALLBACK_TEXT,
       });
       logger.info("[Lingzhu] 为纯图片消息添加了透传提示文本");
     }

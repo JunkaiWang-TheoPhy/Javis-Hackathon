@@ -24,6 +24,7 @@ The desktop bridge avoids that limitation by reading `adb logcat` and readable e
 - `parser.py`: Xiaomi Fitness metric and event parsers
 - `bridge_server.py`: local loopback HTTP service
 - `client.py`: read-only desktop client for local bridge endpoints
+- `wireless_adb.py`: optional wireless ADB helper, kept disabled by default
 - `start_bridge.sh`: run the local bridge
 - `start_tunnel.sh`: expose the local bridge through a public HTTPS tunnel
 - `deploy_remote.py`: install or refresh the remote OpenClaw plugin on `devbox`
@@ -49,6 +50,41 @@ All `/v1/...` endpoints require:
 ```text
 Authorization: Bearer $OPENCLAW_MI_BAND_BRIDGE_TOKEN
 ```
+
+## Optional Wireless ADB
+
+Wireless ADB support now exists, but it is not enabled by default.
+
+The bridge still stays on USB unless you do one of these later:
+
+- export `OPENCLAW_MI_BAND_ADB_TARGET=host:port`
+- or set `wireless_adb.enabled` to `true` in `bridge_config.json`
+
+Current default config keeps:
+
+- `wireless_adb.enabled = false`
+- `wireless_adb.host = ""`
+- active bridge transport on this machine = `usb`
+
+The helper script does not switch the bridge by itself:
+
+```bash
+python3 tools/mi_band_desktop_bridge/wireless_adb.py status
+python3 tools/mi_band_desktop_bridge/wireless_adb.py pair --pair-code 123456 --target 192.168.1.8:37063
+python3 tools/mi_band_desktop_bridge/wireless_adb.py connect --target 192.168.1.8:5555
+python3 tools/mi_band_desktop_bridge/wireless_adb.py disconnect --target 192.168.1.8:5555
+python3 tools/mi_band_desktop_bridge/wireless_adb.py print-env
+```
+
+Recommended future activation flow:
+
+1. Fill `wireless_adb.host`, `wireless_adb.port`, and `wireless_adb.pair_port`.
+2. Run `wireless_adb.py pair`.
+3. Run `wireless_adb.py connect`.
+4. Export the target from `wireless_adb.py print-env`.
+5. Restart the local bridge.
+
+Until you do that, the bridge continues using the USB serial target only.
 
 ## Local Usage
 
@@ -120,3 +156,4 @@ That confirms:
 - the local HTTP bridge is serving non-null metrics
 - the remote `devbox` host can reach the bridge
 - the `mi-band-bridge` plugin is loaded into the running OpenClaw gateway
+- optional wireless ADB support is present in code, but the verified active transport remains `usb`

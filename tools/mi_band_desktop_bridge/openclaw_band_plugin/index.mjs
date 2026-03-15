@@ -54,7 +54,7 @@ async function callBridge(api, endpoint) {
 function buildStatusTool(api) {
   return {
     name: "band_get_status",
-    description: "Read the current local Mi Band bridge status.",
+    description: "Read the current local Mi Band bridge status. Use this tool instead of direct bridge HTTP calls.",
     parameters: {
       type: "object",
       properties: {},
@@ -69,7 +69,7 @@ function buildStatusTool(api) {
 function buildLatestTool(api) {
   return {
     name: "band_get_latest",
-    description: "Read the latest known Mi Band metrics snapshot.",
+    description: "Read the latest known Mi Band metrics snapshot. Use this tool instead of direct bridge HTTP calls.",
     parameters: {
       type: "object",
       properties: {},
@@ -84,7 +84,7 @@ function buildLatestTool(api) {
 function buildEventsTool(api) {
   return {
     name: "band_get_events",
-    description: "Read recent Mi Band sync and collector events.",
+    description: "Read recent Mi Band sync and collector events. Use this tool instead of direct bridge HTTP calls.",
     parameters: {
       type: "object",
       properties: {
@@ -102,7 +102,7 @@ function buildEventsTool(api) {
 function buildAlertsTool(api) {
   return {
     name: "band_get_alerts",
-    description: "Read active Mi Band bridge alerts.",
+    description: "Read active Mi Band bridge alerts. Use this tool instead of direct bridge HTTP calls.",
     parameters: {
       type: "object",
       properties: {
@@ -120,7 +120,7 @@ function buildAlertsTool(api) {
 const plugin = {
   id: PLUGIN_ID,
   name: "Mi Band Bridge",
-  description: "Forward read-only Mi Band data requests to the local desktop bridge.",
+  description: "Forward read-only Mi Band data requests to the local desktop bridge. Do not call the bridge URL directly.",
   configSchema: {
     type: "object",
     additionalProperties: false,

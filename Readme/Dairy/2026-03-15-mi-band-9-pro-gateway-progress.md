@@ -170,6 +170,27 @@ Verified remote reachability:
 - remote logs now include:
   - `[mi-band-bridge] bridge target https://...trycloudflare.com`
 
+### Optional Wireless ADB Capability
+
+We also added optional wireless ADB support into the desktop bridge codebase, but intentionally left it inactive.
+
+What was added:
+
+- bridge-side ADB target resolution:
+  - env override via `OPENCLAW_MI_BAND_ADB_TARGET`
+  - config fallback via `wireless_adb.enabled + host:port`
+  - final fallback to USB serial `4722a997`
+- a helper script:
+  - `tools/mi_band_desktop_bridge/wireless_adb.py`
+
+Verified current inactive state:
+
+- `wireless_adb.enabled = false`
+- `active_target = 4722a997`
+- `active_transport = usb`
+
+So the repo is ready for a later wireless switch, but nothing in the current runtime path was changed away from USB.
+
 ### Practical Outcome
 
 For this hardware and ROM, the recommended path is now:

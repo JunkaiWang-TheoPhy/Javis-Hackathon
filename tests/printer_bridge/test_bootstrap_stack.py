@@ -23,6 +23,23 @@ class BootstrapStackTest(unittest.TestCase):
         self.assertTrue(BOOTSTRAP_SCRIPT.is_file(), BOOTSTRAP_SCRIPT)
         self.assertTrue(UP_SCRIPT.is_file(), UP_SCRIPT)
 
+    def test_public_tunnel_health_timeout_allows_slow_quick_tunnels(self) -> None:
+        module = load_bootstrap_module()
+        self.assertEqual(module.PUBLIC_TUNNEL_HEALTH_TIMEOUT_SECONDS, 120.0)
+
+    def test_build_health_check_command_targets_health_endpoint(self) -> None:
+        module = load_bootstrap_module()
+        self.assertEqual(
+            module.build_health_check_command("https://printer.example", 9.5),
+            [
+                "curl",
+                "-fsS",
+                "--max-time",
+                "9.5",
+                "https://printer.example/health",
+            ],
+        )
+
     def test_read_public_bridge_url_reads_state_file(self) -> None:
         module = load_bootstrap_module()
 

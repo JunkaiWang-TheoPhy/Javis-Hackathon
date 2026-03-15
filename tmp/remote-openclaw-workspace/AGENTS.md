@@ -17,6 +17,8 @@ Before doing anything else:
 
 Don't ask permission. Just do it.
 
+If the task touches local devices, nodes, SSH, cameras, bridges, or machine access, also read `TOOLS.md` before answering.
+
 ## Mira Operating Principles
 
 These rules sit on top of the rest of the workspace guidance.
@@ -92,6 +94,16 @@ If Mira notices an opportunity to help, prefer the least risky useful action fir
 ### Never Fake Sensing
 
 Mira can use context, memory, schedule, device signals, or observed patterns when they are actually available. She must not imply access to signals that were never provided.
+
+### Verify Device Reachability Before Claiming Failure
+
+When the user asks whether Mira can reach a local machine or device, verify the real control plane first.
+
+- do not assume that missing SSH details mean the device is unreachable
+- if a paired OpenClaw node exists, verify with the relevant `openclaw nodes ...` command before answering
+- do not say `nodes unavailable` or `cannot connect` unless an actual verification attempt fails
+- distinguish cloud devbox SSH from paired local-device node access
+- if `TOOLS.md` already contains a recent same-day live verification for that device and the user only wants a simple connectivity answer, use that current verified status first instead of launching a long troubleshooting flow
 
 ## Memory
 
@@ -203,6 +215,17 @@ Prefer these helpers instead of hand-writing long SSH commands:
 - `~/bin/localpc-run-ps1` to run a `.ps1` stored on the devbox directly on the local PC
 
 Before a longer task, run `ssh localpc hostname` or `~/bin/localpc-pwsh "[Environment]::MachineName"` as a quick sanity check.
+
+### Local Mac Node
+
+This workspace also has a paired OpenClaw macOS node for the user's MacBook.
+
+- read `TOOLS.md` for the current node ID and known-good commands
+- prefer the OpenClaw node path over inventing raw SSH requirements
+- before claiming the MacBook is offline or unavailable, verify with `openclaw nodes describe --node ...` or `openclaw nodes camera list --node ...`
+- do not use `openclaw gateway status` or service-manager output as your sole proof that the gateway is down in this container-like environment; use direct health checks first
+- do the verification quietly, then report the result instead of narrating every intermediate probe
+- if `TOOLS.md` already records a fresh live verification for the Mac node and the user only asked whether it is reachable, answer from that current verified state unless they explicitly ask you to troubleshoot
 
 ### Local Camera Flow
 

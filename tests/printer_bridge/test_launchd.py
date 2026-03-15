@@ -1,4 +1,5 @@
 import importlib.util
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -51,6 +52,23 @@ class LaunchdInstallTest(unittest.TestCase):
             module.default_launch_agents_dir(),
             Path.home() / "Library" / "LaunchAgents",
         )
+
+    def test_runtime_tree_lives_under_state_dir_and_contains_bridge_files(self) -> None:
+        module = load_install_module()
+        with tempfile.TemporaryDirectory() as temp_dir:
+            state_dir = Path(temp_dir) / "state"
+            runtime_dir = module.runtime_dir(state_dir)
+
+            self.assertEqual(runtime_dir, state_dir / "runtime")
+
+            module.materialize_runtime_tree(runtime_dir)
+
+            self.assertTrue((runtime_dir / "start_bridge.sh").is_file())
+            self.assertTrue((runtime_dir / "up.sh").is_file())
+            self.assertTrue((runtime_dir / "bridge_server.py").is_file())
+            self.assertTrue((runtime_dir / "bootstrap_stack.py").is_file())
+            self.assertTrue((runtime_dir / "deploy_remote.py").is_file())
+            self.assertTrue((runtime_dir / "openclaw_printer_plugin" / "index.mjs").is_file())
 
 
 if __name__ == "__main__":

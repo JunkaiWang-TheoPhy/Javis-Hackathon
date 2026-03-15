@@ -803,3 +803,188 @@ And the current blocker is external:
 这轮工作的最终结论是：
 
 **远端 `devbox` 上的 OpenClaw 已经可以通过 macOS app node 成功访问本机 Mac 摄像头，并完成至少一次真实的 `camera.snap` 抓拍。**
+
+---
+
+## `camera.clip` Final Fix
+
+这一步最终做完了，`camera.clip` 不再停留在“app 崩溃未修完”的状态。
+
+### 18. Unblocked local rebuild and fixed the compile blockers
+
+为了验证本地 workaround，而不是继续依赖崩溃的 release app，先把本地 `openclaw-src` 构建链打通。
+
+实际做过的事：
+
+1. `Peekaboo` 这个 SwiftPM 远端 branch 依赖会把构建卡在 mirror 拉取上。
+
+   处理方式：
+
+   - 从 GitHub revision zip 下载：
+     - `bace59f90bb276f1c6fb613acfda3935ec4a7a90`
+   - 放到本地：
+     - `/Users/thomasjwang/tmp/openclaw-src/vendor/Peekaboo`
+   - 把 `apps/macos/Package.swift` 里的依赖改成：
+     - `.package(path: "../../vendor/Peekaboo")`
+
+2. 本地 workaround 原来写成了在 async 上下文里直接调用 `DispatchSemaphore.wait()`，这在 Swift 6.2 下会编译失败。
+
+   处理方式：
+
+   - 在 `CameraCaptureService.swift` 中保留 blocking wait 策略
+   - 但把 `wait()` 移到单独的 utility queue，再回到 async 代码里读取 export 结果
+
+3. 构建时还暴露出一个不相关但真实的源码问题：
+
+   - `CronSettings+Testing.swift` 仍在调用 `CronJob` 的 memberwise init
+   - 但 `CronJob` 里引入了 `private sessionTargetRaw`
+   - 导致该 memberwise init 的可见性收窄，不再能从 testing/preview 代码访问
+
+   处理方式：
+
+   - 在 `CronModels.swift` 里补了显式 initializer
+   - 支持：
+     - `sessionTarget: CronSessionTarget`
+     - `sessionTarget: CronCustomSessionTarget`
+
+4. 补了一个最小测试：
+
+   - `apps/macos/Tests/OpenClawIPCTests/CronModelsTests.swift`
+
+5. targeted test 结果：
+
+   - `swift test --filter 'CronModelsTests|CameraCaptureServiceTests' --build-path .build/test-arm64 --arch arm64`
+   - 4 个测试通过
+
+### 19. Built a real app-compatible binary with the correct rpath
+
+第一次尝试直接把 `.build/test-arm64` 里的测试产物塞进 app bundle，结果 app 在启动前就死掉了。
+
+新 crash report：
+
+- `~/Library/Logs/DiagnosticReports/OpenClaw-2026-03-15-102625.ips`
+- `~/Library/Logs/DiagnosticReports/OpenClaw-2026-03-15-102632.ips`
+
+这次不是旧的 export crash，而是新的 dyld 错误：
+
+- `Library not loaded: @rpath/Sparkle.framework/Versions/B/Sparkle`
+
+对比 `otool -l` 后确认：
+
+- `.build/test-arm64/.../debug/OpenClaw` 缺少：
+  - `@executable_path/../Frameworks`
+- 现有 release app binary 则带着这个 `rpath`
+
+因此重新跑了正式那条构建命令：
+
+```bash
+cd /Users/thomasjwang/tmp/openclaw-src/apps/macos
+swift build -c debug --product OpenClaw \
+  --build-path .build/arm64 \
+  --arch arm64 \
+  -Xlinker -rpath \
+  -Xlinker @executable_path/../Frameworks
+```
+
+这次构建成功，产物是：
+
+- `/Users/thomasjwang/tmp/openclaw-src/apps/macos/.build/arm64/debug/OpenClaw`
+
+并确认它确实包含：
+
+- `LC_RPATH -> @executable_path/../Frameworks`
+
+### 20. Switched launchd to a patched app bundle
+
+因为系统不允许直接覆盖：
+
+- `~/Applications/OpenClaw.app/Contents/MacOS/OpenClaw`
+
+所以改成：
+
+1. 复制现有 app bundle 到本地可写路径：
+
+   - `~/.openclaw/workspace/.cache/localmac-camera/OpenClaw-patched.app`
+
+2. 用刚构建出的带正确 `rpath` 的 binary 替换：
+
+   - `OpenClaw-patched.app/Contents/MacOS/OpenClaw`
+
+3. 对 patched bundle 做 ad-hoc 重签：
+
+   - `codesign --force --deep --sign -`
+
+4. 重新安装 launchd jobs，并把 `ai.javis.openclaw-macos-app` 指到这份 patched bundle：
+
+   - `OPENCLAW_MAC_APP_BUNDLE=.../OpenClaw-patched.app`
+   - `OPENCLAW_MAC_APP_PATH=.../OpenClaw-patched.app/Contents/MacOS/OpenClaw`
+
+验证到的运行进程：
+
+- `7135 /Users/thomasjwang/.openclaw/workspace/.cache/localmac-camera/OpenClaw-patched.app/Contents/MacOS/OpenClaw`
+
+### 21. Re-validated media commands against the patched app
+
+patched app 启动后，先确认 node/相机服务恢复：
+
+- `openclaw nodes camera list --node e07facb8...`
+  - 成功返回 `MacBook Air相机`
+
+然后重新验证 `camera.snap`：
+
+```bash
+openclaw nodes camera snap \
+  --node e07facb8fd0ca80d388a3185cc47b3b4d56be29dfa58f39d298fe58432b02116 \
+  --facing front \
+  --delay-ms 2000
+```
+
+成功返回：
+
+- `MEDIA:/tmp/openclaw/openclaw-camera-snap-front-f12cc441-ae4d-4596-bbe4-601ca9617289.jpg`
+
+之后第一次重试 `camera.clip` 时，又发现了一个配置漂移：
+
+- 远端 `~/.openclaw/openclaw.json` 里的 allowlist 又退回成了：
+  - `["camera.snap"]`
+
+因此再次把 devbox 改回：
+
+- `["camera.snap", "camera.clip"]`
+
+最终 live `camera.clip` 成功命令：
+
+```bash
+openclaw nodes camera clip \
+  --node e07facb8fd0ca80d388a3185cc47b3b4d56be29dfa58f39d298fe58432b02116 \
+  --facing front \
+  --duration 5s \
+  --no-audio
+```
+
+成功返回：
+
+- `MEDIA:/tmp/openclaw/openclaw-camera-clip-front-4e75ef68-1506-4912-8e1f-9058babda8bb.mp4`
+
+同时验证：
+
+- patched app 进程仍然活着，没有在 clip 结束时 crash
+- 这次没有出现 `node disconnected (camera.clip)`
+
+### 22. Current status
+
+到这一步，状态变成：
+
+- `camera.snap`：稳定可用
+- `camera.clip`：在 patched macOS app + devbox allowlist 正确时，已 live 验证成功
+- launchd：仍然负责 tunnel / bridge / sidecar / patched app 常驻
+
+剩余注意点只有两个：
+
+1. 远端 allowlist 如果再漂移回：
+   - `["camera.snap"]`
+   那 `camera.clip` 会再次在 gateway policy 层被拒
+
+2. 当前成功依赖的是本地 patched bundle：
+   - `~/.openclaw/workspace/.cache/localmac-camera/OpenClaw-patched.app`
+   不是 stock release app

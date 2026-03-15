@@ -128,9 +128,14 @@ bridge_doc.write_text(
     '- source device: Xiaomi 12X over adb\\n'
     '- source band: Xiaomi Smart Band 9 Pro A094\\n'
     '- metrics: heart rate, SpO2, steps, distance, calories\\n'
-    f"- active bridge URL: {{bridge_url}}\\n"
     '- transport: public HTTPS tunnel to local loopback bridge\\n'
-    '- success means the local bridge returned data from adb-derived Xiaomi Fitness evidence\\n',
+    '- success means the local bridge returned data from adb-derived Xiaomi Fitness evidence\\n\\n'
+    '## Rules\\n\\n'
+    '- Never call the bridge URL directly with exec, curl, wget, or raw HTTP.\\n'
+    '- The bridge requires an Authorization header that is only wired inside the plugin config.\\n'
+    '- Always use the OpenClaw tools `band_get_status`, `band_get_latest`, `band_get_events`, or `band_get_alerts`.\\n'
+    '- If you need current metrics, call `band_get_latest` first.\\n'
+    '- If `band_get_latest` fails, call `band_get_status` next instead of guessing URLs.\\n',
     encoding='utf-8'
 )
 
@@ -138,9 +143,11 @@ tools_path = workspace / 'TOOLS.md'
 section = (
     '\\n## Mi Band Bridge\\n\\n'
     '- Use the Mi Band bridge plugin for read-only health data from the local macOS bridge.\\n'
+    '- Never use exec, curl, wget, or raw HTTP against the bridge URL directly.\\n'
+    '- The bridge auth token is private and is only injected through the plugin config.\\n'
     '- Source path: Xiaomi 12X via adb, not direct server-side BLE.\\n'
+    '- Preferred call order: `band_get_latest` first, then `band_get_status` if needed.\\n'
     '- Tools: `band_get_status`, `band_get_latest`, `band_get_events`, `band_get_alerts`.\\n'
-    f'- Active bridge URL: `{{bridge_url}}`\\n'
 )
 current_tools = tools_path.read_text(encoding='utf-8')
 if '## Mi Band Bridge' in current_tools:

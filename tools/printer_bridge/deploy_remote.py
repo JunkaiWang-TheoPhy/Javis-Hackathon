@@ -131,6 +131,8 @@ printer_doc.write_text(
     '- launchd also reruns bridge sync periodically so the current tunnel URL is redeployed to OpenClaw.\\n\\n'
     '## Rules\\n\\n'
     '- All printing must go through the printer bridge plugin.\\n'
+    '- Do not treat the bridge root URL as a liveness failure. The root response is informational; `/health` is the liveness endpoint.\\n'
+    '- Prefer the printer tools over raw web fetches: `printer_get_status`, `printer_print_image`, `printer_print_pdf`, `printer_cancel_job`.\\n'
     '- Success means the job was accepted by the local macOS queue unless the bridge reports more.\\n'
     '- If the bridge is offline, report failure instead of pretending the print succeeded.\\n',
     encoding='utf-8'
@@ -146,6 +148,7 @@ section = (
     f'- active bridge URL: `{{bridge_url}}`\\n'
     '- local automation: `launchd` bridge keepalive + periodic sync\\n'
     '- OpenClaw printer tools: `printer_get_status`, `printer_print_image`, `printer_print_pdf`, `printer_cancel_job`\\n'
+    '- Do not treat the bridge root URL as a liveness failure; use `/health` for liveness and the printer tools for real work\\n'
 )
 current_tools = tools_path.read_text(encoding='utf-8')
 if '## Printer Bridge' in current_tools:

@@ -16,6 +16,8 @@ class DeployRemoteScriptTest(unittest.TestCase):
         self.assertIn("--skip-restart", text)
         self.assertIn("OPENCLAW_MI_BAND_BRIDGE_URL", text)
         self.assertIn(".openclaw-mi-band-bridge-tunnel.json", text)
+        self.assertIn("Never call the bridge URL directly", text)
+        self.assertIn("Always use the OpenClaw tools `band_get_status`, `band_get_latest`, `band_get_events`, or `band_get_alerts`.", text)
 
 
 if __name__ == "__main__":

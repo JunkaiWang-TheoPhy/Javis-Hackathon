@@ -55,6 +55,8 @@ zsh tools/mi_band_desktop_bridge/start_tunnel.sh
 python3 tools/mi_band_desktop_bridge/deploy_remote.py
 ```
 
+Optional future wireless mode exists now, but it is not active by default. The current verified bridge still uses the USB serial target. When you want to switch later, use [wireless_adb.py](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/tools/mi_band_desktop_bridge/wireless_adb.py) and keep `wireless_adb.enabled = false` until pairing and connectivity are confirmed.
+
 ## Older Android Gateway Workflow
 
 1. Connect the `Xiaomi 12X` over USB with `adb` authorized.
@@ -127,6 +129,12 @@ The newer desktop `adb` bridge has already bypassed this blocker and returned no
 - `calories_kcal = 104`
 
 It has also been exposed to `devbox` over a public tunnel and loaded into the running `OpenClaw` gateway through the `mi-band-bridge` plugin.
+
+As of the latest verification, the bridge also supports an optional wireless ADB target, but:
+
+- it is disabled in config
+- the active target is still the USB serial `4722a997`
+- the active transport is still `usb`
 
 ## Known Limits
 

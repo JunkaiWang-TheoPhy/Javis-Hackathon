@@ -36,6 +36,7 @@ class RemotePluginTest(unittest.TestCase):
         self.assertIn("bridgeToken", text)
         self.assertIn("OPENCLAW_MI_BAND_BRIDGE_URL", text)
         self.assertIn("OPENCLAW_MI_BAND_BRIDGE_TOKEN", text)
+        self.assertIn("Use this tool instead of direct bridge HTTP calls.", text)
 
 
 if __name__ == "__main__":

@@ -139,43 +139,44 @@ Observed behavior:
 So the current state is:
 
 - `camera.snap`: verified and usable
-- `camera.clip`: allowed by policy, wrapper exists, but runtime is unstable and should be treated as experimental
+- `camera.clip`: verified and usable with the locally patched macOS app bundle
 
-## `camera.clip` Root-Cause Notes
+## `camera.clip` Status
 
-The current failure is narrower than a generic "camera clip does not work".
+`camera.clip` is now working end-to-end in this environment, but only through a locally patched macOS app bundle.
 
-Validated facts:
+Validated path:
 
-- `camera.clip` is accepted by the remote gateway policy
-- the paired macOS node receives the command
-- a `.mov` recording is produced in the user temp directory
-- an `.mp4` export is also produced in the user temp directory
-- the exported `mp4` is valid and readable
+- remote gateway policy explicitly allows:
+  - `camera.snap`
+  - `camera.clip`
+- the paired macOS node remains:
+  - `e07facb8fd0ca80d388a3185cc47b3b4d56be29dfa58f39d298fe58432b02116`
+- the locally patched app bundle runs from:
+  - `~/.openclaw/workspace/.cache/localmac-camera/OpenClaw-patched.app`
+- `camera.snap` still succeeds
+- `camera.clip` now succeeds and returns a real `MEDIA:` mp4 path instead of crashing the app
 
-What fails is the macOS app after export completion:
+Root cause of the original failure:
 
-- `OpenClaw.app` crashes with `EXC_BAD_ACCESS / SIGSEGV`
-- crash reports consistently point at:
+- stock `OpenClaw.app 2026.3.12` crashed in the `camera.clip` export completion path
+- crash reports consistently pointed at:
   - queue: `com.apple.coremedia.figassetexportsession.notifications`
-  - frames including:
-    - `AVAssetExportSession ... completion handler`
-    - `CheckedContinuation.resume(returning:)`
+  - frames involving the `AVAssetExportSession` completion bridge
+- the local fix keeps export completion off the direct async resumption path and waits from a separate utility queue before reading final export state
 
-This means the current strongest hypothesis is:
-
-- not a gateway policy problem
-- not a camera permission problem
-- not a file-generation problem
-- not a payload-size problem for these short test clips
-- but a runtime bug in the macOS app's `camera.clip` export completion / async result bridge
-
-Relevant source paths in the OpenClaw macOS app checkout:
+Relevant source paths in the local OpenClaw macOS checkout:
 
 - `apps/macos/Sources/OpenClaw/CameraCaptureService.swift`
-- `apps/macos/Sources/OpenClaw/NodeMode/MacNodeRuntime.swift`
+- `apps/macos/Sources/OpenClaw/CronModels.swift`
+- `apps/macos/Tests/OpenClawIPCTests/CameraCaptureServiceTests.swift`
+- `apps/macos/Tests/OpenClawIPCTests/CronModelsTests.swift`
 
-Until that path is fixed upstream or patched locally, use `camera.snap` for productionized flows and treat `camera.clip` as diagnostic-only.
+Operational note:
+
+- if the remote `devbox` config drifts back to `allowCommands: ["camera.snap"]`, `camera.clip` will fail at the gateway policy layer again
+- the patched app is launched by the existing `launchd` stack through:
+  - `ai.javis.openclaw-macos-app`
 
 ## Prerequisites
 
@@ -266,7 +267,10 @@ Try a short clip through the paired node:
 ./scripts/macos-camera/devbox/localmac-cam-clip
 ```
 
-Treat the clip wrapper as experimental until the macOS runtime issue is resolved.
+The clip wrapper is now expected to work as long as:
+
+- the patched app bundle is the one launchd starts
+- the remote gateway still allows `camera.clip`
 
 ## launchd Caveat: `OpenClaw.app` is now started automatically, but ad hoc capture is still less stable than the loop
 

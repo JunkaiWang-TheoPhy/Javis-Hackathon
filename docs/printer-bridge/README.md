@@ -37,7 +37,7 @@ User-facing `three_inch` maps to `3x3.Fullbleed`.
 
 ## Bring Up
 
-Use [up.sh](/Users/thomasjwang/.config/superpowers/worktrees/Javis-Hackathon/printer-bridge/tools/printer_bridge/up.sh) to bring the stack back to a usable state in one command.
+Use [up.sh](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/tools/printer_bridge/up.sh) to bring the stack back to a usable state in one command.
 
 - local bridge: ensures the loopback printer bridge is healthy
 - public tunnel: reuses the current HTTPS tunnel when healthy, otherwise starts a new one
@@ -60,7 +60,14 @@ Use [print_image.py](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/tools/p
 
 ## Launchd
 
-Use [install_launchd.py](/Users/thomasjwang/.config/superpowers/worktrees/Javis-Hackathon/printer-bridge/tools/printer_bridge/install_launchd.py) to install persistent user LaunchAgents on this Mac.
+Use [install_launchd.py](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/tools/printer_bridge/install_launchd.py) to install persistent user LaunchAgents on this Mac.
 
 - `com.javis.openclaw.printer-bridge`: keeps the local bridge process alive
 - `com.javis.openclaw.printer-sync`: runs `up.sh --skip-remote-gateway` every 5 minutes and at login to refresh tunnel state and redeploy the current bridge URL to `devbox`
+- launchd runs a staged copy under `~/.openclaw-printer-bridge/runtime` so background jobs do not depend on direct execution from `~/Documents`
+
+## Health Checks
+
+- `/health` is the liveness endpoint
+- `/` returns an informational JSON document and is not an error
+- OpenClaw should prefer `printer_get_status`, `printer_print_image`, `printer_print_pdf`, and `printer_cancel_job` over raw bridge fetches

@@ -27,6 +27,7 @@ class ScriptLayoutTest(unittest.TestCase):
         text = STOP_TUNNEL.read_text(encoding="utf-8")
         self.assertIn(".openclaw-printer-bridge-tunnel.json", text)
         self.assertIn("pkill", text)
+        self.assertIn("cloudflared tunnel .*--url http://${LOCAL_HOST}:${LOCAL_PORT}", text)
 
 
 if __name__ == "__main__":

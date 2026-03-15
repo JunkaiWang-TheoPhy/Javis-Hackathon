@@ -2,6 +2,7 @@
 import argparse
 import os
 import plistlib
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -11,6 +12,19 @@ STATE_DIR = Path.home() / ".openclaw-printer-bridge"
 BRIDGE_LABEL = "com.javis.openclaw.printer-bridge"
 SYNC_LABEL = "com.javis.openclaw.printer-sync"
 SYNC_INTERVAL_SECONDS = 300
+RUNTIME_COPY_ITEMS = (
+    "bridge_config.json",
+    "bridge_server.py",
+    "bootstrap_stack.py",
+    "deploy_remote.py",
+    "install_launchd.py",
+    "print_image.py",
+    "start_bridge.sh",
+    "start_tunnel.sh",
+    "stop_tunnel.sh",
+    "up.sh",
+    "openclaw_printer_plugin",
+)
 
 
 def default_launch_agents_dir() -> Path:
@@ -19,6 +33,26 @@ def default_launch_agents_dir() -> Path:
 
 def bridge_takeover_command() -> list[str]:
     return ["pkill", "-f", "bridge_server.py"]
+
+
+def runtime_dir(state_dir: Path) -> Path:
+    return state_dir / "runtime"
+
+
+def materialize_runtime_tree(target_dir: Path) -> Path:
+    if target_dir.exists():
+        shutil.rmtree(target_dir)
+    target_dir.mkdir(parents=True, exist_ok=True)
+
+    for name in RUNTIME_COPY_ITEMS:
+        source = ROOT / name
+        destination = target_dir / name
+        if source.is_dir():
+            shutil.copytree(source, destination)
+        else:
+            shutil.copy2(source, destination)
+
+    return target_dir
 
 
 def build_bridge_plist(script_dir: Path, state_dir: Path) -> dict:
@@ -74,12 +108,13 @@ def bootstrap_and_kickstart(label: str, label_path: Path) -> None:
 def install_launch_agents(launch_agents_dir: Path | None = None, load: bool = True) -> list[Path]:
     launch_agents_dir = launch_agents_dir or default_launch_agents_dir()
     STATE_DIR.mkdir(parents=True, exist_ok=True)
+    script_dir = materialize_runtime_tree(runtime_dir(STATE_DIR))
 
     bridge_path = launch_agents_dir / f"{BRIDGE_LABEL}.plist"
     sync_path = launch_agents_dir / f"{SYNC_LABEL}.plist"
 
-    write_plist(bridge_path, build_bridge_plist(ROOT, STATE_DIR))
-    write_plist(sync_path, build_sync_plist(ROOT, STATE_DIR))
+    write_plist(bridge_path, build_bridge_plist(script_dir, STATE_DIR))
+    write_plist(sync_path, build_sync_plist(script_dir, STATE_DIR))
 
     if load:
         bootout(bridge_path)
@@ -102,6 +137,7 @@ def uninstall_launch_agents(launch_agents_dir: Path | None = None) -> list[Path]
         if path.exists():
             bootout(path)
             path.unlink()
+    shutil.rmtree(runtime_dir(STATE_DIR), ignore_errors=True)
     return paths
 
 

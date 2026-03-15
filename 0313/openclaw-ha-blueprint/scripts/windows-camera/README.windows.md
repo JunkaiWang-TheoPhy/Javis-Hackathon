@@ -25,6 +25,9 @@ scripts/windows-camera/
     win-camera-start-loop.ps1
     win-camera-stop-loop.ps1
     win-camera-status.ps1
+scripts/camera-comic/
+  local-windows/
+    win-cam-comic.ps1
   devbox/
     localpc-pwsh
     localpc-camera-common.sh
@@ -91,6 +94,20 @@ From the devbox, pull the freshest frame:
 ~/bin/localpc-cam-pull
 cat ~/.openclaw/workspace/.cache/localpc-camera/latest.json
 ```
+
+Run a one-shot Windows capture and push it to the cloud comic renderer:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File ".\\scripts\\camera-comic\\local-windows\\win-cam-comic.ps1"
+```
+
+The comic helper expects these repo-relative pieces to stay aligned:
+
+- local capture entry: `scripts/windows-camera/local-windows/win-camera-common.ps1`
+- cloud upload helper: `scripts/camera-comic/push_camera_comic_to_devbox.py`
+- remote renderer target: `~/.openclaw/workspace/comic-tools/generate_camera_comic.py`
+
+If you copy `win-cam-comic.ps1` outside the repo checkout, also set `OPENCLAW_COMIC_HELPER` or pass `-HelperScript` so the wrapper can still find `push_camera_comic_to_devbox.py`.
 
 ## Notes
 

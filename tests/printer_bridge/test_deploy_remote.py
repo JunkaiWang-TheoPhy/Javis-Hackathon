@@ -18,6 +18,12 @@ class DeployRemoteScriptTest(unittest.TestCase):
         self.assertIn(".openclaw-printer-bridge-tunnel.json", text)
         self.assertIn("launchd", text)
 
+    def test_deploy_script_teaches_remote_runtime_to_prefer_tools_over_raw_bridge_fetches(self) -> None:
+        text = DEPLOY_SCRIPT.read_text(encoding="utf-8")
+        self.assertIn("printer_get_status", text)
+        self.assertIn("Do not treat the bridge root URL as a liveness failure", text)
+        self.assertIn("/health", text)
+
 
 if __name__ == "__main__":
     unittest.main()

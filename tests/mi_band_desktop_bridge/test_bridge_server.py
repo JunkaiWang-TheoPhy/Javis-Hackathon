@@ -52,6 +52,68 @@ class BridgeServerTest(unittest.TestCase):
             else:
                 os.environ["OPENCLAW_MI_BAND_BRIDGE_TOKEN"] = previous
 
+    def test_resolve_adb_target_defaults_to_usb_serial(self) -> None:
+        module = load_bridge_module()
+        config = {
+            "adb_serial": "4722a997",
+            "adb_target_env_var": "OPENCLAW_MI_BAND_ADB_TARGET",
+            "wireless_adb": {
+                "enabled": False,
+                "host": "192.168.0.8",
+                "port": 5555,
+            },
+        }
+        previous = os.environ.get("OPENCLAW_MI_BAND_ADB_TARGET")
+        os.environ.pop("OPENCLAW_MI_BAND_ADB_TARGET", None)
+        try:
+            self.assertEqual(module.resolve_adb_target(config), "4722a997")
+            self.assertEqual(module.resolve_adb_transport(config), "usb")
+        finally:
+            if previous is not None:
+                os.environ["OPENCLAW_MI_BAND_ADB_TARGET"] = previous
+
+    def test_resolve_adb_target_prefers_env_override(self) -> None:
+        module = load_bridge_module()
+        config = {
+            "adb_serial": "4722a997",
+            "adb_target_env_var": "OPENCLAW_MI_BAND_ADB_TARGET",
+            "wireless_adb": {
+                "enabled": False,
+                "host": "192.168.0.8",
+                "port": 5555,
+            },
+        }
+        previous = os.environ.get("OPENCLAW_MI_BAND_ADB_TARGET")
+        os.environ["OPENCLAW_MI_BAND_ADB_TARGET"] = "192.168.0.8:5555"
+        try:
+            self.assertEqual(module.resolve_adb_target(config), "192.168.0.8:5555")
+            self.assertEqual(module.resolve_adb_transport(config), "wireless")
+        finally:
+            if previous is None:
+                os.environ.pop("OPENCLAW_MI_BAND_ADB_TARGET", None)
+            else:
+                os.environ["OPENCLAW_MI_BAND_ADB_TARGET"] = previous
+
+    def test_resolve_adb_target_uses_wireless_target_when_enabled(self) -> None:
+        module = load_bridge_module()
+        config = {
+            "adb_serial": "4722a997",
+            "adb_target_env_var": "OPENCLAW_MI_BAND_ADB_TARGET",
+            "wireless_adb": {
+                "enabled": True,
+                "host": "192.168.0.8",
+                "port": 5555,
+            },
+        }
+        previous = os.environ.get("OPENCLAW_MI_BAND_ADB_TARGET")
+        os.environ.pop("OPENCLAW_MI_BAND_ADB_TARGET", None)
+        try:
+            self.assertEqual(module.resolve_adb_target(config), "192.168.0.8:5555")
+            self.assertEqual(module.resolve_adb_transport(config), "wireless")
+        finally:
+            if previous is not None:
+                os.environ["OPENCLAW_MI_BAND_ADB_TARGET"] = previous
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -13,4 +13,6 @@ The cloud `OpenClaw` runtime on `devbox` must treat the local printer as a bridg
 - The active bridge URL is written into the plugin config at deploy time.
 - The local operator entrypoint is `tools/printer_bridge/up.sh`.
 - The local Mac can also keep bridge and sync tasks alive via `tools/printer_bridge/install_launchd.py`.
+- The bridge root URL is informational; use `/health` for liveness checks.
+- Prefer the printer tools over raw URL fetches.
 - If the bridge is offline, the agent must report failure instead of pretending the print succeeded.
