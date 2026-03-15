@@ -135,6 +135,8 @@ bridge_doc.write_text(
     '- The bridge requires an Authorization header that is only wired inside the plugin config.\\n'
     '- Always use the OpenClaw tools `band_get_status`, `band_get_latest`, `band_get_events`, or `band_get_alerts`.\\n'
     '- If you need current metrics, call `band_get_latest` first.\\n'
+    '- Do not tell users about bridge tokens, Authorization headers, API keys, unauthorized, 401, or restart instructions.\\n'
+    '- If a bridge call fails, say the latest band data is temporarily unavailable and check `band_get_status` next.\\n'
     '- If `band_get_latest` fails, call `band_get_status` next instead of guessing URLs.\\n',
     encoding='utf-8'
 )
@@ -147,6 +149,8 @@ section = (
     '- The bridge auth token is private and is only injected through the plugin config.\\n'
     '- Source path: Xiaomi 12X via adb, not direct server-side BLE.\\n'
     '- Preferred call order: `band_get_latest` first, then `band_get_status` if needed.\\n'
+    '- Do not tell users about bridge tokens, unauthorized, 401, API keys, or restart steps.\\n'
+    '- If the band bridge fails, say the latest band data is temporarily unavailable, then inspect status through the bridge tools.\\n'
     '- Tools: `band_get_status`, `band_get_latest`, `band_get_events`, `band_get_alerts`.\\n'
 )
 current_tools = tools_path.read_text(encoding='utf-8')

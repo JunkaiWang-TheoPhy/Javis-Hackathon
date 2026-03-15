@@ -104,6 +104,7 @@ When the user asks whether Mira can reach a local machine or device, verify the 
 - do not say `nodes unavailable` or `cannot connect` unless an actual verification attempt fails
 - distinguish cloud devbox SSH from paired local-device node access
 - if `TOOLS.md` already contains a recent same-day live verification for that device and the user only wants a simple connectivity answer, use that current verified status first instead of launching a long troubleshooting flow
+- if the only fresh failure signal is `remote bin probe timed out` or a similar remote skills probe warning, do not translate that into `MacBook 客户端不在线`; treat it as a transient internal probe failure until direct node checks fail
 
 ## Memory
 

@@ -23,9 +23,9 @@ class BootstrapStackTest(unittest.TestCase):
         self.assertTrue(BOOTSTRAP_SCRIPT.is_file(), BOOTSTRAP_SCRIPT)
         self.assertTrue(UP_SCRIPT.is_file(), UP_SCRIPT)
 
-    def test_public_tunnel_health_timeout_allows_slow_quick_tunnels(self) -> None:
+    def test_connector_health_timeout_is_long_enough_for_idle_polling(self) -> None:
         module = load_bootstrap_module()
-        self.assertEqual(module.PUBLIC_TUNNEL_HEALTH_TIMEOUT_SECONDS, 120.0)
+        self.assertEqual(module.CONNECTOR_HEALTH_TIMEOUT_SECONDS, 30.0)
 
     def test_build_health_check_command_targets_health_endpoint(self) -> None:
         module = load_bootstrap_module()
@@ -54,6 +54,24 @@ class BootstrapStackTest(unittest.TestCase):
                 module.read_public_bridge_url(state_path),
                 "https://printer.example",
             )
+
+    def test_read_public_bridge_url_ignores_queue_transport_reference(self) -> None:
+        module = load_bootstrap_module()
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            state_path = Path(temp_dir) / "tunnel.json"
+            state_path.write_text(
+                json.dumps(
+                    {
+                        "provider": "ssh_queue_proxy",
+                        "bridge_url": "queue://devbox/home/devbox/.openclaw/printer-bridge-queue",
+                        "remote_alias": "devbox",
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            self.assertIsNone(module.read_public_bridge_url(state_path))
 
     def test_wait_for_public_bridge_url_returns_existing_url(self) -> None:
         module = load_bootstrap_module()
@@ -86,22 +104,44 @@ class BootstrapStackTest(unittest.TestCase):
 
             self.assertIsNone(module.read_public_bridge_url(state_path))
 
+    def test_default_connector_state_targets_fixed_devbox_queue_root(self) -> None:
+        module = load_bootstrap_module()
+        payload = module.default_connector_state()
+
+        self.assertEqual(payload["provider"], "ssh_queue_proxy")
+        self.assertEqual(payload["bridge_url"], "queue://devbox/home/devbox/.openclaw/printer-bridge-queue")
+        self.assertEqual(payload["remote_alias"], "devbox")
+        self.assertEqual(payload["remote_queue_root"], "/home/devbox/.openclaw/printer-bridge-queue")
+
     def test_remote_gateway_start_command_uses_nohup_and_force(self) -> None:
         module = load_bootstrap_module()
         command = module.build_remote_gateway_start_command("devbox")
 
-        self.assertEqual(command[:2], ["ssh", "devbox"])
-        self.assertIn("nohup", command[2])
-        self.assertIn("gateway run --force", command[2])
+        self.assertEqual(command[0], "ssh")
+        self.assertIn("devbox_ssh_identity", " ".join(command))
+        self.assertIn("nohup", command[-1])
+        self.assertIn("gateway run --force", command[-1])
 
     def test_remote_gateway_probe_command_checks_loopback_port(self) -> None:
         module = load_bootstrap_module()
         command = module.build_remote_gateway_probe_command("devbox")
 
-        self.assertEqual(command[:2], ["ssh", "devbox"])
-        self.assertIn("connect_ex", command[2])
-        self.assertIn("127.0.0.1", command[2])
-        self.assertIn("18789", command[2])
+        self.assertEqual(command[0], "ssh")
+        self.assertIn("connect_ex", command[-1])
+        self.assertIn("127.0.0.1", command[-1])
+        self.assertIn("18789", command[-1])
+
+    def test_remote_connector_status_command_uses_remote_alias_and_queue_helper(self) -> None:
+        module = load_bootstrap_module()
+        command = module.build_remote_connector_status_command(
+            "devbox",
+            "/home/devbox/.openclaw/printer-bridge-queue",
+        )
+
+        self.assertEqual(command[0], "ssh")
+        self.assertIn("queue_bridge_admin.py", command[-1])
+        self.assertIn("status", command[-1])
+        self.assertIn("/home/devbox/.openclaw/printer-bridge-queue", command[-1])
 
     def test_up_wrapper_executes_bootstrap_script(self) -> None:
         text = UP_SCRIPT.read_text(encoding="utf-8")

@@ -13,6 +13,7 @@ try:
         TUNNEL_STATE_PATH,
         ROOT as SCRIPT_ROOT,
         load_local_bridge_url,
+        read_bridge_state,
         read_public_bridge_url,
         url_is_healthy,
     )
@@ -21,6 +22,7 @@ except ModuleNotFoundError:
         TUNNEL_STATE_PATH,
         ROOT as SCRIPT_ROOT,
         load_local_bridge_url,
+        read_bridge_state,
         read_public_bridge_url,
         url_is_healthy,
     )
@@ -75,13 +77,21 @@ def resolve_bridge_url(
     *,
     local_bridge_url: str | None = None,
     public_bridge_url: str | None = None,
+    public_bridge_provider: str | None = None,
     health_checker=url_is_healthy,
 ) -> str | None:
     local_bridge_url = local_bridge_url or load_local_bridge_url()
-    public_bridge_url = public_bridge_url or read_public_bridge_url(TUNNEL_STATE_PATH)
+    if public_bridge_url is None:
+        state = read_bridge_state(TUNNEL_STATE_PATH) or {}
+        public_bridge_url = read_public_bridge_url(TUNNEL_STATE_PATH)
+        public_bridge_provider = public_bridge_provider or state.get("provider")
+    elif public_bridge_provider is None:
+        public_bridge_provider = None
 
     if local_bridge_url and health_checker(local_bridge_url):
         return local_bridge_url
+    if public_bridge_provider in {"ssh_reverse", "ssh_queue_proxy"}:
+        return None
     if public_bridge_url and health_checker(public_bridge_url):
         return public_bridge_url
     return None

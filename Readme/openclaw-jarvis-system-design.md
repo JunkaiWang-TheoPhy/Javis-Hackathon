@@ -7,11 +7,11 @@
 **Link:** [https://chatgpt.com/g/g-p-69b2efe76b00819186fbc160a4ff2a3f-hackthon/c/69b2fdf6-9ae4-8331-a433-217a44749e56](https://chatgpt.com/g/g-p-69b2efe76b00819186fbc160a4ff2a3f-hackthon/c/69b2fdf6-9ae4-8331-a433-217a44749e56)  
 
 ## Prompt:
-ChatGPT-OpenClaw 智能设备演示.md
+openclaw-smart-device-demo.md
 
 File
 
-ChatGPT-Vision Pro 开发指南.md
+vision-pro-development-guide.md
 
 File
 

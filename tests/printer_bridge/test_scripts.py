@@ -17,17 +17,15 @@ class ScriptLayoutTest(unittest.TestCase):
 
     def test_start_tunnel_script_supports_dynamic_https_tunnels(self) -> None:
         text = START_TUNNEL.read_text(encoding="utf-8")
-        self.assertIn("cloudflared", text)
-        self.assertIn("npx --yes localtunnel", text)
-        self.assertIn("OPENCLAW_PRINTER_BRIDGE_URL", text)
+        self.assertIn("connector_loop.py", text)
         self.assertIn(".openclaw-printer-bridge-tunnel.json", text)
-        self.assertIn("(?!api\\.)", text)
 
     def test_stop_tunnel_script_clears_state_and_stops_localtunnel(self) -> None:
         text = STOP_TUNNEL.read_text(encoding="utf-8")
         self.assertIn(".openclaw-printer-bridge-tunnel.json", text)
         self.assertIn("pkill", text)
-        self.assertIn("cloudflared tunnel .*--url http://${LOCAL_HOST}:${LOCAL_PORT}", text)
+        self.assertIn("connector_loop.py", text)
+        self.assertIn("cloudflared tunnel .*--url http://127.0.0.1:9771", text)
 
 
 if __name__ == "__main__":

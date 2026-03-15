@@ -1,9 +1,11 @@
+import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 
 const PLUGIN_ID = "printer-bridge";
-const DEFAULT_BRIDGE_URL = "http://127.0.0.1:4771";
 const DEFAULT_MEDIA = "3x3.Fullbleed";
+const DEFAULT_QUEUE_ROOT = "/home/devbox/.openclaw/printer-bridge-queue";
+const DEFAULT_RESPONSE_TIMEOUT_MS = 45000;
 const SUPPORTED_MEDIA = new Set(["3x3", "3x3.Fullbleed", "4x6", "4x6.Fullbleed"]);
 const MEDIA_ALIASES = {
   three_inch: "3x3.Fullbleed",
@@ -23,10 +25,11 @@ function asTextContent(data) {
 function resolvePluginConfig(api) {
   const raw = api.config?.plugins?.entries?.[PLUGIN_ID]?.config ?? {};
   return {
-    bridgeBaseUrl:
-      raw.bridgeBaseUrl ?? process.env.OPENCLAW_PRINTER_BRIDGE_URL ?? DEFAULT_BRIDGE_URL,
-    bridgeToken:
-      raw.bridgeToken ?? process.env.OPENCLAW_PRINTER_BRIDGE_TOKEN ?? "",
+    queueRoot:
+      raw.queueRoot ?? process.env.OPENCLAW_PRINTER_BRIDGE_QUEUE_ROOT ?? DEFAULT_QUEUE_ROOT,
+    responseTimeoutMs:
+      raw.responseTimeoutMs ??
+      Number(process.env.OPENCLAW_PRINTER_BRIDGE_RESPONSE_TIMEOUT_MS ?? DEFAULT_RESPONSE_TIMEOUT_MS),
     defaultMedia: raw.defaultMedia ?? DEFAULT_MEDIA,
   };
 }
@@ -39,38 +42,73 @@ function normalizeMedia(media) {
   return value;
 }
 
+function buildQueuePaths(queueRoot, requestId) {
+  return {
+    queueRoot,
+    pendingDir: path.join(queueRoot, "pending"),
+    claimedDir: path.join(queueRoot, "claimed"),
+    responsesDir: path.join(queueRoot, "responses"),
+    pendingPath: path.join(queueRoot, "pending", `${requestId}.json`),
+    claimedPath: path.join(queueRoot, "claimed", `${requestId}.json`),
+    responsePath: path.join(queueRoot, "responses", `${requestId}.json`),
+  };
+}
+
+async function ensureQueueDirs(queueRoot) {
+  for (const name of ["pending", "claimed", "responses", "heartbeats"]) {
+    await fs.mkdir(path.join(queueRoot, name), { recursive: true });
+  }
+}
+
+async function waitForResponse(queueRoot, requestId, timeoutMs) {
+  const paths = buildQueuePaths(queueRoot, requestId);
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    try {
+      const raw = await fs.readFile(paths.responsePath, "utf8");
+      await fs.unlink(paths.responsePath).catch(() => {});
+      return JSON.parse(raw);
+    } catch (error) {
+      if (error?.code !== "ENOENT") {
+        throw error;
+      }
+    }
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  }
+
+  await fs.unlink(paths.pendingPath).catch(() => {});
+  throw new Error("Printer bridge request timed out waiting for the local Mac connector");
+}
+
 async function callBridge(api, method, endpoint, payload) {
   const cfg = resolvePluginConfig(api);
-  if (!cfg.bridgeToken) {
-    throw new Error("Printer bridge token is missing");
+  const requestId = crypto.randomUUID();
+  const queuePaths = buildQueuePaths(cfg.queueRoot, requestId);
+  await ensureQueueDirs(cfg.queueRoot);
+
+  await fs.writeFile(
+    queuePaths.pendingPath,
+    `${JSON.stringify(
+      {
+        id: requestId,
+        method,
+        path: endpoint,
+        body: payload ?? null,
+        createdAt: new Date().toISOString(),
+      },
+      null,
+      2
+    )}\n`,
+    "utf8"
+  );
+
+  const response = await waitForResponse(cfg.queueRoot, requestId, cfg.responseTimeoutMs);
+  const statusCode = Number(response.statusCode ?? 200);
+  const body = response.body ?? {};
+  if (statusCode >= 400) {
+    throw new Error(typeof body === "string" ? body : JSON.stringify(body));
   }
-
-  const response = await fetch(`${cfg.bridgeBaseUrl}${endpoint}`, {
-    method,
-    headers: {
-      Authorization: `Bearer ${cfg.bridgeToken}`,
-      "Content-Type": "application/json",
-    },
-    body: payload ? JSON.stringify(payload) : undefined,
-  });
-
-  const raw = await response.text();
-  let parsed = raw;
-  try {
-    parsed = raw ? JSON.parse(raw) : {};
-  } catch {
-    // Keep raw text when the bridge does not return JSON.
-  }
-
-  if (!response.ok) {
-    throw new Error(
-      typeof parsed === "string"
-        ? parsed
-        : JSON.stringify(parsed)
-    );
-  }
-
-  return parsed;
+  return body;
 }
 
 async function materializeInput(params) {
@@ -104,7 +142,7 @@ async function materializeInput(params) {
 function buildImageTool(api) {
   return {
     name: "printer_print_image",
-    description: "Submit an image print job to the local macOS printer bridge.",
+    description: "Submit an image print job through the local Mac printer connector queue.",
     parameters: {
       type: "object",
       properties: {
@@ -123,12 +161,7 @@ function buildImageTool(api) {
         media: normalizeMedia(params.media ?? resolvePluginConfig(api).defaultMedia),
         fit_to_page: params.fitToPage === true,
       };
-      const data = await callBridge(
-        api,
-        "POST",
-        "/v1/printers/default/print-image",
-        payload
-      );
+      const data = await callBridge(api, "POST", "/v1/printers/default/print-image", payload);
       return asTextContent(data);
     },
   };
@@ -137,7 +170,7 @@ function buildImageTool(api) {
 function buildPdfTool(api) {
   return {
     name: "printer_print_pdf",
-    description: "Submit a PDF print job to the local macOS printer bridge.",
+    description: "Submit a PDF print job through the local Mac printer connector queue.",
     parameters: {
       type: "object",
       properties: {
@@ -154,12 +187,7 @@ function buildPdfTool(api) {
         ...(await materializeInput(params)),
         media: normalizeMedia(params.media ?? resolvePluginConfig(api).defaultMedia),
       };
-      const data = await callBridge(
-        api,
-        "POST",
-        "/v1/printers/default/print-pdf",
-        payload
-      );
+      const data = await callBridge(api, "POST", "/v1/printers/default/print-pdf", payload);
       return asTextContent(data);
     },
   };
@@ -168,7 +196,7 @@ function buildPdfTool(api) {
 function buildCancelTool(api) {
   return {
     name: "printer_cancel_job",
-    description: "Cancel a queued print job on the local printer bridge.",
+    description: "Cancel a queued print job through the local Mac printer connector queue.",
     parameters: {
       type: "object",
       properties: {
@@ -188,7 +216,7 @@ function buildCancelTool(api) {
 function buildStatusTool(api) {
   return {
     name: "printer_get_status",
-    description: "Read the default printer status from the local macOS printer bridge.",
+    description: "Read the default printer status through the local Mac printer connector queue.",
     parameters: {
       type: "object",
       properties: {},
@@ -204,13 +232,13 @@ function buildStatusTool(api) {
 const plugin = {
   id: PLUGIN_ID,
   name: "Printer Bridge",
-  description: "Forward bounded printer actions to a loopback-only macOS printer bridge.",
+  description: "Queue bounded printer actions for the local Mac connector without relying on a public tunnel.",
   configSchema: {
     type: "object",
     additionalProperties: false,
     properties: {
-      bridgeBaseUrl: { type: "string", default: DEFAULT_BRIDGE_URL },
-      bridgeToken: { type: "string" },
+      queueRoot: { type: "string", default: DEFAULT_QUEUE_ROOT },
+      responseTimeoutMs: { type: "number", default: DEFAULT_RESPONSE_TIMEOUT_MS },
       defaultMedia: { type: "string", default: DEFAULT_MEDIA },
     },
   },
@@ -225,7 +253,7 @@ const plugin = {
         id: "printer-bridge-status",
         start: () => {
           const cfg = resolvePluginConfig(api);
-          api.logger.info(`[${PLUGIN_ID}] bridge target ${cfg.bridgeBaseUrl}`);
+          api.logger.info(`[${PLUGIN_ID}] queue root ${cfg.queueRoot}`);
         },
         stop: () => {
           api.logger.info(`[${PLUGIN_ID}] stopped`);

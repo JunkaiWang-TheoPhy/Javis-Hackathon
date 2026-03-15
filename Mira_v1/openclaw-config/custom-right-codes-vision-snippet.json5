@@ -1,0 +1,24 @@
+{
+  "models": {
+    "providers": {
+      "custom-right-codes": {
+        "models": [
+          {
+            "id": "claude-sonnet-4-6",
+            "name": "claude-sonnet-4-6 (Custom Provider)",
+            "reasoning": false,
+            "input": ["text", "image"],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 200000,
+            "maxTokens": 8192
+          }
+        ]
+      }
+    }
+  }
+}

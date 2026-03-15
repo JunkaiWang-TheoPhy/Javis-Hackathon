@@ -29,6 +29,15 @@ class LaunchdInstallTest(unittest.TestCase):
         self.assertTrue(payload["RunAtLoad"])
         self.assertIn("/repo/tools/printer_bridge/start_bridge.sh", payload["ProgramArguments"])
 
+    def test_tunnel_launch_agent_keeps_tunnel_alive(self) -> None:
+        module = load_install_module()
+        payload = module.build_tunnel_plist(Path("/repo/tools/printer_bridge"), Path("/state"))
+
+        self.assertEqual(payload["Label"], module.TUNNEL_LABEL)
+        self.assertTrue(payload["KeepAlive"])
+        self.assertTrue(payload["RunAtLoad"])
+        self.assertIn("/repo/tools/printer_bridge/start_tunnel.sh", payload["ProgramArguments"])
+
     def test_install_script_knows_how_to_take_over_existing_bridge_process(self) -> None:
         module = load_install_module()
         self.assertEqual(
@@ -67,8 +76,15 @@ class LaunchdInstallTest(unittest.TestCase):
             self.assertTrue((runtime_dir / "up.sh").is_file())
             self.assertTrue((runtime_dir / "bridge_server.py").is_file())
             self.assertTrue((runtime_dir / "bootstrap_stack.py").is_file())
+            self.assertTrue((runtime_dir / "connector_loop.py").is_file())
             self.assertTrue((runtime_dir / "deploy_remote.py").is_file())
+            self.assertTrue((runtime_dir / "queue_bridge_admin.py").is_file())
             self.assertTrue((runtime_dir / "openclaw_printer_plugin" / "index.mjs").is_file())
+
+    def test_install_script_knows_how_to_stage_devbox_ssh_identity_for_launchd(self) -> None:
+        text = INSTALL_SCRIPT.read_text(encoding="utf-8")
+        self.assertIn("devbox_ssh_identity", text)
+        self.assertIn('"ssh", "-G"', text)
 
 
 if __name__ == "__main__":

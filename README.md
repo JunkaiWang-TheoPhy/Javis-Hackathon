@@ -122,7 +122,7 @@ It currently combines:
 - [Windows camera to cloud OpenClaw scripts](0313/openclaw-ha-blueprint/scripts/windows-camera/README.windows.md)
 - [Mi Band 9 Pro gateway notes](devices/mi-band-9-pro/README.md)
 - [Printer bridge notes](docs/printer-bridge/README.md)
-- [Vision Pro development notes](Readme/ChatGPT-Vision%20Pro%20开发指南.md)
+- [Vision Pro development notes](Readme/vision-pro-development-guide.md)
 
 - [OpenClaw HA 主蓝图文档](0313/openclaw-ha-blueprint/README.md)
 - [智能家居生态集成进展](docs/openclaw-ha-ecosystem-progress-2026-03-15.md)
@@ -130,7 +130,7 @@ It currently combines:
 - [Windows 摄像头到云端 OpenClaw 脚本](0313/openclaw-ha-blueprint/scripts/windows-camera/README.windows.md)
 - [Mi Band 9 Pro 网关说明](devices/mi-band-9-pro/README.md)
 - [打印桥说明](docs/printer-bridge/README.md)
-- [Vision Pro 开发笔记](Readme/ChatGPT-Vision%20Pro%20开发指南.md)
+- [Vision Pro 开发笔记](Readme/vision-pro-development-guide.md)
 
 ## Where the Prototype Stands | 原型走到哪里了
 

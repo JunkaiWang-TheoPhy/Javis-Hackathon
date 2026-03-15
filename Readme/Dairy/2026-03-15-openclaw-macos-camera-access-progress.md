@@ -988,3 +988,58 @@ openclaw nodes camera clip \
 2. 当前成功依赖的是本地 patched bundle：
    - `~/.openclaw/workspace/.cache/localmac-camera/OpenClaw-patched.app`
    不是 stock release app
+
+### 23. Hardened the devbox clip wrapper and confirmed the remaining failures are no longer app crashes
+
+为了把 `camera.clip` 的剩余问题和原始 app crash 区分开，这一轮又做了两件事：
+
+1. 给 repo 内的 devbox clip wrapper 补上了和 `snap` 一致的瞬时错误重试：
+
+   - 文件：
+     - `scripts/macos-camera/devbox/localmac-camera-common.sh`
+     - `scripts/macos-camera/devbox/localmac-cam-clip`
+   - 新增行为：
+     - 识别瞬时错误：
+       - `gateway closed ...`
+       - `unknown node: ...`
+       - `TIMEOUT`
+     - 每次重试前自动跑一次：
+       - `openclaw nodes camera list --node <mac-node-id>`
+     - 默认最多重试 4 次，间隔 5 秒
+
+2. 增加了对应的回归测试并拉绿：
+
+   - `scripts/tests/localmac-cam-clip-retry.test.sh`
+   - 测试场景：
+     - 第 1 次 clip 返回 `gateway closed`
+     - 第 2 次 clip 返回 `unknown node`
+     - 第 3 次 clip 返回 `MEDIA:/tmp/openclaw/fake-camera-clip.mp4`
+   - 验证点：
+     - clip wrapper 确实重试 3 次
+     - 中间至少执行一次 node refresh
+
+验证结果：
+
+- shell 语法检查通过
+- `localmac-cam-clip-retry.test.sh` 通过
+- live `camera.clip` 再次出现失败时，表现已经变成：
+  - gateway/node 层的 websocket 关闭或 unknown-node
+  - **而不是** 原先的 `EXC_BAD_ACCESS / SIGSEGV` export-completion crash
+- 重新检查本机：
+  - patched `OpenClaw.app` 进程仍然存活
+  - 最新 crash report 仍停在之前的旧时间点，没有新增 export-completion crash
+
+因此现在可以把结论收紧成：
+
+- `camera.clip` 的原始 app 崩溃问题已经修完
+- 当前剩余问题是：
+  1. 远端 `allowCommands` 偶发漂回 `["camera.snap"]`
+  2. gateway / websocket / node registry 间歇性抖动
+
+也就是说，`camera.clip` 现在的主要风险已经从：
+
+- `app export-completion crash`
+
+变成了：
+
+- `remote policy drift + control-plane flakiness`

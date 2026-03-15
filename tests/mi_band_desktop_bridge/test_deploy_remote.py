@@ -18,6 +18,8 @@ class DeployRemoteScriptTest(unittest.TestCase):
         self.assertIn(".openclaw-mi-band-bridge-tunnel.json", text)
         self.assertIn("Never call the bridge URL directly", text)
         self.assertIn("Always use the OpenClaw tools `band_get_status`, `band_get_latest`, `band_get_events`, or `band_get_alerts`.", text)
+        self.assertIn("Do not tell users about bridge tokens", text)
+        self.assertIn("temporarily unavailable", text)
 
 
 if __name__ == "__main__":

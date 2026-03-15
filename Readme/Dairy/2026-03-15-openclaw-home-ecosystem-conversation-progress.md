@@ -109,7 +109,7 @@ The main design decision settled in this conversation was:
 - Added `Amazon Alexa` to the repo's support inventory documentation
 - Expanded the Apple wording to call out `Apple Home / HomeKit` more explicitly
 - Added a compact support overview file:
-  - `Readme/支持的智能家居品牌生态一览.md`
+  - `Readme/supported-smart-home-ecosystems.md`
 
 This last step was kept documentation-only on purpose:
 
@@ -194,7 +194,7 @@ This last step was kept documentation-only on purpose:
 
 - `0313/openclaw-ha-blueprint/README.md`
 - `docs/openclaw-ha-ecosystem-progress-2026-03-15.md`
-- `Readme/支持的智能家居品牌生态一览.md`
+- `Readme/supported-smart-home-ecosystems.md`
 - `Readme/Dairy/2026-03-15-openclaw-home-ecosystem-conversation-progress.md`
 
 ---

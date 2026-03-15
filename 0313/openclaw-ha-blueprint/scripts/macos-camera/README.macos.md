@@ -127,14 +127,16 @@ curl http://127.0.0.1:3301/v1/health
 
 ## Current Runtime Caveat
 
-`camera.clip` was explicitly enabled on the remote gateway allowlist, but it is **not stable** on this machine/app combination.
+`camera.clip` is no longer blocked on the original app crash, but it is still not as stable as `camera.snap`.
 
 Observed behavior:
 
-- the command is no longer blocked by policy
-- invoking `camera.clip` can disconnect the node
-- macOS logs show `AVCaptureMovieFileOutput` compressor errors
-- the macOS app can crash after export completes
+- the original stock-app crash has been replaced by a working patched-app path
+- the most common remaining failures are:
+  - `gateway closed (...)`
+  - `unknown node: <mac-node-id>`
+  - remote policy drift back to `allowCommands: ["camera.snap"]`
+- those remaining failures live in the gateway/node control path, not the app export-completion path
 
 So the current state is:
 
@@ -271,6 +273,13 @@ The clip wrapper is now expected to work as long as:
 
 - the patched app bundle is the one launchd starts
 - the remote gateway still allows `camera.clip`
+- short websocket or node flaps stay within the wrapper retry window
+
+The devbox clip wrapper now retries transient failures such as:
+
+- `gateway closed (1006 abnormal closure (no close frame))`
+- `gateway closed (1012): service restart`
+- `unknown node: <mac-node-id>`
 
 ## launchd Caveat: `OpenClaw.app` is now started automatically, but ad hoc capture is still less stable than the loop
 

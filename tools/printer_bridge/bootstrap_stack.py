@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import json
+import os
 import shutil
 import subprocess
 import time
@@ -9,9 +10,9 @@ import urllib.request
 from pathlib import Path
 
 try:
-    from install_launchd import BRIDGE_LABEL, SYNC_LABEL
+    from install_launchd import BRIDGE_LABEL, SYNC_LABEL, TUNNEL_LABEL
 except ModuleNotFoundError:
-    from tools.printer_bridge.install_launchd import BRIDGE_LABEL, SYNC_LABEL
+    from tools.printer_bridge.install_launchd import BRIDGE_LABEL, SYNC_LABEL, TUNNEL_LABEL
 
 
 ROOT = Path(__file__).resolve().parent
@@ -29,21 +30,48 @@ TUNNEL_STATE_PATH = Path.home() / ".openclaw-printer-bridge-tunnel.json"
 REMOTE_GATEWAY_BIN = "/home/devbox/.nvm/versions/node/v22.22.1/bin/openclaw"
 REMOTE_GATEWAY_LOG = "/home/devbox/.openclaw/gateway-printer-bridge.log"
 REMOTE_GATEWAY_PORT = 18789
-PUBLIC_TUNNEL_HEALTH_TIMEOUT_SECONDS = 120.0
+DEFAULT_REMOTE_ALIAS = "devbox"
+DEFAULT_REMOTE_QUEUE_ROOT = "/home/devbox/.openclaw/printer-bridge-queue"
+CONNECTOR_HEALTH_TIMEOUT_SECONDS = 30.0
+STAGED_SSH_IDENTITY_FILE = Path(
+    os.environ.get(
+        "OPENCLAW_PRINTER_BRIDGE_SSH_IDENTITY_FILE",
+        str(Path.home() / ".openclaw-printer-bridge" / "runtime" / "devbox_ssh_identity"),
+    )
+)
 
 
 def load_bridge_config() -> dict:
     return json.loads(BRIDGE_CONFIG.read_text(encoding="utf-8"))
 
 
-def read_public_bridge_url(path: Path) -> str | None:
+def default_connector_state() -> dict[str, object]:
+    remote_alias = os.environ.get("OPENCLAW_PRINTER_BRIDGE_REMOTE_ALIAS", DEFAULT_REMOTE_ALIAS)
+    remote_queue_root = os.environ.get("OPENCLAW_PRINTER_BRIDGE_REMOTE_QUEUE_ROOT", DEFAULT_REMOTE_QUEUE_ROOT)
+    return {
+        "provider": "ssh_queue_proxy",
+        "bridge_url": f"queue://{remote_alias}{remote_queue_root}",
+        "remote_alias": remote_alias,
+        "remote_queue_root": remote_queue_root,
+    }
+
+
+def read_bridge_state(path: Path) -> dict | None:
     if not path.is_file():
         return None
-    payload = json.loads(path.read_text(encoding="utf-8"))
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def read_public_bridge_url(path: Path) -> str | None:
+    payload = read_bridge_state(path)
+    if not payload:
+        return None
     public_url = payload.get("public_url") or payload.get("bridge_url")
     if not public_url:
         return None
     candidate = str(public_url).strip()
+    if not candidate.startswith(("http://", "https://")):
+        return None
     if candidate == "https://api.trycloudflare.com":
         return None
     return candidate
@@ -60,7 +88,7 @@ def wait_for_public_bridge_url(
         if public_url:
             return public_url
         time.sleep(poll_interval)
-    raise TimeoutError(f"timed out waiting for tunnel URL in {path}")
+    raise TimeoutError(f"timed out waiting for bridge reference in {path}")
 
 
 def build_remote_gateway_start_command(remote_alias: str) -> list[str]:
@@ -68,7 +96,7 @@ def build_remote_gateway_start_command(remote_alias: str) -> list[str]:
         f"nohup {REMOTE_GATEWAY_BIN} gateway run --force "
         f"> {REMOTE_GATEWAY_LOG} 2>&1 < /dev/null &"
     )
-    return ["ssh", remote_alias, remote_command]
+    return build_ssh_command(remote_alias, remote_command)
 
 
 def build_remote_gateway_probe_command(remote_alias: str) -> list[str]:
@@ -81,7 +109,52 @@ def build_remote_gateway_probe_command(remote_alias: str) -> list[str]:
         "sock.close()\n"
         "PY"
     )
-    return ["ssh", remote_alias, remote_command]
+    return build_ssh_command(remote_alias, remote_command)
+
+
+def build_remote_connector_status_command(remote_alias: str, queue_root: str) -> list[str]:
+    remote_command = (
+        "python3 /home/devbox/.openclaw/extensions/printer-bridge/queue_bridge_admin.py "
+        f"status --queue-root {queue_root}"
+    )
+    return build_ssh_command(remote_alias, remote_command)
+
+
+def resolve_ssh_setting(remote_alias: str, key: str) -> str:
+    result = subprocess.run(
+        ["ssh", "-G", remote_alias],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        return ""
+    for line in result.stdout.splitlines():
+        if line.startswith(f"{key} "):
+            return line.split(" ", 1)[1].strip()
+    return ""
+
+
+def build_ssh_command(remote_alias: str, remote_command: str) -> list[str]:
+    return [
+        "ssh",
+        "-F",
+        "/dev/null",
+        "-p",
+        resolve_ssh_setting(remote_alias, "port") or "22",
+        "-l",
+        resolve_ssh_setting(remote_alias, "user") or os.environ.get("USER", "devbox"),
+        "-i",
+        str(STAGED_SSH_IDENTITY_FILE),
+        "-o",
+        "IdentitiesOnly=yes",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=10",
+        resolve_ssh_setting(remote_alias, "hostname") or remote_alias,
+        remote_command,
+    ]
 
 
 def run(
@@ -139,33 +212,39 @@ def build_health_check_command(url: str, timeout_seconds: float) -> list[str]:
         "-fsS",
         "--max-time",
         str(timeout_seconds),
-        f"{url}/health",
+        f"{url.rstrip('/')}/health",
     ]
 
 
 def url_is_healthy(url: str, timeout_seconds: float = 5.0) -> bool:
     if shutil.which("curl"):
-        result = run(
-            build_health_check_command(url, timeout_seconds),
-            check=False,
-            capture_output=True,
-        )
+        result = run(build_health_check_command(url, timeout_seconds), check=False, capture_output=True)
         return result.returncode == 0
 
     try:
-        with urllib.request.urlopen(f"{url}/health", timeout=timeout_seconds) as response:
+        with urllib.request.urlopen(f"{url.rstrip('/')}/health", timeout=timeout_seconds) as response:
             return response.status == 200
     except (urllib.error.URLError, TimeoutError, ValueError):
         return False
 
 
-def wait_for_health(url: str, timeout_seconds: float) -> None:
-    deadline = time.monotonic() + timeout_seconds
-    while time.monotonic() < deadline:
-        if url_is_healthy(url):
-            return
-        time.sleep(1.0)
-    raise TimeoutError(f"timed out waiting for health at {url}/health")
+def connector_status(remote_alias: str, queue_root: str) -> dict | None:
+    result = run(
+        build_remote_connector_status_command(remote_alias, queue_root),
+        check=False,
+        capture_output=True,
+    )
+    if result.returncode != 0 or not result.stdout.strip():
+        return None
+    try:
+        return json.loads(result.stdout)
+    except json.JSONDecodeError:
+        return None
+
+
+def connector_is_healthy(remote_alias: str, queue_root: str) -> bool:
+    status = connector_status(remote_alias, queue_root)
+    return bool(status and status.get("connector_online"))
 
 
 def ensure_local_bridge(force_restart: bool) -> str:
@@ -178,21 +257,30 @@ def ensure_local_bridge(force_restart: bool) -> str:
         time.sleep(1.0)
 
     start_detached(["zsh", str(START_BRIDGE)], BRIDGE_LOG)
-    wait_for_health(local_url, timeout_seconds=20.0)
-    return local_url
+    deadline = time.monotonic() + 20.0
+    while time.monotonic() < deadline:
+        if url_is_healthy(local_url):
+            return local_url
+        time.sleep(1.0)
+    raise TimeoutError(f"timed out waiting for health at {local_url}/health")
 
 
-def ensure_tunnel(force_restart: bool) -> str:
-    current_url = read_public_bridge_url(TUNNEL_STATE_PATH)
-    if not force_restart and current_url and url_is_healthy(current_url):
-        return current_url
+def ensure_connector(force_restart: bool, remote_alias: str) -> str:
+    state = read_bridge_state(TUNNEL_STATE_PATH) or default_connector_state()
+    queue_root = str(state.get("remote_queue_root") or DEFAULT_REMOTE_QUEUE_ROOT)
+    if not force_restart and connector_is_healthy(remote_alias, queue_root):
+        return str(state["bridge_url"])
 
     run(["zsh", str(STOP_TUNNEL)], check=False)
     time.sleep(1.0)
     start_detached(["zsh", str(START_TUNNEL)], TUNNEL_LOG)
-    public_url = wait_for_public_bridge_url(TUNNEL_STATE_PATH, timeout_seconds=45.0, poll_interval=1.0)
-    wait_for_health(public_url, timeout_seconds=PUBLIC_TUNNEL_HEALTH_TIMEOUT_SECONDS)
-    return public_url
+
+    deadline = time.monotonic() + CONNECTOR_HEALTH_TIMEOUT_SECONDS
+    while time.monotonic() < deadline:
+        if connector_is_healthy(remote_alias, queue_root):
+            return str((read_bridge_state(TUNNEL_STATE_PATH) or state)["bridge_url"])
+        time.sleep(1.0)
+    raise TimeoutError(f"timed out waiting for connector heartbeat for queue {queue_root}")
 
 
 def remote_gateway_running(remote_alias: str) -> bool:
@@ -213,23 +301,22 @@ def ensure_remote_gateway(remote_alias: str) -> None:
     raise TimeoutError(f"timed out waiting for remote gateway on {remote_alias}")
 
 
-def deploy_remote_config(remote_alias: str, bridge_url: str) -> None:
+def deploy_remote_config(remote_alias: str) -> None:
     run(
         [
             "python3",
             str(DEPLOY_REMOTE),
             "--remote",
             remote_alias,
-            "--bridge-url",
-            bridge_url,
             "--skip-restart",
         ]
     )
 
 
-def persist_local_memory(bridge_url: str, remote_alias: str) -> None:
+def persist_local_memory(bridge_reference: str, remote_alias: str) -> None:
     cfg = load_bridge_config()
     host = read_host_metadata()
+    state = read_bridge_state(TUNNEL_STATE_PATH) or default_connector_state()
     STATE_DIR.mkdir(parents=True, exist_ok=True)
 
     payload = {
@@ -242,8 +329,10 @@ def persist_local_memory(bridge_url: str, remote_alias: str) -> None:
         },
         "bridge": {
             "local_url": load_local_bridge_url(),
-            "public_url": bridge_url,
-            "remote_alias": remote_alias,
+            "transport": "ssh_queue_connector",
+            "remote_bridge_reference": bridge_reference,
+            "remote_host_alias": state.get("remote_alias", remote_alias),
+            "remote_queue_root": state.get("remote_queue_root", DEFAULT_REMOTE_QUEUE_ROOT),
             "tunnel_state_path": str(TUNNEL_STATE_PATH),
         },
         "scripts": {
@@ -276,9 +365,10 @@ def persist_local_memory(bridge_url: str, remote_alias: str) -> None:
         "## Runtime",
         "",
         f"- local bridge URL: `{load_local_bridge_url()}`",
-        f"- public bridge URL: `{bridge_url}`",
+        f"- remote bridge reference: `{bridge_reference}`",
         f"- remote OpenClaw alias: `{remote_alias}`",
-        f"- tunnel state file: `{TUNNEL_STATE_PATH}`",
+        f"- remote queue root: `{state.get('remote_queue_root', DEFAULT_REMOTE_QUEUE_ROOT)}`",
+        f"- transport state file: `{TUNNEL_STATE_PATH}`",
         "",
         "## Commands",
         "",
@@ -289,8 +379,10 @@ def persist_local_memory(bridge_url: str, remote_alias: str) -> None:
         "## Automation",
         "",
         f"- launchd bridge label: `{BRIDGE_LABEL}`",
+        f"- launchd connector label: `{TUNNEL_LABEL}`",
         f"- launchd sync label: `{SYNC_LABEL}`",
         f"- launchd runtime directory: `{STATE_DIR / 'runtime'}`",
+        "- launchd connector job keeps the devbox queue drained from the Mac host over SSH",
         "- launchd sync job reruns bridge refresh every 5 minutes",
     ]
     LOCAL_README_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -303,23 +395,29 @@ def main() -> None:
     parser.add_argument("--remote", default="devbox", help="SSH alias for the remote OpenClaw host")
     parser.add_argument("--skip-remote-gateway", action="store_true", help="Do not ensure the remote gateway process is running")
     parser.add_argument("--force-restart-bridge", action="store_true", help="Restart the local bridge process even if health checks pass")
-    parser.add_argument("--force-restart-tunnel", action="store_true", help="Restart the public HTTPS tunnel even if the current one is healthy")
+    parser.add_argument("--force-restart-tunnel", action="store_true", help="Restart the local SSH connector even if the current one is healthy")
     args = parser.parse_args()
 
     local_url = ensure_local_bridge(force_restart=args.force_restart_bridge)
-    public_url = ensure_tunnel(force_restart=args.force_restart_tunnel)
-    persist_local_memory(public_url, args.remote)
-    deploy_remote_config(args.remote, public_url)
+    deploy_remote_config(args.remote)
+    connector_reference = ensure_connector(force_restart=args.force_restart_tunnel, remote_alias=args.remote)
+    persist_local_memory(connector_reference, args.remote)
     if not args.skip_remote_gateway:
         ensure_remote_gateway(args.remote)
 
-    print(json.dumps({
-        "ok": True,
-        "local_bridge_url": local_url,
-        "public_bridge_url": public_url,
-        "local_memory": str(LOCAL_README_PATH),
-        "remote": args.remote,
-    }, ensure_ascii=False, indent=2))
+    print(
+        json.dumps(
+            {
+                "ok": True,
+                "local_bridge_url": local_url,
+                "remote_bridge_reference": connector_reference,
+                "local_memory": str(LOCAL_README_PATH),
+                "remote": args.remote,
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+    )
 
 
 if __name__ == "__main__":

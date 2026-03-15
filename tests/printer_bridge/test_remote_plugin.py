@@ -30,12 +30,12 @@ class RemotePluginTest(unittest.TestCase):
         ):
             self.assertIn(f'name: "{name}"', text)
 
-    def test_plugin_reads_bridge_url_and_token_from_config_or_env(self) -> None:
+    def test_plugin_reads_queue_config_from_config_or_env(self) -> None:
         text = PLUGIN_INDEX.read_text(encoding="utf-8")
-        self.assertIn("bridgeBaseUrl", text)
-        self.assertIn("bridgeToken", text)
-        self.assertIn("OPENCLAW_PRINTER_BRIDGE_URL", text)
-        self.assertIn("OPENCLAW_PRINTER_BRIDGE_TOKEN", text)
+        self.assertIn("queueRoot", text)
+        self.assertIn("responseTimeoutMs", text)
+        self.assertIn("OPENCLAW_PRINTER_BRIDGE_QUEUE_ROOT", text)
+        self.assertIn("OPENCLAW_PRINTER_BRIDGE_RESPONSE_TIMEOUT_MS", text)
 
 
 if __name__ == "__main__":

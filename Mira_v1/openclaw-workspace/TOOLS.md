@@ -44,6 +44,7 @@ Important distinction:
 - SSH in this workspace is for the cloud devbox.
 - The MacBook is normally reached through the paired OpenClaw macOS node, not through raw SSH login.
 - A remote skills probe timeout is not the same thing as Mac node unavailability.
+- If logs mention `remote bin probe timed out` or `CLI 工具访问不到`, treat that as an internal devbox probe failure unless a direct node check also fails.
 
 Gateway caveat in this environment:
 
@@ -60,3 +61,4 @@ Current limitations:
 - `camera.snap` is allowed and verified.
 - `camera.clip` is still unreliable because the macOS OpenClaw app can crash during video export completion.
 - Prefer `camera.snap` for live captures unless the user explicitly wants to debug `camera.clip`.
+- The current primary model is expected to support image input for camera analysis. If image reasoning regresses, check the provider model catalog first before blaming the node.

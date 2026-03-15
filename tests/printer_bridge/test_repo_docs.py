@@ -33,11 +33,13 @@ class RepoDocsTest(unittest.TestCase):
             profile["local_host"]["computer_name"],
             "Thomas的MacBook Air",
         )
-        self.assertEqual(profile["bridge"]["transport"], "https_tunnel")
-        self.assertIn(
-            ".openclaw-printer-bridge-tunnel.json",
-            profile["bridge"]["public_url_source"],
+        self.assertEqual(profile["bridge"]["transport"], "ssh_queue_connector")
+        self.assertEqual(
+            profile["bridge"]["remote_bridge_reference"],
+            "queue://devbox/home/devbox/.openclaw/printer-bridge-queue",
         )
+        self.assertEqual(profile["bridge"]["remote_host_alias"], "devbox")
+        self.assertEqual(profile["bridge"]["remote_queue_root"], "/home/devbox/.openclaw/printer-bridge-queue")
         self.assertIn("3x3.Fullbleed", profile["printer"]["supported_media"])
 
 

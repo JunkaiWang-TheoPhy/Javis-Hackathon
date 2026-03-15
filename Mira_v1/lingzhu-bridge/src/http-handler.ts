@@ -27,6 +27,7 @@ import {
   stripRedundantFirstTurnIntro,
   trimLeadingPunctuationAndWhitespace,
 } from "./first-turn-opening.js";
+import { injectMemoryPrompt, maybeFetchMemoryPrompt } from "./memory-context.js";
 import {
   buildCachedImageFileName,
   extractFallbackUserText,
@@ -592,6 +593,8 @@ export function createHttpHandler(api: any, getRuntimeState: () => LingzhuRuntim
           sessionMode: state.config.sessionMode || "per_user",
           debugLogging: state.config.debugLogging === true,
           experimentalNativeActions: state.config.enableExperimentalNativeActions === true,
+          memoryContextEnabled: state.config.memoryContextEnabled === true,
+          memoryContextAudience: state.config.memoryContextAudience || "auto",
           chatCompletionsEnabled: state.chatCompletionsEnabled === true,
         })
       );
@@ -739,6 +742,17 @@ export function createHttpHandler(api: any, getRuntimeState: () => LingzhuRuntim
       const targetAgentId = config.agentId || body.agent_id || "main";
       const gatewayPort = api.config?.gateway?.port ?? state.gatewayPort ?? 18789;
       const gatewayToken = api.config?.gateway?.auth?.token;
+
+      const memoryPrompt = await maybeFetchMemoryPrompt({
+        config,
+        sessionKey,
+        messages: body.message,
+        logger,
+      });
+      if (memoryPrompt) {
+        openaiMessages = injectMemoryPrompt(openaiMessages as any, memoryPrompt) as typeof openaiMessages;
+        logger.info(`[Lingzhu] Injected memory context into prompt, openaiMessages=${openaiMessages.length}`);
+      }
 
       nativeToolListener = (eventData: any) => {
         logger.info(`[Lingzhu:NativeEvent] Received native_invoke event: ${JSON.stringify(eventData)}`);

@@ -1,0 +1,6 @@
+{"ts":"2026-03-15T00:29:03.501Z","event":"1773534436606.error","payload":{"message_id":"1773534436606","agent_id":"11c5401d20d9486fbc03d5a9f5d6931f","error":"Client disconnected"}}
+{"ts":"2026-03-15T00:32:19.318Z","event":"1773534436606.error","payload":{"message_id":"1773534436606","agent_id":"11c5401d20d9486fbc03d5a9f5d6931f","error":"Client disconnected"}}
+{"ts":"2026-03-15T00:58:58.774Z","event":"1773534436606.error","payload":{"message_id":"1773534436606","agent_id":"11c5401d20d9486fbc03d5a9f5d6931f","error":"Client disconnected"}}
+{"ts":"2026-03-15T01:00:50.157Z","event":"1773534436606.error","payload":{"message_id":"1773534436606","agent_id":"11c5401d20d9486fbc03d5a9f5d6931f","error":"Client disconnected"}}
+{"ts":"2026-03-15T02:21:49.101Z","event":"1773541234836.error","payload":{"message_id":"1773541234836","agent_id":"11c5401d20d9486fbc03d5a9f5d6931f","error":"Client disconnected"}}
+{"ts":"2026-03-15T02:34:35.413Z","event":"1773542030068.error","payload":{"message_id":"1773542030068","agent_id":"11c5401d20d9486fbc03d5a9f5d6931f","error":"Client disconnected"}}

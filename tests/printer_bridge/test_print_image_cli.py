@@ -74,14 +74,25 @@ class PrintImageCliTest(unittest.TestCase):
 
         self.assertEqual(chosen, public_url)
 
+    def test_resolve_bridge_url_skips_queue_transport_reference(self) -> None:
+        module = load_print_image_module()
+        chosen = module.resolve_bridge_url(
+            local_bridge_url="http://127.0.0.1:9771",
+            public_bridge_url="queue://devbox/home/devbox/.openclaw/printer-bridge-queue",
+            public_bridge_provider="ssh_queue_proxy",
+            health_checker=lambda _url: False,
+        )
+
+        self.assertIsNone(chosen)
+
     def test_parse_args_accepts_source_path_media_and_dry_run(self) -> None:
         module = load_print_image_module()
         args = module.parse_args(
-            ["Readme/test.jpg", "--media", "4x6", "--fit-to-page", "--dry-run"]
+            ["Readme/xiaomi-printer-label-test-image.jpg", "--media", "4x6", "--fit-to-page", "--dry-run"]
         )
 
         self.assertIsInstance(args, argparse.Namespace)
-        self.assertEqual(args.source_path, Path("Readme/test.jpg"))
+        self.assertEqual(args.source_path, Path("Readme/xiaomi-printer-label-test-image.jpg"))
         self.assertEqual(args.media, "4x6")
         self.assertTrue(args.fit_to_page)
         self.assertTrue(args.dry_run)

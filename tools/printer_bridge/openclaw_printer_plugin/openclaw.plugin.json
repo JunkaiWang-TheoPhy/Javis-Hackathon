@@ -4,12 +4,13 @@
     "type": "object",
     "additionalProperties": false,
     "properties": {
-      "bridgeBaseUrl": {
+      "queueRoot": {
         "type": "string",
-        "default": "http://127.0.0.1:4771"
+        "default": "/home/devbox/.openclaw/printer-bridge-queue"
       },
-      "bridgeToken": {
-        "type": "string"
+      "responseTimeoutMs": {
+        "type": "number",
+        "default": 45000
       },
       "defaultMedia": {
         "type": "string",

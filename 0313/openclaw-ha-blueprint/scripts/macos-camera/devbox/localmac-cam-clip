@@ -5,4 +5,6 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$script_dir/localmac-camera-common.sh"
 
 duration="${MAC_CAMERA_CLIP_DURATION:-5s}"
-run_openclaw nodes camera clip --node "$mac_camera_node_id" --facing front --duration "$duration" --no-audio
+run_mac_camera_command_with_retry \
+  "camera clip" \
+  nodes camera clip --node "$mac_camera_node_id" --facing front --duration "$duration" --no-audio

@@ -27,7 +27,7 @@
 ### Task 2: Add the new Readme overview file
 
 **Files:**
-- Create: `Readme/支持的智能家居品牌生态一览.md`
+- Create: `Readme/supported-smart-home-ecosystems.md`
 
 - [ ] **Step 1: Write a compact list of supported smart-home ecosystems only**
 - [ ] **Step 2: Avoid implementation detail, caveats, or setup notes**

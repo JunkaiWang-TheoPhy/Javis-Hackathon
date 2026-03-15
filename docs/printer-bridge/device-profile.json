@@ -21,9 +21,10 @@
   },
   "bridge": {
     "remote_host_alias": "devbox",
-    "transport": "https_tunnel",
-    "public_url_source": "OPENCLAW_PRINTER_BRIDGE_URL or ~/.openclaw-printer-bridge-tunnel.json",
-    "fallback_remote_base_url": "http://127.0.0.1:4771",
+    "transport": "ssh_queue_connector",
+    "remote_bridge_reference": "queue://devbox/home/devbox/.openclaw/printer-bridge-queue",
+    "remote_queue_root": "/home/devbox/.openclaw/printer-bridge-queue",
+    "bridge_state_source": "~/.openclaw-printer-bridge-tunnel.json",
     "local_port": 9771,
     "auth_env_var": "OPENCLAW_PRINTER_BRIDGE_TOKEN"
   }

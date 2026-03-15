@@ -144,7 +144,7 @@ Home Assistant 官方给了一个很值得抄的边界：
 
 ### 2.7 Scientify 的 orchestrator / executor 分离
 
-从 `Scientify-Meetup 0314.pdf` 里，最值得借鉴的不是“科研”本身，而是**架构纪律**：
+从 `scientify-openclaw-meetup-2026-03-14.pdf` 里，最值得借鉴的不是“科研”本身，而是**架构纪律**：
 
 - 编排器持有全局视角和长期知识
 - 执行器只做狭义任务
@@ -173,7 +173,7 @@ Home Assistant 官方给了一个很值得抄的边界：
 | OpenClaw exec approvals 思路 | 真实执行能力必须有 allowlist、policy、必要时用户确认 | `proposal -> confirm -> dispatch` 升级成全局风险引擎 |
 | OpenAI safety best practices | 不可信输入必须经过多层过滤，工具边界要单独治理 | OCR、网页、语音、第三方返回值都视作 untrusted |
 | Anthropic prompt-injection mitigation | 提示注入需要多重防线，不能押注单一 prompt | Layer 3 的输入净化、默认静默、危险域禁止自动执行 |
-| Scientify-Meetup 0314.pdf | 编排器持全局知识，执行器只做狭义任务 | `security-governor` 的拆分建议 |
+| scientify-openclaw-meetup-2026-03-14.pdf | 编排器持全局知识，执行器只做狭义任务 | `security-governor` 的拆分建议 |
 | ChatGPT-OpenClaw Jarvis 系统设计稿 | 记忆分层、隐私标签、risk/care escalation 要独立建模 | Layer 3 和 Layer 4 的 memory / consent / care 模型 |
 
 这张矩阵的目的不是“堆参考文献”，而是明确：  
@@ -1290,7 +1290,7 @@ Mac webcam
 - `camera.snap`：稳定可用
 - ambient route：已通过
 - `POST /hooks/agent`：已通过
-- `camera.clip`：远端 allowlist 已放开，但当前 `OpenClaw.app v2026.3.12` 在这台 Mac 上仍不稳定，调用时会触发 node disconnect；应视为实验能力而不是稳定能力
+- `camera.clip`：原始 `OpenClaw.app v2026.3.12` 的 export-completion 崩溃已经通过本地 patched bundle 绕开；当前可 live 成功返回 `MEDIA:` mp4，但仍受远端 allowlist 回漂和 websocket/node 抖动影响，应视为“可用但仍需链路级容错”的能力
 
 ---
 
@@ -1381,8 +1381,8 @@ npm test
 
 ### 本地文件与设计稿
 
-- `Readme/Scientify-Meetup 0314.pdf`
-- `Readme/ChatGPT-OpenClaw Jarvis系统设计 (1).md`
+- `Readme/scientify-openclaw-meetup-2026-03-14.pdf`
+- `Readme/openclaw-jarvis-system-design.md`
 - 你提供的四层防线图片
 
 ---
