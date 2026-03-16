@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1773525440426,
+  "lastScanned": 1773698508582,
   "projectRoot": "/Users/thomasjwang/Documents/GitHub/Javis-Hackathon",
   "techStack": {
     "languages": [],
@@ -24,7 +24,10 @@
   "structure": {
     "isMonorepo": false,
     "workspaces": [],
-    "mainDirectories": [],
+    "mainDirectories": [
+      "docs",
+      "tests"
+    ],
     "gitBranches": {
       "defaultBranch": "main",
       "branchingStrategy": null
@@ -36,50 +39,97 @@
       "path": "0313",
       "purpose": null,
       "fileCount": 1,
-      "lastAccessed": 1773525440410,
+      "lastAccessed": 1773698508569,
       "keyFiles": [
         "openclaw-ha-blueprint.zip"
       ]
+    },
+    "Mira_Released_Version": {
+      "path": "Mira_Released_Version",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1773698508570,
+      "keyFiles": []
     },
     "Mira_v1": {
       "path": "Mira_v1",
       "purpose": null,
       "fileCount": 0,
-      "lastAccessed": 1773525440412,
+      "lastAccessed": 1773698508571,
       "keyFiles": []
+    },
+    "OpenClaw": {
+      "path": "OpenClaw",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1773698508571,
+      "keyFiles": [
+        "SYNC_MANIFEST.md"
+      ]
     },
     "Readme": {
       "path": "Readme",
       "purpose": null,
-      "fileCount": 8,
-      "lastAccessed": 1773525440413,
+      "fileCount": 14,
+      "lastAccessed": 1773698508572,
       "keyFiles": [
-        "30 s自动拍照程序.pdf",
-        "ADB环境配置.pdf",
-        "ChatGPT-OpenClaw Jarvis系统设计 (1).md",
-        "ChatGPT-OpenClaw 智能设备演示.md",
-        "ChatGPT-Vision Pro 开发指南.md"
+        "2026-03-15-mi-band-automation-plan.md",
+        "adb-environment-setup-guide.pdf",
+        "mira-pitch-script-v1.pdf",
+        "mira-released-version-layered-release-architecture.html",
+        "mira-released-version-layered-release-architecture.md"
       ]
     },
     "Rokid": {
       "path": "Rokid",
       "purpose": null,
       "fileCount": 0,
-      "lastAccessed": 1773525440413,
+      "lastAccessed": 1773698508574,
+      "keyFiles": []
+    },
+    "devices": {
+      "path": "devices",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1773698508575,
+      "keyFiles": []
+    },
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 2,
+      "lastAccessed": 1773698508575,
+      "keyFiles": [
+        "openclaw-ha-ecosystem-progress-2026-03-15.md",
+        "rokid-lingzhu-progress-2026-03-15.md"
+      ]
+    },
+    "tests": {
+      "path": "tests",
+      "purpose": "Test files",
+      "fileCount": 0,
+      "lastAccessed": 1773698508576,
       "keyFiles": []
     },
     "tmp": {
       "path": "tmp",
       "purpose": null,
-      "fileCount": 17,
-      "lastAccessed": 1773525440413,
+      "fileCount": 18,
+      "lastAccessed": 1773698508576,
       "keyFiles": [
+        "devbox_key",
         "rokid-after-tap.png",
         "rokid-camera-after-next-1.png",
         "rokid-camera-back.png",
-        "rokid-camera-check.png",
-        "rokid-camera-current-retry.png"
+        "rokid-camera-check.png"
       ]
+    },
+    "tools": {
+      "path": "tools",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1773698508577,
+      "keyFiles": []
     }
   },
   "hotPaths": [],

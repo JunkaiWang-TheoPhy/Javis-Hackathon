@@ -4,6 +4,7 @@ import { DatabaseSync } from "node:sqlite";
 import type { MemoryEventInput, MemoryEventRecord } from "./memoryEvent.ts";
 import type { MemoryLongTermFact, MemoryLifecycleUpdate } from "./memoryFact.ts";
 import type { MemoryLedger } from "./memoryLedger.ts";
+import type { MemoryRuntimeState, MemoryRuntimeStatePatch } from "./memoryRuntimeState.ts";
 
 type EventRow = {
   event_id: string;
@@ -36,6 +37,14 @@ type FactRow = {
   privacy_level: string | null;
   source_event_id: string | null;
   updated_at: string;
+};
+
+type RuntimeStateRow = {
+  last_user_request_at: string | null;
+  last_sleep_started_at: string | null;
+  last_sleep_completed_at: string | null;
+  last_sleep_triggered_for_request_at: string | null;
+  last_sleep_batch_id: string | null;
 };
 
 function rowToRecord(row: EventRow): MemoryEventRecord {
@@ -72,6 +81,22 @@ function rowToFact(row: FactRow): MemoryLongTermFact {
     privacyLevel: row.privacy_level ?? "private",
     ...(row.source_event_id ? { sourceEventId: row.source_event_id } : {}),
     updatedAt: row.updated_at,
+  };
+}
+
+function rowToRuntimeState(row: RuntimeStateRow | undefined): MemoryRuntimeState {
+  if (!row) {
+    return {};
+  }
+
+  return {
+    ...(row.last_user_request_at ? { lastUserRequestAt: row.last_user_request_at } : {}),
+    ...(row.last_sleep_started_at ? { lastSleepStartedAt: row.last_sleep_started_at } : {}),
+    ...(row.last_sleep_completed_at ? { lastSleepCompletedAt: row.last_sleep_completed_at } : {}),
+    ...(row.last_sleep_triggered_for_request_at
+      ? { lastSleepTriggeredForRequestAt: row.last_sleep_triggered_for_request_at }
+      : {}),
+    ...(row.last_sleep_batch_id ? { lastSleepBatchId: row.last_sleep_batch_id } : {}),
   };
 }
 
@@ -114,6 +139,15 @@ export class SQLiteMemoryLedger implements MemoryLedger {
         updated_at TEXT NOT NULL
       );
 
+      CREATE TABLE IF NOT EXISTS memory_runtime_state (
+        singleton_key INTEGER PRIMARY KEY CHECK (singleton_key = 1),
+        last_user_request_at TEXT,
+        last_sleep_started_at TEXT,
+        last_sleep_completed_at TEXT,
+        last_sleep_triggered_for_request_at TEXT,
+        last_sleep_batch_id TEXT
+      );
+
       CREATE INDEX IF NOT EXISTS idx_memory_events_occurred_at
         ON memory_events (occurred_at);
       CREATE INDEX IF NOT EXISTS idx_memory_events_session_id
@@ -128,6 +162,17 @@ export class SQLiteMemoryLedger implements MemoryLedger {
     this.ensureColumn("memory_events", "consolidation_batch_id", "TEXT");
     this.ensureColumn("memory_events", "forgotten_at", "TEXT");
     this.ensureColumn("memory_long_term_facts", "privacy_level", "TEXT");
+    this.db.prepare(`
+      INSERT INTO memory_runtime_state (
+        singleton_key,
+        last_user_request_at,
+        last_sleep_started_at,
+        last_sleep_completed_at,
+        last_sleep_triggered_for_request_at,
+        last_sleep_batch_id
+      ) VALUES (1, NULL, NULL, NULL, NULL, NULL)
+      ON CONFLICT(singleton_key) DO NOTHING
+    `).run();
   }
 
   record(input: MemoryEventInput): MemoryEventRecord {
@@ -211,6 +256,17 @@ export class SQLiteMemoryLedger implements MemoryLedger {
     return this.selectEvents("WHERE substr(occurred_at, 1, 10) = ?", [date]);
   }
 
+  listEventDatesBetween(startOccurredAt: string, endOccurredAt: string): string[] {
+    const rows = this.db.prepare(`
+      SELECT DISTINCT substr(occurred_at, 1, 10) AS date
+      FROM memory_events
+      WHERE occurred_at >= ? AND occurred_at <= ?
+      ORDER BY date ASC
+    `).all(startOccurredAt, endOccurredAt) as Array<{ date: string }>;
+
+    return rows.map((row) => row.date);
+  }
+
   applySleepUpdates(updates: MemoryLifecycleUpdate[], facts: MemoryLongTermFact[]): void {
     const updateStmt = this.db.prepare(`
       UPDATE memory_events
@@ -276,6 +332,73 @@ export class SQLiteMemoryLedger implements MemoryLedger {
     `).all() as FactRow[];
 
     return rows.map(rowToFact);
+  }
+
+  getRuntimeState(): MemoryRuntimeState {
+    const row = this.db.prepare(`
+      SELECT
+        last_user_request_at,
+        last_sleep_started_at,
+        last_sleep_completed_at,
+        last_sleep_triggered_for_request_at,
+        last_sleep_batch_id
+      FROM memory_runtime_state
+      WHERE singleton_key = 1
+    `).get() as RuntimeStateRow | undefined;
+
+    return rowToRuntimeState(row);
+  }
+
+  updateRuntimeState(patch: MemoryRuntimeStatePatch): MemoryRuntimeState {
+    const current = this.getRuntimeState();
+    const next: MemoryRuntimeState = {
+      ...(current.lastUserRequestAt ? { lastUserRequestAt: current.lastUserRequestAt } : {}),
+      ...(current.lastSleepStartedAt ? { lastSleepStartedAt: current.lastSleepStartedAt } : {}),
+      ...(current.lastSleepCompletedAt ? { lastSleepCompletedAt: current.lastSleepCompletedAt } : {}),
+      ...(current.lastSleepTriggeredForRequestAt
+        ? { lastSleepTriggeredForRequestAt: current.lastSleepTriggeredForRequestAt }
+        : {}),
+      ...(current.lastSleepBatchId ? { lastSleepBatchId: current.lastSleepBatchId } : {}),
+    };
+
+    const applyField = <K extends keyof MemoryRuntimeState>(
+      field: K,
+      value: string | null | undefined,
+    ) => {
+      if (value === undefined) {
+        return;
+      }
+      if (value === null) {
+        delete next[field];
+        return;
+      }
+      next[field] = value;
+    };
+
+    applyField("lastUserRequestAt", patch.lastUserRequestAt);
+    applyField("lastSleepStartedAt", patch.lastSleepStartedAt);
+    applyField("lastSleepCompletedAt", patch.lastSleepCompletedAt);
+    applyField("lastSleepTriggeredForRequestAt", patch.lastSleepTriggeredForRequestAt);
+    applyField("lastSleepBatchId", patch.lastSleepBatchId);
+
+    this.db.prepare(`
+      UPDATE memory_runtime_state
+      SET
+        last_user_request_at = ?,
+        last_sleep_started_at = ?,
+        last_sleep_completed_at = ?,
+        last_sleep_triggered_for_request_at = ?,
+        last_sleep_batch_id = ?
+      WHERE singleton_key = 1
+    `).run(
+      next.lastUserRequestAt ?? null,
+      next.lastSleepStartedAt ?? null,
+      next.lastSleepCompletedAt ?? null,
+      next.lastSleepTriggeredForRequestAt ?? null,
+      next.lastSleepBatchId ?? null,
+    );
+
+    return next;
   }
 
   private selectEvents(whereClause = "", params: unknown[] = []) {

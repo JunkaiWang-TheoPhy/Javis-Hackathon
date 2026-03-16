@@ -7,13 +7,15 @@ import { handleAmbientObserveRequest } from "./routes/ambientObserve.ts";
 import { handleConfirmRequest } from "./routes/confirm.ts";
 import { type HaControlConfig } from "../../../plugins/openclaw-plugin-ha-control/src/ecosystem.ts";
 import { MemoryContextRetriever } from "./memory/memoryContextRetriever.ts";
+import { MemoryIdleSleepController } from "./memory/memoryIdleSleepController.ts";
 import type { MemoryLedger } from "./memory/memoryLedger.ts";
 import { MemorySleepConsolidator } from "./memory/memorySleepConsolidator.ts";
 import { SQLiteMemoryLedger } from "./memory/sqliteMemoryLedger.ts";
 import { DeterministicOpenClawClient } from "./orchestration/openclawClient.ts";
+import { handleMemoryAutoSleepRequest } from "./routes/memoryAutoSleep.ts";
 import { handleMemoryContextRequest } from "./routes/memoryContext.ts";
 import { handleObserveRequest } from "./routes/observe.ts";
-import { handleMemoryIngestRequest } from "./routes/memoryIngest.ts";
+import { extractUserRequestTimestampFromMemoryEvent, handleMemoryIngestRequest } from "./routes/memoryIngest.ts";
 import { handleMemorySleepRequest } from "./routes/memorySleep.ts";
 import { TransientMemoryStore } from "./store/transientMemory.ts";
 
@@ -28,6 +30,8 @@ type BridgeServerOptions = {
   memoryLedger?: MemoryLedger;
   memoryWorkspaceDir?: string;
 };
+
+const DEFAULT_IDLE_SLEEP_THRESHOLD_MS = 2 * 60 * 60 * 1000;
 
 function resolveRuntimeMemoryPaths() {
   const home = process.env.HOME ?? homedir();
@@ -114,6 +118,20 @@ function writeJson(res: http.ServerResponse, status: number, body: unknown) {
   res.end(JSON.stringify(body));
 }
 
+function resolveIdleSleepThresholdMs() {
+  const raw = process.env.MIRA_MEMORY_IDLE_THRESHOLD_SECONDS;
+  if (!raw) {
+    return DEFAULT_IDLE_SLEEP_THRESHOLD_MS;
+  }
+
+  const seconds = Number(raw);
+  if (!Number.isFinite(seconds) || seconds < 60) {
+    return DEFAULT_IDLE_SLEEP_THRESHOLD_MS;
+  }
+
+  return Math.trunc(seconds) * 1000;
+}
+
 export function createBridgeServer(options: BridgeServerOptions = {}) {
   const defaultMemoryRuntime = options.memoryLedger ? undefined : createDefaultMemoryLedger();
   const store = new TransientMemoryStore();
@@ -123,6 +141,17 @@ export function createBridgeServer(options: BridgeServerOptions = {}) {
     defaultDispatchHomeAssistantAction;
   const memoryLedger = options.memoryLedger ?? defaultMemoryRuntime?.memoryLedger;
   const memoryWorkspaceDir = options.memoryWorkspaceDir ?? defaultMemoryRuntime?.memoryWorkspaceDir;
+  const idleSleepThresholdMs = resolveIdleSleepThresholdMs();
+
+  const touchUserRequest = (occurredAt: string | null) => {
+    if (!memoryLedger || !occurredAt) {
+      return;
+    }
+
+    memoryLedger.updateRuntimeState({
+      lastUserRequestAt: occurredAt,
+    });
+  };
 
   const server = http.createServer(async (req, res) => {
     try {
@@ -134,7 +163,11 @@ export function createBridgeServer(options: BridgeServerOptions = {}) {
       }
 
       if (req.method === "POST" && url.pathname === "/v1/observe") {
-        const result = await handleObserveRequest(await readJson(req), store, memoryLedger, client);
+        const body = await readJson(req) as { observation?: { observedAt?: string } };
+        const result = await handleObserveRequest(body, store, memoryLedger, client);
+        if (result.status === 200 && typeof body.observation?.observedAt === "string") {
+          touchUserRequest(body.observation.observedAt);
+        }
         writeJson(res, result.status, result.body);
         return;
       }
@@ -146,13 +179,17 @@ export function createBridgeServer(options: BridgeServerOptions = {}) {
       }
 
       if (req.method === "POST" && url.pathname === "/v1/confirm") {
+        const body = await readJson(req);
         const result = await handleConfirmRequest(
-          await readJson(req),
+          body,
           store,
           memoryLedger,
           dispatchHomeAssistantAction,
           client,
         );
+        if (result.status === 200) {
+          touchUserRequest(new Date().toISOString());
+        }
         writeJson(res, result.status, result.body);
         return;
       }
@@ -166,7 +203,11 @@ export function createBridgeServer(options: BridgeServerOptions = {}) {
           return;
         }
 
-        const result = await handleMemoryIngestRequest(await readJson(req), memoryLedger);
+        const body = await readJson(req) as { event?: Parameters<typeof extractUserRequestTimestampFromMemoryEvent>[0] };
+        const result = await handleMemoryIngestRequest(body, memoryLedger);
+        if (result.status === 202) {
+          touchUserRequest(extractUserRequestTimestampFromMemoryEvent(body.event));
+        }
         writeJson(res, result.status, result.body);
         return;
       }
@@ -185,6 +226,26 @@ export function createBridgeServer(options: BridgeServerOptions = {}) {
           workspaceDir: memoryWorkspaceDir,
         });
         const result = await handleMemorySleepRequest(await readJson(req), consolidator);
+        writeJson(res, result.status, result.body);
+        return;
+      }
+
+      if (req.method === "POST" && url.pathname === "/v1/memory/auto-sleep") {
+        if (!memoryLedger || !memoryWorkspaceDir) {
+          writeJson(res, 503, {
+            ok: false,
+            error: "memory auto-sleep is not configured",
+          });
+          return;
+        }
+
+        const controller = new MemoryIdleSleepController({
+          ledger: memoryLedger,
+          workspaceDir: memoryWorkspaceDir,
+          idleThresholdMs: idleSleepThresholdMs,
+          hasPendingActions: () => store.hasPendingActions(),
+        });
+        const result = await handleMemoryAutoSleepRequest(await readJson(req), controller);
         writeJson(res, result.status, result.body);
         return;
       }

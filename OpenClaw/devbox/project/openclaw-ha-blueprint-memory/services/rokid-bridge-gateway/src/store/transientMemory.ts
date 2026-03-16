@@ -45,13 +45,16 @@ export class TransientMemoryStore {
     buttonId: string,
     envelope: ActionEnvelope,
   ) {
-    this.confirmedByKey.set(
-      confirmKey(sessionId, observationId, panelId, buttonId),
-      envelope,
-    );
+    const key = confirmKey(sessionId, observationId, panelId, buttonId);
+    this.pendingByKey.delete(key);
+    this.confirmedByKey.set(key, envelope);
   }
 
   getConfirmed(sessionId: string, observationId: string, panelId: string, buttonId: string) {
     return this.confirmedByKey.get(confirmKey(sessionId, observationId, panelId, buttonId));
+  }
+
+  hasPendingActions() {
+    return this.pendingByKey.size > 0;
   }
 }

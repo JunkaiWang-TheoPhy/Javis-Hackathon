@@ -404,6 +404,73 @@ test("POST /v1/memory/events writes a normalized external event", async () => {
   assert.equal(events.some((event) => event.eventType === "wearable.sleep_session"), true);
 });
 
+test("POST /v1/observe records the last user request timestamp", async () => {
+  const ledger = createLedger() as SQLiteMemoryLedger & {
+    getRuntimeState: () => Record<string, string | null>;
+  };
+  const server = createBridgeServer({
+    dispatchHomeAssistantAction: async () => ({ ok: true }),
+    memoryLedger: ledger,
+  });
+  await server.listen(0);
+  closers.push(() => server.close());
+
+  const response = await fetch(`${server.baseUrl}/v1/observe`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ observation: buildObservation() }),
+  });
+
+  assert.equal(response.status, 200);
+  const state = ledger.getRuntimeState();
+  assert.equal(state.lastUserRequestAt, "2026-03-14T10:15:00.000Z");
+});
+
+test("POST /v1/memory/events records chat user messages as the latest user request", async () => {
+  const ledger = createLedger() as SQLiteMemoryLedger & {
+    getRuntimeState: () => Record<string, string | null>;
+  };
+  const server = createBridgeServer({
+    dispatchHomeAssistantAction: async () => ({ ok: true }),
+    memoryLedger: ledger,
+  });
+  await server.listen(0);
+  closers.push(() => server.close());
+
+  const response = await fetch(`${server.baseUrl}/v1/memory/events`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      event: {
+        eventType: "chat.user_message",
+        sourceType: "chat",
+        sourceEventId: "chat-001",
+        sessionId: "sess-chat-001",
+        actorId: "user:thomas",
+        targetId: "agent:mira",
+        occurredAt: "2026-03-15T10:00:00.000Z",
+        modality: "text",
+        scope: "direct",
+        payload: {
+          text: "记住：晚上提醒尽量轻一点。",
+        },
+        dedupeKey: "chat:chat-001",
+        privacyLevel: "private",
+        salienceHint: 0.95,
+        retentionClass: "candidate_long_term",
+      },
+    }),
+  });
+
+  assert.equal(response.status, 202);
+  const state = ledger.getRuntimeState();
+  assert.equal(state.lastUserRequestAt, "2026-03-15T10:00:00.000Z");
+});
+
 test("POST /v1/memory/sleep consolidates events into daily and long-term memory", async () => {
   const ledger = createLedger();
   const dir = mkdtempSync(join(tmpdir(), "mira-bridge-sleep-"));
@@ -460,6 +527,178 @@ test("POST /v1/memory/sleep consolidates events into daily and long-term memory"
   const body = await response.json();
   assert.equal(body.ok, true);
   assert.equal(body.promotedFactCount, 1);
+});
+
+test("POST /v1/memory/auto-sleep runs after two idle hours and records completion state", async () => {
+  const ledger = createLedger() as SQLiteMemoryLedger & {
+    getRuntimeState: () => Record<string, string | null>;
+  };
+  const dir = mkdtempSync(join(tmpdir(), "mira-bridge-auto-sleep-"));
+  tempDirs.push(dir);
+
+  const server = createBridgeServer({
+    dispatchHomeAssistantAction: async () => ({ ok: true }),
+    memoryLedger: ledger,
+    memoryWorkspaceDir: dir,
+  });
+  await server.listen(0);
+  closers.push(() => server.close());
+
+  let response = await fetch(`${server.baseUrl}/v1/memory/events`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      event: {
+        eventType: "chat.user_message",
+        sourceType: "chat",
+        sourceEventId: "chat-auto-sleep-1",
+        sessionId: "sess-auto-sleep",
+        actorId: "user:thomas",
+        targetId: "agent:mira",
+        occurredAt: "2026-03-15T10:00:00.000Z",
+        modality: "text",
+        scope: "direct",
+        payload: {
+          text: "记住：晚上不要突然打扰我。",
+        },
+        dedupeKey: "chat:auto-sleep-1",
+        privacyLevel: "private",
+        salienceHint: 0.93,
+        retentionClass: "candidate_long_term",
+      },
+    }),
+  });
+  assert.equal(response.status, 202);
+
+  response = await fetch(`${server.baseUrl}/v1/memory/events`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      event: {
+        eventType: "ambient.observe",
+        sourceType: "ambient",
+        sourceEventId: "ambient-auto-sleep-1",
+        sessionId: "sess-auto-sleep-ambient",
+        actorId: "sensor:mac-webcam",
+        occurredAt: "2026-03-15T10:05:00.000Z",
+        modality: "image",
+        scope: "ambient",
+        payload: {
+          activityState: "idle",
+          changeScore: 0.02,
+          personPresent: false,
+        },
+        dedupeKey: "ambient:auto-sleep-1",
+        privacyLevel: "sensitive",
+        salienceHint: 0.03,
+        retentionClass: "episodic",
+      },
+    }),
+  });
+  assert.equal(response.status, 202);
+
+  response = await fetch(`${server.baseUrl}/v1/memory/auto-sleep`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      now: "2026-03-15T12:01:00.000Z",
+    }),
+  });
+
+  assert.equal(response.status, 200);
+  const body = await response.json();
+  assert.equal(body.ok, true);
+  assert.equal(body.status, "slept");
+  assert.equal(body.runCount, 1);
+
+  const state = ledger.getRuntimeState();
+  assert.equal(state.lastSleepCompletedAt, "2026-03-15T12:01:00.000Z");
+  assert.equal(state.lastSleepTriggeredForRequestAt, "2026-03-15T10:00:00.000Z");
+});
+
+test("POST /v1/memory/auto-sleep does not stay blocked after a pending action is confirmed", async () => {
+  const ledger = createLedger();
+  const dir = mkdtempSync(join(tmpdir(), "mira-bridge-auto-sleep-confirmed-"));
+  tempDirs.push(dir);
+
+  const server = createBridgeServer({
+    dispatchHomeAssistantAction: async () => ({ ok: true }),
+    memoryLedger: ledger,
+    memoryWorkspaceDir: dir,
+  });
+  await server.listen(0);
+  closers.push(() => server.close());
+
+  let response = await fetch(`${server.baseUrl}/v1/observe`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ observation: buildObservation() }),
+  });
+  assert.equal(response.status, 200);
+
+  response = await fetch(`${server.baseUrl}/v1/confirm`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      sessionId: "sess-rokid-001",
+      panelId: "panel-1",
+      buttonId: "start_scene",
+      observationId: "obs-0001",
+    }),
+  });
+  assert.equal(response.status, 200);
+
+  response = await fetch(`${server.baseUrl}/v1/memory/events`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      event: {
+        eventType: "chat.user_message",
+        sourceType: "chat",
+        sourceEventId: "chat-after-confirm-1",
+        sessionId: "sess-after-confirm",
+        actorId: "user:thomas",
+        targetId: "agent:mira",
+        occurredAt: "2026-03-15T10:00:00.000Z",
+        modality: "text",
+        scope: "direct",
+        payload: {
+          text: "记住：确认后的对话也应该能睡眠整理。",
+        },
+        dedupeKey: "chat:after-confirm-1",
+        privacyLevel: "private",
+        salienceHint: 0.92,
+        retentionClass: "candidate_long_term",
+      },
+    }),
+  });
+  assert.equal(response.status, 202);
+
+  response = await fetch(`${server.baseUrl}/v1/memory/auto-sleep`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      now: "2026-03-15T12:01:00.000Z",
+    }),
+  });
+
+  assert.equal(response.status, 200);
+  const body = await response.json();
+  assert.equal(body.status, "slept");
 });
 
 test("POST /v1/memory/context returns a prompt-ready memory snippet", async () => {

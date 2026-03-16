@@ -23,6 +23,15 @@ function createLedger() {
   return new SQLiteMemoryLedger(join(dir, "memory.sqlite"));
 }
 
+function createLedgerFixture() {
+  const dir = mkdtempSync(join(tmpdir(), "mira-memory-ledger-"));
+  tempDirs.push(dir);
+  return {
+    dir,
+    path: join(dir, "memory.sqlite"),
+  };
+}
+
 test("SQLiteMemoryLedger records and lists persisted events", () => {
   const ledger = createLedger();
 
@@ -83,4 +92,35 @@ test("SQLiteMemoryLedger treats duplicate dedupe keys as idempotent", () => {
   const events = ledger.listEvents();
   assert.equal(events.length, 1);
   assert.equal(events[0]?.dedupeKey, "ambient:amb-001");
+});
+
+test("SQLiteMemoryLedger persists runtime memory state across reopen", () => {
+  const fixture = createLedgerFixture();
+  const ledger = new SQLiteMemoryLedger(fixture.path) as SQLiteMemoryLedger & {
+    getRuntimeState: () => Record<string, string | null>;
+    updateRuntimeState: (patch: Record<string, string | null>) => void;
+  };
+
+  const initialState = ledger.getRuntimeState();
+  assert.equal(initialState.lastUserRequestAt ?? null, null);
+  assert.equal(initialState.lastSleepCompletedAt ?? null, null);
+
+  ledger.updateRuntimeState({
+    lastUserRequestAt: "2026-03-15T12:00:00.000Z",
+    lastSleepStartedAt: "2026-03-15T14:00:00.000Z",
+    lastSleepCompletedAt: "2026-03-15T14:00:05.000Z",
+    lastSleepTriggeredForRequestAt: "2026-03-15T12:00:00.000Z",
+    lastSleepBatchId: "batch-001",
+  });
+
+  const reopened = new SQLiteMemoryLedger(fixture.path) as SQLiteMemoryLedger & {
+    getRuntimeState: () => Record<string, string | null>;
+  };
+  const state = reopened.getRuntimeState();
+
+  assert.equal(state.lastUserRequestAt, "2026-03-15T12:00:00.000Z");
+  assert.equal(state.lastSleepStartedAt, "2026-03-15T14:00:00.000Z");
+  assert.equal(state.lastSleepCompletedAt, "2026-03-15T14:00:05.000Z");
+  assert.equal(state.lastSleepTriggeredForRequestAt, "2026-03-15T12:00:00.000Z");
+  assert.equal(state.lastSleepBatchId, "batch-001");
 });

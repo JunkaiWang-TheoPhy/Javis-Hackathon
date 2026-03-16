@@ -1,0 +1,193 @@
+<h2>Mira Released Version: Layered Release</h2>
+<p class="subtitle">A release architecture built around a clean core, optional modules, hardware adapters, and deployment/documentation layers.</p>
+
+<div class="section">
+  <div class="mockup">
+    <div class="mockup-header">Top-Level Release Shape</div>
+    <div class="mockup-body">
+      <pre style="margin:0; white-space:pre-wrap; line-height:1.45;">
+Mira_Released_Version/
+├─ README.md
+├─ LICENSE
+├─ readme/
+├─ core/
+├─ modules/
+├─ hardware/
+├─ apps/
+├─ services/
+├─ examples/
+├─ deploy/
+└─ docs/
+      </pre>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Layer Model</h3>
+  <div class="cards">
+    <div class="card">
+      <div class="card-body">
+        <h3>1. Core</h3>
+        <p>The smallest independently deployable Mira package: workspace, prompts, baseline config, core skills/plugins, and a minimal example.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <h3>2. Modules</h3>
+        <p>Optional capabilities grouped by domain: Home Assistant, Rokid, Printer, Apple, Wearable, Local Device Bridges.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <h3>3. Hardware</h3>
+        <p>Concrete hardware-facing adapters, desktop/mobile sidecars, device-specific setup, and capability notes.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <h3>4. Deploy + Docs</h3>
+        <p>Installation templates, environment examples, scenario walkthroughs, and English release documentation.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Dependency Direction</h3>
+  <div class="mockup">
+    <div class="mockup-body">
+      <pre style="margin:0; white-space:pre-wrap; line-height:1.5;">
+readme/ + docs/
+        │
+deploy/ examples/
+        │
+     modules/
+        │
+     hardware/
+        │
+       core/
+      </pre>
+      <p style="margin-top:12px;">Rules: core stands alone; modules depend on core; hardware exists to support modules; examples and deploy recipes compose from lower layers; docs explain all layers.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Responsibility Boundaries</h3>
+  <div class="cards">
+    <div class="card">
+      <div class="card-body">
+        <h3>Core Boundary</h3>
+        <p><strong>Owns:</strong> Mira persona, workspace contract, baseline OpenClaw config, minimal skills/plugins, and the smallest runnable deployment path.</p>
+        <p><strong>Must not own:</strong> vendor-specific integrations, device-side setup, hardware credentials, or ecosystem-specific behavior trees.</p>
+        <p><strong>Dependency rule:</strong> core stands alone and exposes stable interfaces upward; nothing in core should require Home Assistant, Rokid, Apple, or a specific wearable to exist.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <h3>Modules Boundary</h3>
+        <p><strong>Owns:</strong> domain capabilities built on top of core, such as Home Assistant, Rokid, wearables, printer workflows, and messaging integrations.</p>
+        <p><strong>Must not own:</strong> Mira's base identity, core runtime assumptions, or raw device adapter internals that belong to hardware-facing packages.</p>
+        <p><strong>Dependency rule:</strong> modules may depend on core and coordinate hardware/app/service pieces, but should remain optional and removable without breaking core.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <h3>Hardware Boundary</h3>
+        <p><strong>Owns:</strong> device adapters, sidecars, local scripts, pairing/setup instructions, capability matrices, and OS/device-specific operational details.</p>
+        <p><strong>Must not own:</strong> product narrative, cross-domain orchestration policy, or long-lived user-facing behavior definitions that should live in core or modules.</p>
+        <p><strong>Dependency rule:</strong> hardware supports upper layers as an implementation surface; it should be swappable and should not become the place where Mira's product logic is defined.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>What Goes Where</h3>
+  <div class="split">
+    <div class="mockup">
+      <div class="mockup-header">Inside Core</div>
+      <div class="mockup-body">
+        <ul>
+          <li>Mira persona workspace</li>
+          <li>OpenClaw config templates</li>
+          <li>Core Lingzhu/Mira path</li>
+          <li>Minimal deployable example</li>
+          <li>Sanitized baseline skills/plugins</li>
+        </ul>
+      </div>
+    </div>
+    <div class="mockup">
+      <div class="mockup-header">Outside Core</div>
+      <div class="mockup-body">
+        <ul>
+          <li>Home Assistant ecosystem packs</li>
+          <li>Rokid companion apps/services</li>
+          <li>Mi Band / wearable bridges</li>
+          <li>Printer and camera bridges</li>
+          <li>Apple integration assets</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Proposed Release Tree</h3>
+  <div class="mockup">
+    <div class="mockup-body">
+      <pre style="margin:0; white-space:pre-wrap; line-height:1.45;">
+Mira_Released_Version/
+├─ README.md
+├─ LICENSE
+├─ readme/
+│  ├─ 00-overview/
+│  ├─ 10-core/
+│  ├─ 20-modules/
+│  ├─ 30-hardware/
+│  ├─ 40-deploy/
+│  └─ 50-development/
+├─ core/
+│  ├─ workspace/
+│  ├─ openclaw-config/
+│  ├─ skills/
+│  ├─ plugins/
+│  └─ examples/
+├─ modules/
+│  ├─ home-assistant/
+│  ├─ rokid/
+│  ├─ wearable-mi-band/
+│  ├─ printer/
+│  ├─ apple/
+│  └─ local-device-bridges/
+├─ hardware/
+│  ├─ mi-band-9-pro/
+│  ├─ xiaomi-printer/
+│  ├─ macos-camera/
+│  └─ windows-camera/
+├─ apps/
+│  ├─ rokid-companion/
+│  └─ rokid-android-companion/
+├─ services/
+│  ├─ ecosystem-auth-gateway/
+│  └─ rokid-bridge-gateway/
+├─ examples/
+│  ├─ minimal-core/
+│  ├─ home-stack/
+│  ├─ rokid-stack/
+│  └─ full-demo/
+├─ deploy/
+│  ├─ core/
+│  ├─ module-home/
+│  ├─ module-rokid/
+│  ├─ module-wearable/
+│  └─ env-templates/
+└─ docs/
+   ├─ architecture/
+   ├─ migration/
+   └─ release-notes/
+      </pre>
+    </div>
+  </div>
+</div>

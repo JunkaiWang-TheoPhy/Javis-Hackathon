@@ -16,7 +16,7 @@ type RunOptions = {
   now?: string;
 };
 
-type RunResult = {
+export type RunResult = {
   batchId: string;
   consolidatedCount: number;
   forgottenCount: number;
@@ -37,6 +37,14 @@ function ageDays(occurredAt: string, now: string) {
 function extractText(event: MemoryEventRecord) {
   const text = event.payload.text;
   return typeof text === "string" ? text.trim() : null;
+}
+
+function extractAmbientActivityState(event: MemoryEventRecord) {
+  return typeof event.payload.activityState === "string" ? event.payload.activityState : null;
+}
+
+function extractAmbientChangeScore(event: MemoryEventRecord) {
+  return typeof event.payload.changeScore === "number" ? event.payload.changeScore : null;
 }
 
 function normalizeFactContent(text: string) {
@@ -76,6 +84,26 @@ function computeImportance(event: MemoryEventRecord) {
   }
 
   return clamp(score);
+}
+
+function shouldForgetEvent(event: MemoryEventRecord, importanceScore: number, now: string) {
+  if (event.eventType !== "ambient.observe") {
+    return false;
+  }
+
+  const activityState = extractAmbientActivityState(event);
+  const changeScore = extractAmbientChangeScore(event);
+  const sameDayIdleNoise =
+    activityState === "idle" &&
+    changeScore !== null &&
+    changeScore <= 0.08 &&
+    importanceScore < 0.2;
+
+  if (sameDayIdleNoise) {
+    return true;
+  }
+
+  return importanceScore < 0.3 && ageDays(event.occurredAt, now) >= 2;
 }
 
 function summarizeEvent(event: MemoryEventRecord) {
@@ -137,10 +165,7 @@ export class MemorySleepConsolidator {
 
     for (const event of events) {
       const importanceScore = computeImportance(event);
-      const shouldForget =
-        event.eventType === "ambient.observe" &&
-        importanceScore < 0.3 &&
-        ageDays(event.occurredAt, now) >= 2;
+      const shouldForget = shouldForgetEvent(event, importanceScore, now);
 
       updates.push({
         eventId: event.eventId,

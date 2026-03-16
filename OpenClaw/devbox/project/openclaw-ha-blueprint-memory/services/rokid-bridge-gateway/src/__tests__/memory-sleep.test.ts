@@ -96,3 +96,46 @@ test("MemorySleepConsolidator forgets low-value noise and promotes explicit long
   assert.equal(facts.length, 1);
   assert.equal(facts[0]?.content, "我晚上运动后不想被打扰。");
 });
+
+test("MemorySleepConsolidator forgets same-day idle ambient noise during sleep", () => {
+  const fixture = createFixture();
+
+  fixture.ledger.record({
+    eventType: "ambient.observe",
+    sourceType: "ambient",
+    sourceEventId: "amb-same-day-1",
+    sessionId: "ambient-session",
+    actorId: "sensor:mac-webcam",
+    occurredAt: "2026-03-15T13:15:00.000Z",
+    modality: "image",
+    scope: "ambient",
+    payload: {
+      activityState: "idle",
+      changeScore: 0.02,
+      personPresent: false,
+    },
+    dedupeKey: "ambient:amb-same-day-1",
+    privacyLevel: "sensitive",
+    salienceHint: 0.03,
+    retentionClass: "episodic",
+  });
+
+  const consolidator = new MemorySleepConsolidator({
+    ledger: fixture.ledger,
+    workspaceDir: fixture.workspaceDir,
+  });
+
+  const result = consolidator.run({
+    date: "2026-03-15",
+    now: "2026-03-15T15:30:00.000Z",
+  });
+
+  assert.equal(result.consolidatedCount, 1);
+  assert.equal(result.forgottenCount, 1);
+
+  const event = fixture.ledger.listEvents()[0];
+  assert.ok(event?.forgottenAt);
+
+  const dailyNote = readFileSync(join(fixture.workspaceDir, "memory", "2026-03-15.md"), "utf8");
+  assert.match(dailyNote, /Forgotten Noise/);
+});

@@ -3,6 +3,18 @@ import { Value } from "@sinclair/typebox/value";
 import type { MemoryLedger } from "../memory/memoryLedger.ts";
 import { MemoryEventInputSchema, type MemoryEventInput } from "../memory/memoryEvent.ts";
 
+export function extractUserRequestTimestampFromMemoryEvent(event: MemoryEventInput | undefined) {
+  if (!event) {
+    return null;
+  }
+
+  if (event.eventType === "chat.user_message" || event.sourceType === "chat") {
+    return event.occurredAt;
+  }
+
+  return null;
+}
+
 export async function handleMemoryIngestRequest(body: unknown, ledger: MemoryLedger) {
   const event = (body as { event?: MemoryEventInput })?.event;
 
