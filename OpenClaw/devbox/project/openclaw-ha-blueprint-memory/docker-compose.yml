@@ -1,0 +1,86 @@
+version: "3.9"
+
+services:
+  homeassistant:
+    image: homeassistant/home-assistant:stable
+    container_name: homeassistant
+    restart: unless-stopped
+    ports:
+      - "8123:8123"
+    volumes:
+      - ./homeassistant-config:/config
+    environment:
+      TZ: Asia/Shanghai
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./ollama-data:/root/.ollama
+
+  rokid-bridge-gateway:
+    image: node:22-alpine
+    container_name: rokid-bridge-gateway
+    restart: unless-stopped
+    working_dir: /project
+    depends_on:
+      - homeassistant
+    command: ["/bin/sh", "-lc", "npm install && npx tsx services/rokid-bridge-gateway/src/server.ts"]
+    environment:
+      PORT: "3301"
+      HA_BASE_URL: http://homeassistant:8123
+      HA_TOKEN: REPLACE_ME_HA_LONG_LIVED_TOKEN
+      ROKID_COFFEE_SCENE_ENTITY_ID: scene.morning_coffee
+    ports:
+      - "3301:3301"
+    volumes:
+      - .:/project
+
+  ecosystem-auth-gateway:
+    image: node:22-alpine
+    container_name: ecosystem-auth-gateway
+    restart: unless-stopped
+    working_dir: /project
+    command: ["/bin/sh", "-lc", "npm install && npx tsx services/ecosystem-auth-gateway/src/server.ts"]
+    environment:
+      PORT: "3401"
+      ECOSYSTEM_AUTH_TOKEN_STORE_PATH: /project/tmp/ecosystem-auth-tokens.json
+      GOOGLE_HOME_CLIENT_ID: REPLACE_ME_GOOGLE_HOME_CLIENT_ID
+      GOOGLE_HOME_CLIENT_SECRET: REPLACE_ME_GOOGLE_HOME_CLIENT_SECRET
+      GOOGLE_HOME_REDIRECT_URI: https://example.com/oauth/google-home/callback
+    ports:
+      - "3401:3401"
+    volumes:
+      - .:/project
+
+  openclaw-gateway:
+    image: ghcr.io/openclaw/openclaw:latest
+    container_name: openclaw-gateway
+    restart: unless-stopped
+    ports:
+      - "18789:18789"
+    depends_on:
+      - homeassistant
+      - ollama
+      - rokid-bridge-gateway
+      - ecosystem-auth-gateway
+    environment:
+      PLAYWRIGHT_BROWSERS_PATH: /home/node/.cache/ms-playwright
+    volumes:
+      - ./openclaw-config:/home/node/.openclaw
+      - ./plugins:/project/plugins:ro
+  openclaw-cli:
+    image: ghcr.io/openclaw/openclaw:latest
+    container_name: openclaw-cli
+    network_mode: "service:openclaw-gateway"
+    depends_on:
+      - openclaw-gateway
+    working_dir: /project
+    entrypoint: ["/bin/sh", "-lc", "sleep infinity"]
+    volumes:
+      - ./openclaw-config:/home/node/.openclaw
+      - ./plugins:/project/plugins:ro
+      - ./scripts:/project/scripts:ro

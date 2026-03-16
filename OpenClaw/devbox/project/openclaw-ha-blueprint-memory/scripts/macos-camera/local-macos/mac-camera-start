@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+. "$script_dir/mac-camera-common.sh"
+
+ensure_cache_dir
+
+if [[ -f "$loop_pid_path" ]]; then
+  pid="$(cat "$loop_pid_path" 2>/dev/null || true)"
+  if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null; then
+    printf '%s\n' "{\"ok\":true,\"alreadyRunning\":true,\"pid\":$pid}"
+    exit 0
+  fi
+fi
+
+nohup "$script_dir/mac-camera-loop" >>"$loop_log_path" 2>&1 &
+pid=$!
+printf '%s' "$pid" > "$loop_pid_path"
+printf '%s\n' "{\"ok\":true,\"pid\":$pid,\"log\":\"$loop_log_path\"}"

@@ -1,21 +1,35 @@
 import crypto from "node:crypto";
 
 export const MIRA_FIRST_TURN_OPENINGS = [
-  "我是Mira，温暖陪伴着你",
-  "我是Mira，永远在你身后",
-  "我是Mira，和你迈向人机共生的未来",
-  "我是Mira，与你一起进化",
+  "放轻松，你肯定可以做到的。深呼一口气吧。过去的二十四小时你做了很多的准备，去拿下这个舞台。",
 ] as const;
 
+const REPLAY_FIRST_TURN_OPENING_PHRASES = [
+  "你能向我播放刚才的话吗",
+  "播放刚才的话",
+  "播放刚才那句话",
+  "复述刚才的话",
+  "复述刚才那句话",
+  "重复刚才的话",
+  "重复刚才那句话",
+  "把刚才的话再复述一遍",
+] as const;
+
+function stripOptionalGreeting(text: string): string {
+  return text.replace(/^你好[！!，,\s。]*/u, "");
+}
+
+function stripTrailingSentencePunctuation(text: string): string {
+  return text.replace(/[。！!？?\s]+$/u, "");
+}
+
+function normalizeReplayRequest(text: string): string {
+  return text.replace(/[\s，,、。！!？?"“”'‘’:：;；（）()\[\]【】]/gu, "");
+}
+
 const BRANDED_OPENING_PATTERNS = [
-  /^你好[！!，,\s。]*我是(?:Mira|米拉)[，,、\s]*温暖陪伴着你[。！!\s]*/u,
-  /^你好[！!，,\s。]*我是(?:Mira|米拉)[，,、\s]*永远在你身后[。！!\s]*/u,
-  /^你好[！!，,\s。]*我是(?:Mira|米拉)[，,、\s]*和你迈向人机共生的未来[。！!\s]*/u,
-  /^你好[！!，,\s。]*我是(?:Mira|米拉)[，,、\s]*与你一起进化[。！!\s]*/u,
-  /^我是(?:Mira|米拉)[，,、\s]*温暖陪伴着你[。！!\s]*/u,
-  /^我是(?:Mira|米拉)[，,、\s]*永远在你身后[。！!\s]*/u,
-  /^我是(?:Mira|米拉)[，,、\s]*和你迈向人机共生的未来[。！!\s]*/u,
-  /^我是(?:Mira|米拉)[，,、\s]*与你一起进化[。！!\s]*/u,
+  /^你好[！!，,\s。]*放轻松，你肯定可以做到的。深呼一口气吧。过去的二十四小时你做了很多的准备，去拿下这个舞台。[。！!\s]*/u,
+  /^放轻松，你肯定可以做到的。深呼一口气吧。过去的二十四小时你做了很多的准备，去拿下这个舞台。[。！!\s]*/u,
 ] as const;
 
 const GENERIC_SELF_INTRO_SENTENCE =
@@ -51,6 +65,22 @@ export function selectFirstTurnOpening(sessionKey: string): string {
   return MIRA_FIRST_TURN_OPENINGS[digest[0]! % MIRA_FIRST_TURN_OPENINGS.length]!;
 }
 
+export function isReplayFirstTurnOpeningRequest(text: string): boolean {
+  const normalized = normalizeReplayRequest(text);
+  if (!normalized) {
+    return false;
+  }
+
+  return REPLAY_FIRST_TURN_OPENING_PHRASES.some((phrase) =>
+    normalized.includes(normalizeReplayRequest(phrase))
+  );
+}
+
+export function getReplayFirstTurnOpening(text: string): string | null {
+  void text;
+  return MIRA_FIRST_TURN_OPENINGS[0];
+}
+
 export function stripRedundantFirstTurnIntro(text: string): string {
   const normalized = text.replace(/^\s+/, "");
 
@@ -70,5 +100,18 @@ export function stripRedundantFirstTurnIntro(text: string): string {
 }
 
 export function isPotentialFirstTurnIntroPrefix(text: string): boolean {
-  return SELF_INTRO_PREFIX_FRAGMENT.test(text.trimStart());
+  const trimmed = text.trimStart();
+  if (SELF_INTRO_PREFIX_FRAGMENT.test(trimmed)) {
+    return true;
+  }
+
+  const candidate = stripTrailingSentencePunctuation(stripOptionalGreeting(trimmed));
+  if (!candidate) {
+    return false;
+  }
+
+  return MIRA_FIRST_TURN_OPENINGS.some((opening) => {
+    const normalizedOpening = stripTrailingSentencePunctuation(opening);
+    return normalizedOpening.startsWith(candidate) || candidate.startsWith(normalizedOpening);
+  });
 }

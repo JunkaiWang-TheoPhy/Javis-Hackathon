@@ -1,0 +1,6 @@
+{"type":"session","version":3,"id":"88826d99-0315-4c61-9323-9ccce345dd74","timestamp":"2026-03-15T00:22:57.270Z","cwd":"/home/devbox/.openclaw/workspace"}
+{"type":"model_change","id":"eed36d99","parentId":null,"timestamp":"2026-03-15T00:22:57.271Z","provider":"custom-right-codes","modelId":"claude-sonnet-4-6"}
+{"type":"thinking_level_change","id":"fdf7de1d","parentId":"eed36d99","timestamp":"2026-03-15T00:22:57.271Z","thinkingLevel":"off"}
+{"type":"custom","customType":"model-snapshot","data":{"timestamp":1773534177272,"provider":"custom-right-codes","modelApi":"anthropic-messages","modelId":"claude-sonnet-4-6"},"id":"a5d788ca","parentId":"fdf7de1d","timestamp":"2026-03-15T00:22:57.272Z"}
+{"type":"message","id":"fd584f8b","parentId":"a5d788ca","timestamp":"2026-03-15T00:22:57.279Z","message":{"role":"user","content":[{"type":"text","text":"只回复你的第一句开场，不要补充其他内容。"}],"timestamp":1773534177276}}
+{"type":"message","id":"aa704ea4","parentId":"fd584f8b","timestamp":"2026-03-15T00:22:59.847Z","message":{"role":"assistant","content":[{"type":"text","text":"我是Mira，与你一起进化"}],"api":"anthropic-messages","provider":"custom-right-codes","model":"claude-sonnet-4-6","usage":{"input":46,"output":8,"cacheRead":16907,"cacheWrite":269,"totalTokens":17230,"cost":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0,"total":0}},"stopReason":"stop","timestamp":1773534177278}}

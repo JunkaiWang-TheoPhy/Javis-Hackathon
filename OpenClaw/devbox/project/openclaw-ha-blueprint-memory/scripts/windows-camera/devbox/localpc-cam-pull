@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cache_dir="${1:-}"
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+. "$script_dir/localpc-camera-common.sh"
+
+if [[ -z "$cache_dir" ]]; then
+  cache_dir="$remote_cache_dir_default"
+fi
+
+ensure_remote_cache_dir "$cache_dir"
+
+remote_image_path="$cache_dir/latest.jpg"
+remote_meta_path="$cache_dir/latest.json"
+local_image_path="$localpc_camera_dir\\latest.jpg"
+local_meta_path="$localpc_camera_dir\\latest.json"
+
+"$localpc_pwsh" "if (-not (Test-Path $(ps_quote "$local_image_path"))) { throw 'latest.jpg missing on local PC' }; [Convert]::ToBase64String([IO.File]::ReadAllBytes($(ps_quote "$local_image_path")))" \
+  | tr -d '\r\n' \
+  | base64 -d > "$remote_image_path"
+
+"$localpc_pwsh" "if (-not (Test-Path $(ps_quote "$local_meta_path"))) { throw 'latest.json missing on local PC' }; Get-Content $(ps_quote "$local_meta_path") -Raw" > "$remote_meta_path"
+
+printf '%s\n' "$remote_image_path"

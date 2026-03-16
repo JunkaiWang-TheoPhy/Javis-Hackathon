@@ -1,0 +1,6 @@
+{"type":"session","version":3,"id":"status-now-1","timestamp":"2026-03-15T02:07:05.565Z","cwd":"/home/devbox/.openclaw/workspace"}
+{"type":"model_change","id":"ce6e532e","parentId":null,"timestamp":"2026-03-15T02:07:05.566Z","provider":"custom-right-codes","modelId":"claude-sonnet-4-6"}
+{"type":"thinking_level_change","id":"eace9592","parentId":"ce6e532e","timestamp":"2026-03-15T02:07:05.566Z","thinkingLevel":"off"}
+{"type":"custom","customType":"model-snapshot","data":{"timestamp":1773540425567,"provider":"custom-right-codes","modelApi":"anthropic-messages","modelId":"claude-sonnet-4-6"},"id":"7694344b","parentId":"eace9592","timestamp":"2026-03-15T02:07:05.567Z"}
+{"type":"message","id":"61d68d96","parentId":"7694344b","timestamp":"2026-03-15T02:07:05.582Z","message":{"role":"user","content":[{"type":"text","text":"[Sun 2026-03-15 10:07 GMT+8] 只回复OK"}],"timestamp":1773540425571}}
+{"type":"message","id":"1540c2f0","parentId":"61d68d96","timestamp":"2026-03-15T02:07:08.278Z","message":{"role":"assistant","content":[{"type":"text","text":"OK"}],"api":"anthropic-messages","provider":"custom-right-codes","model":"claude-sonnet-4-6","usage":{"input":42,"output":1,"cacheRead":16525,"cacheWrite":958,"totalTokens":17526,"cost":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0,"total":0}},"stopReason":"stop","timestamp":1773540425581}}

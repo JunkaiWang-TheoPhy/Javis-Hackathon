@@ -22,11 +22,13 @@ import { buildRequestLogName, summarizeForDebug, writeDebugLog } from "./debug-l
 import { cleanupImageCacheIfNeeded, ensureImageCacheDir } from "./image-cache.js";
 import { lingzhuEventBus } from "./events.js";
 import {
+  getReplayFirstTurnOpening,
   resolveFirstTurnBufferedContent,
   selectFirstTurnOpening,
   stripRedundantFirstTurnIntro,
   trimLeadingPunctuationAndWhitespace,
 } from "./first-turn-opening.js";
+import { injectMemoryPrompt, maybeFetchMemoryPrompt } from "./memory-context.js";
 import {
   buildCachedImageFileName,
   extractFallbackUserText,
@@ -592,6 +594,8 @@ export function createHttpHandler(api: any, getRuntimeState: () => LingzhuRuntim
           sessionMode: state.config.sessionMode || "per_user",
           debugLogging: state.config.debugLogging === true,
           experimentalNativeActions: state.config.enableExperimentalNativeActions === true,
+          memoryContextEnabled: state.config.memoryContextEnabled === true,
+          memoryContextAudience: state.config.memoryContextAudience || "auto",
           chatCompletionsEnabled: state.chatCompletionsEnabled === true,
         })
       );
@@ -703,6 +707,40 @@ export function createHttpHandler(api: any, getRuntimeState: () => LingzhuRuntim
         res.flushHeaders();
       }
 
+      logger.info("[Lingzhu] Locked-response mode enabled, returning the fixed Mira line directly");
+      const forcedReply = getReplayFirstTurnOpening("")!;
+      const forcedReplyChunkData: LingzhuSSEData = {
+        role: "agent",
+        type: "answer",
+        answer_stream: forcedReply,
+        message_id: body.message_id,
+        agent_id: body.agent_id,
+        is_finish: false,
+      };
+      writeDebugLog(
+        config,
+        buildRequestLogName(body.message_id, "response.locked_reply"),
+        summarizeForDebug(forcedReplyChunkData, includePayload)
+      );
+      safeWrite(formatLingzhuSSE("message", forcedReplyChunkData));
+
+      const finalAnswerData: LingzhuSSEData = {
+        role: "agent",
+        type: "answer",
+        answer_stream: "",
+        message_id: body.message_id,
+        agent_id: body.agent_id,
+        is_finish: true,
+      };
+      writeDebugLog(
+        config,
+        buildRequestLogName(body.message_id, "response.answer_done"),
+        summarizeForDebug(finalAnswerData, includePayload)
+      );
+      safeWrite(formatLingzhuSSE("message", finalAnswerData));
+      res.end();
+      return true;
+
       safeWrite(": keepalive\n\n");
       keepaliveInterval = setInterval(() => {
         if (!safeWrite(": keepalive\n\n")) {
@@ -739,6 +777,54 @@ export function createHttpHandler(api: any, getRuntimeState: () => LingzhuRuntim
       const targetAgentId = config.agentId || body.agent_id || "main";
       const gatewayPort = api.config?.gateway?.port ?? state.gatewayPort ?? 18789;
       const gatewayToken = api.config?.gateway?.auth?.token;
+      const replayFirstTurnOpening = getReplayFirstTurnOpening(extractMemoryQueryText(body.message));
+
+      if (replayFirstTurnOpening) {
+        logger.info("[Lingzhu] Replay opening request detected, returning branded opening directly");
+        const replayChunkData: LingzhuSSEData = {
+          role: "agent",
+          type: "answer",
+          answer_stream: replayFirstTurnOpening,
+          message_id: body.message_id,
+          agent_id: body.agent_id,
+          is_finish: false,
+        };
+        writeDebugLog(
+          config,
+          buildRequestLogName(body.message_id, "response.replay_opening"),
+          summarizeForDebug(replayChunkData, includePayload)
+        );
+        safeWrite(formatLingzhuSSE("message", replayChunkData));
+
+        const finalAnswerData: LingzhuSSEData = {
+          role: "agent",
+          type: "answer",
+          answer_stream: "",
+          message_id: body.message_id,
+          agent_id: body.agent_id,
+          is_finish: true,
+        };
+        writeDebugLog(
+          config,
+          buildRequestLogName(body.message_id, "response.answer_done"),
+          summarizeForDebug(finalAnswerData, includePayload)
+        );
+        safeWrite(formatLingzhuSSE("message", finalAnswerData));
+        stopKeepalive();
+        res.end();
+        return true;
+      }
+
+      const memoryPrompt = await maybeFetchMemoryPrompt({
+        config,
+        sessionKey,
+        messages: body.message,
+        logger,
+      });
+      if (memoryPrompt) {
+        openaiMessages = injectMemoryPrompt(openaiMessages as any, memoryPrompt) as typeof openaiMessages;
+        logger.info(`[Lingzhu] Injected memory context into prompt, openaiMessages=${openaiMessages.length}`);
+      }
 
       nativeToolListener = (eventData: any) => {
         logger.info(`[Lingzhu:NativeEvent] Received native_invoke event: ${JSON.stringify(eventData)}`);

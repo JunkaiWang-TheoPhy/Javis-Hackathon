@@ -1,0 +1,11 @@
+{
+  "source": "localmac",
+  "capturedAt": "2026-03-15T01:21:33.603623Z",
+  "inputPath": "/home/devbox/.openclaw/workspace/.cache/localmac-camera/latest.jpg",
+  "metadataPath": "/home/devbox/.openclaw/workspace/.cache/localmac-camera/latest.json",
+  "outputPath": "/home/devbox/.openclaw/workspace/comic/20260315T012133Z-localmac-comic.png",
+  "renderMode": "local-pillow-comic",
+  "prompt": "Transform the source photo into a vivid comic-style illustration. Keep the main scene recognizable, boost linework and posterized color, and add a clearly visible lobster in a prominent position.",
+  "lobsterTheme": true,
+  "createdAt": "2026-03-15T01:21:34.055896Z"
+}

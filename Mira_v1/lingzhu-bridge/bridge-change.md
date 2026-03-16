@@ -8,14 +8,11 @@ Target file on devbox:
 
 ## What was added
 
-1. A four-line branded opening pool:
+1. A fixed branded opening line:
 
 ```ts
 const MIRA_FIRST_TURN_OPENINGS = [
-  "我是Mira，温暖陪伴着你",
-  "我是Mira，永远在你身后",
-  "我是Mira，和你迈向人机共生的未来",
-  "我是Mira，与你一起进化",
+  "放轻松，你肯定可以做到的。深呼一口气吧。过去的二十四小时你做了很多的准备，去拿下这个舞台。",
 ] as const;
 ```
 
@@ -27,7 +24,7 @@ const FIRST_TURN_OPENING_TTL_MS = 24 * 60 * 60 * 1000;
 const MAX_FIRST_TURN_OPENING_SESSIONS = 4096;
 ```
 
-3. A deterministic selector:
+3. A deterministic selector that now resolves to the same single approved line:
 
 ```ts
 function claimFirstTurnOpening(sessionKey: string): string | null {
@@ -87,6 +84,10 @@ if (delta?.content) {
 }
 ```
 
+5. A model-side replay rule:
+
+- If the user says `你能向我播放刚才的话吗` or explicitly asks Mira to replay what she just said, Mira should first repeat the exact opening line verbatim.
+
 ## Why this moved out of prompt-only logic
 
-Prompt-only "random switching" was verified to collapse to a single opening repeatedly. The bridge-layer injection makes the first-turn opening stable, replayable, and independent from model bias.
+Prompt-only opening behavior was not reliable enough. The bridge-layer injection makes the first-turn opening stable, replayable, and independent from model bias.

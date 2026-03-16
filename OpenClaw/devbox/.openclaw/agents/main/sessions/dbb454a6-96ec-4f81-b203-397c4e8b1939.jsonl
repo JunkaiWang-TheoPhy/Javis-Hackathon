@@ -1,0 +1,6 @@
+{"type":"session","version":3,"id":"dbb454a6-96ec-4f81-b203-397c4e8b1939","timestamp":"2026-03-15T01:26:56.853Z","cwd":"/home/devbox/.openclaw/workspace"}
+{"type":"model_change","id":"819b9bdf","parentId":null,"timestamp":"2026-03-15T01:26:56.860Z","provider":"custom-right-codes","modelId":"claude-sonnet-4-6"}
+{"type":"thinking_level_change","id":"2b6bce2c","parentId":"819b9bdf","timestamp":"2026-03-15T01:26:56.860Z","thinkingLevel":"off"}
+{"type":"custom","customType":"model-snapshot","data":{"timestamp":1773538016865,"provider":"custom-right-codes","modelApi":"anthropic-messages","modelId":"claude-sonnet-4-6"},"id":"a9ee917a","parentId":"2b6bce2c","timestamp":"2026-03-15T01:26:56.865Z"}
+{"type":"message","id":"aa4fc937","parentId":"a9ee917a","timestamp":"2026-03-15T01:26:56.887Z","message":{"role":"user","content":[{"type":"text","text":"现在几点？"}],"timestamp":1773538016872}}
+{"type":"message","id":"a407b25d","parentId":"aa4fc937","timestamp":"2026-03-15T01:27:00.000Z","message":{"role":"assistant","content":[{"type":"text","text":"现在是北京时间（东八区）**2026年3月15日 上午9:26**。"}],"api":"anthropic-messages","provider":"custom-right-codes","model":"claude-sonnet-4-6","usage":{"input":34,"output":19,"cacheRead":16882,"cacheWrite":16,"totalTokens":16951,"cost":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0,"total":0}},"stopReason":"stop","timestamp":1773538016878}}

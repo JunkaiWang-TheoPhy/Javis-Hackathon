@@ -1,0 +1,6 @@
+{"type":"session","version":3,"id":"d5918792-bc3c-484e-adaf-7a0010ca36b8","timestamp":"2026-03-15T00:59:08.830Z","cwd":"/home/devbox/.openclaw/workspace"}
+{"type":"model_change","id":"d53cf96f","parentId":null,"timestamp":"2026-03-15T00:59:08.831Z","provider":"custom-right-codes","modelId":"claude-sonnet-4-6"}
+{"type":"thinking_level_change","id":"fb4f5e29","parentId":"d53cf96f","timestamp":"2026-03-15T00:59:08.832Z","thinkingLevel":"off"}
+{"type":"custom","customType":"model-snapshot","data":{"timestamp":1773536348833,"provider":"custom-right-codes","modelApi":"anthropic-messages","modelId":"claude-sonnet-4-6"},"id":"c507a153","parentId":"fb4f5e29","timestamp":"2026-03-15T00:59:08.833Z"}
+{"type":"message","id":"3f073c15","parentId":"c507a153","timestamp":"2026-03-15T00:59:08.841Z","message":{"role":"user","content":[{"type":"text","text":"你好"}],"timestamp":1773536348837}}
+{"type":"message","id":"24341b2b","parentId":"3f073c15","timestamp":"2026-03-15T00:59:11.675Z","message":{"role":"assistant","content":[{"type":"text","text":"我是Mira，温暖陪伴着你\n\n你好！有什么我可以帮你的吗？"}],"api":"anthropic-messages","provider":"custom-right-codes","model":"claude-sonnet-4-6","usage":{"input":32,"output":19,"cacheRead":16826,"cacheWrite":58,"totalTokens":16935,"cost":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0,"total":0}},"stopReason":"stop","timestamp":1773536348839}}

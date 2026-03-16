@@ -1,0 +1,16 @@
+{
+  "name": "openclaw-ha-blueprint",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "tsx --test"
+  },
+  "dependencies": {
+    "@sinclair/typebox": "^0.34.41",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}

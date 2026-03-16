@@ -1,0 +1,5 @@
+{
+  "name": "rokid-bridge-gateway",
+  "private": true,
+  "type": "module"
+}

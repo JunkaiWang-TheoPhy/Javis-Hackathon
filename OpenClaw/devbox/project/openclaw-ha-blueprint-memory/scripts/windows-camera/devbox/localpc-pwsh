@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $# -gt 0 ]]; then
+  script="$*"
+elif [[ ! -t 0 ]]; then
+  script="$(cat)"
+else
+  echo "Usage: localpc-pwsh <powershell-snippet>" >&2
+  echo "   or: cat script.ps1 | localpc-pwsh" >&2
+  exit 2
+fi
+
+encoded="$(
+  printf '%s' "$script" \
+    | iconv -f UTF-8 -t UTF-16LE \
+    | base64 -w0
+)"
+
+exec ssh \
+  -o BatchMode=yes \
+  -o ConnectTimeout=15 \
+  localpc \
+  "powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -EncodedCommand $encoded"

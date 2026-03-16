@@ -1,0 +1,230 @@
+{
+  "e7851c4b40de220ba6afafe554e93a8d7729024f4b0c8a99fd74032116fce16a": {
+    "deviceId": "e7851c4b40de220ba6afafe554e93a8d7729024f4b0c8a99fd74032116fce16a",
+    "publicKey": "l9KSySdzVCKmvlP2Iy7q4mF7y1OcuD4L7cxyW7eTPus",
+    "platform": "linux",
+    "clientId": "gateway-client",
+    "clientMode": "ui",
+    "role": "operator",
+    "roles": [
+      "operator"
+    ],
+    "scopes": [
+      "operator.admin",
+      "operator.read",
+      "operator.write",
+      "operator.approvals",
+      "operator.pairing"
+    ],
+    "approvedScopes": [
+      "operator.admin"
+    ],
+    "tokens": {
+      "operator": {
+        "token": "Bsu4qHVOybHpcRAv-TGHHEEvOFqbT8Uj-e6KdncELO8",
+        "role": "operator",
+        "scopes": [
+          "operator.admin"
+        ],
+        "createdAtMs": 1773461452955
+      }
+    },
+    "createdAtMs": 1773461452954,
+    "approvedAtMs": 1773461452954,
+    "displayName": "openclaw-tui"
+  },
+  "16c9804fd9a449a56831a6e498a9092b7641bdb64202dca028175ed86287519d": {
+    "deviceId": "16c9804fd9a449a56831a6e498a9092b7641bdb64202dca028175ed86287519d",
+    "publicKey": "rSrDaC_XjEFzL15K5jAN99SAFJ7iVlNaSv3aPOmSLt4",
+    "platform": "Win32",
+    "clientId": "openclaw-control-ui",
+    "clientMode": "webchat",
+    "role": "operator",
+    "roles": [
+      "operator"
+    ],
+    "scopes": [
+      "operator.admin",
+      "operator.approvals",
+      "operator.pairing"
+    ],
+    "approvedScopes": [
+      "operator.admin",
+      "operator.approvals",
+      "operator.pairing"
+    ],
+    "tokens": {
+      "operator": {
+        "token": "rI-PJ0zVk6Ghg2V06q79dUC_RxfaDtz5kWkwG6hoxGE",
+        "role": "operator",
+        "scopes": [
+          "operator.admin",
+          "operator.approvals",
+          "operator.pairing"
+        ],
+        "createdAtMs": 1773469405248,
+        "lastUsedAtMs": 1773575283386
+      }
+    },
+    "createdAtMs": 1773469405248,
+    "approvedAtMs": 1773469405248
+  },
+  "0759ecc578acc1c99bccaa8cd06a987a4fabc2911f64fec9778fe6e300c77d38": {
+    "deviceId": "0759ecc578acc1c99bccaa8cd06a987a4fabc2911f64fec9778fe6e300c77d38",
+    "publicKey": "Lj_Z75Zpw7HS6d9jYv_bn4-VZbXYW4HKpXsyz80ay7k",
+    "platform": "Win32",
+    "clientId": "openclaw-control-ui",
+    "clientMode": "webchat",
+    "role": "operator",
+    "roles": [
+      "operator"
+    ],
+    "scopes": [
+      "operator.admin",
+      "operator.approvals",
+      "operator.pairing"
+    ],
+    "approvedScopes": [
+      "operator.admin",
+      "operator.approvals",
+      "operator.pairing"
+    ],
+    "tokens": {
+      "operator": {
+        "token": "8kCh9l1w_K06et1UESh0gnYpZE6_NvcDMrAp_VmWsKc",
+        "role": "operator",
+        "scopes": [
+          "operator.admin",
+          "operator.approvals",
+          "operator.pairing"
+        ],
+        "createdAtMs": 1773519891114
+      }
+    },
+    "createdAtMs": 1773519891114,
+    "approvedAtMs": 1773519891114
+  },
+  "8d4752fb069beaf535c92f18836e72f6feff9d6659a47b450029312b9c95e5fc": {
+    "deviceId": "8d4752fb069beaf535c92f18836e72f6feff9d6659a47b450029312b9c95e5fc",
+    "publicKey": "71OdxBP-bblaxoMaA59Y4jCx_vJIwe7L_XtyFbFQBEQ",
+    "platform": "MacIntel",
+    "clientId": "openclaw-control-ui",
+    "clientMode": "webchat",
+    "role": "operator",
+    "roles": [
+      "operator"
+    ],
+    "scopes": [
+      "operator.admin",
+      "operator.approvals",
+      "operator.pairing"
+    ],
+    "approvedScopes": [
+      "operator.admin",
+      "operator.approvals",
+      "operator.pairing"
+    ],
+    "tokens": {
+      "operator": {
+        "token": "g2a8eOUQdraqQZ-XiwPFLd2Mn2JGZeVvLoB1AO6_qAA",
+        "role": "operator",
+        "scopes": [
+          "operator.admin",
+          "operator.approvals",
+          "operator.pairing"
+        ],
+        "createdAtMs": 1773520804158
+      }
+    },
+    "createdAtMs": 1773520804158,
+    "approvedAtMs": 1773520804158
+  },
+  "d79f49179721817a1578e7f9f6b6187717cd46a201d0ee5d77f56b0c285b1344": {
+    "deviceId": "d79f49179721817a1578e7f9f6b6187717cd46a201d0ee5d77f56b0c285b1344",
+    "publicKey": "mejMoXWn4YfiEapqaedGPZDJKi5cV5D_LahUzz1BzTo",
+    "platform": "darwin",
+    "clientId": "cli",
+    "clientMode": "cli",
+    "role": "operator",
+    "roles": [
+      "operator"
+    ],
+    "scopes": [
+      "operator.admin",
+      "operator.approvals",
+      "operator.pairing",
+      "operator.read",
+      "operator.write"
+    ],
+    "approvedScopes": [
+      "operator.admin",
+      "operator.approvals",
+      "operator.pairing"
+    ],
+    "tokens": {
+      "operator": {
+        "token": "OaZVJjYYamIttGlGqsvVkWIGOdkdooKE-2M8w0B6Y5A",
+        "role": "operator",
+        "scopes": [
+          "operator.admin",
+          "operator.approvals",
+          "operator.pairing"
+        ],
+        "createdAtMs": 1773528334837,
+        "lastUsedAtMs": 1773528552881
+      }
+    },
+    "createdAtMs": 1773528334837,
+    "approvedAtMs": 1773528334837
+  },
+  "e07facb8fd0ca80d388a3185cc47b3b4d56be29dfa58f39d298fe58432b02116": {
+    "deviceId": "e07facb8fd0ca80d388a3185cc47b3b4d56be29dfa58f39d298fe58432b02116",
+    "publicKey": "qMG8_CMNc9r4ccIABOLiEwfmPIvCsMfrq-EJJHBFycM",
+    "displayName": "Thomas的MacBook Air",
+    "platform": "macOS 15.6.0",
+    "deviceFamily": "Mac",
+    "clientId": "openclaw-macos",
+    "clientMode": "node",
+    "role": "node",
+    "roles": [
+      "operator",
+      "node"
+    ],
+    "scopes": [
+      "operator.admin",
+      "operator.read",
+      "operator.write",
+      "operator.approvals",
+      "operator.pairing"
+    ],
+    "approvedScopes": [
+      "operator.admin",
+      "operator.read",
+      "operator.write",
+      "operator.approvals",
+      "operator.pairing"
+    ],
+    "tokens": {
+      "operator": {
+        "token": "7W9V1nxhcDH3Zhj8wVCQpDfJ7jlThOMBBB57fwupWMY",
+        "role": "operator",
+        "scopes": [
+          "operator.admin",
+          "operator.approvals",
+          "operator.pairing",
+          "operator.read",
+          "operator.write"
+        ],
+        "createdAtMs": 1773528436562
+      },
+      "node": {
+        "token": "Wr3vWwbaeDfDIu1Y_Kmu6mR7F2UbwXHjFv6EQTMSeT0",
+        "role": "node",
+        "scopes": [],
+        "createdAtMs": 1773528436568
+      }
+    },
+    "createdAtMs": 1773528436562,
+    "approvedAtMs": 1773528436562
+  }
+}

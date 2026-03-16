@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+interval_ms="${1:-1000}"
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+. "$script_dir/localpc-camera-common.sh"
+
+exec "$localpc_pwsh" "& $(ps_quote "$localpc_script_dir\\win-camera-start-loop.ps1") -IntervalMs $interval_ms | ConvertTo-Json -Compress -Depth 6"
