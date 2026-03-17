@@ -176,6 +176,68 @@ test("POST /v1/observe returns a confirm-tier coffee machine envelope", async ()
   assert.equal(events.some((event) => event.eventType === "vision.observe"), true);
 });
 
+test("POST /v1/outbound/evaluate returns an allow decision for user self reminders", async () => {
+  const server = createBridgeServer({
+    dispatchHomeAssistantAction: async () => ({ ok: true }),
+  });
+  await server.listen(0);
+  closers.push(() => server.close());
+
+  const response = await fetch(`${server.baseUrl}/v1/outbound/evaluate`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      intent: {
+        messageKind: "reminder",
+        recipientScope: "self",
+        riskTier: "low",
+        channel: "email",
+        firstContact: false,
+        contentTags: [],
+      },
+    }),
+  });
+
+  assert.equal(response.status, 200);
+  const body = await response.json();
+  assert.equal(body.ok, true);
+  assert.equal(body.decision.action, "allow");
+  assert.equal(body.decision.matchedRule, "user_self_reminder");
+});
+
+test("POST /v1/outbound/evaluate returns a block decision for public posts", async () => {
+  const server = createBridgeServer({
+    dispatchHomeAssistantAction: async () => ({ ok: true }),
+  });
+  await server.listen(0);
+  closers.push(() => server.close());
+
+  const response = await fetch(`${server.baseUrl}/v1/outbound/evaluate`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      intent: {
+        messageKind: "summary",
+        recipientScope: "public",
+        riskTier: "low",
+        channel: "public_post",
+        firstContact: false,
+        contentTags: [],
+      },
+    }),
+  });
+
+  assert.equal(response.status, 200);
+  const body = await response.json();
+  assert.equal(body.ok, true);
+  assert.equal(body.decision.action, "block");
+  assert.equal(body.decision.matchedRule, "block_public_posting");
+});
+
 test("POST /v1/confirm returns a side-effect envelope after Start", async () => {
   let dispatchCount = 0;
   const ledger = createLedger();

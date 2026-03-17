@@ -14,6 +14,7 @@
 - `devbox-connectivity-and-sync-overview.md`
 - `messaging-lark-module-positioning.md`
 - `mira-core-openclaw-relationship-and-proactive-capabilities.md`
+- `mira-openclaw-channel-integration-spec.md`
 
 ## 3. 本次对话已存在并继续沿用的相关文档
 
@@ -49,3 +50,5 @@
 - `home-assistant-module-positioning-options.md` 已包含两版可直接复用的正式产品描述文案
 - `mira-core-openclaw-relationship-and-proactive-capabilities.md` 已补充 `Mira Core` 与 `OpenClaw` 的关系以及主动能力边界说明
 - `messaging-lark-module-positioning.md` 已更新为最终发布结论：发布版不保留 `messaging-lark` 为一级模块，而改为通过 OpenClaw 原生 channel 能力接入所有受支持的通讯软件
+- `mira-openclaw-channel-integration-spec.md` 已把 channel-agnostic 通讯层整理成正式 spec，覆盖目录结构、channel contract、outbound policy、三条主动触发路径和 `notification-router` 职责边界
+- `mira-openclaw-channel-integration-spec.en.md` 是对应英文伴生版，便于后续与中文版一起迁移到 `Mira_Released_Version`

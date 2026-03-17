@@ -1,7 +1,7 @@
 version: 1
 policy_name: mira_outbound_policy
 effective_date: "2026-03-17"
-current_runtime_path: services/rokid-bridge-gateway/config/outbound-policy.yaml
+current_runtime_path: services/notification-router/config/outbound-policy.yaml
 future_runtime_path: services/notification-router/config/outbound-policy.yaml
 
 defaults:
@@ -40,11 +40,6 @@ channel_classes:
     - social_post
 
 rules:
-  # Core contrast rules:
-  # - user_self_reminder = allow
-  # - user_self_checkin = allow
-  # - caregiver_escalation = ask
-  # - new_recipient_requires_confirmation = ask
   - name: user_self_reminder
     enabled: true
     description: allow low-risk reminders sent privately to the user themselves

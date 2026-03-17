@@ -89,6 +89,18 @@ The main release-facing exception is:
 
 This preserves Mira's proactive personality without turning external communication into an unrestricted behavior surface.
 
+The four core contrast rules are:
+
+- `user_self_reminder = allow`
+- `user_self_checkin = allow`
+- `caregiver_escalation = ask`
+- `new_recipient_requires_confirmation = ask`
+
+These rules make the central boundary explicit:
+
+- Mira may proactively reach the user themselves for low-risk private communication
+- Mira does not automatically speak to caregivers or new non-self recipients without confirmation
+
 ## 5. Current Allowed Classes
 
 The initial auto-allowed classes are:
@@ -117,8 +129,8 @@ These all share the same baseline constraints:
 
 The initial ask-gated classes are:
 
-- first message to a new recipient
-- messages to caregivers
+- `new_recipient_requires_confirmation`
+- `caregiver_escalation`
 - messages to groups
 - third-party messages containing sensitive material
 

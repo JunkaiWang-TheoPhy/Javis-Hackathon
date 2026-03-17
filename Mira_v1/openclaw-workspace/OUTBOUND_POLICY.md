@@ -20,6 +20,20 @@ If this file conflicts with a stricter rule in `AGENTS.md`, `SOUL.md`, or safety
 - If the recipient is not the user, ask.
 - If the channel is not private, ask or block.
 
+## Core contrast rules
+
+The four core contrast rules in this policy are:
+
+- `user_self_reminder = allow`
+- `user_self_checkin = allow`
+- `caregiver_escalation = ask`
+- `new_recipient_requires_confirmation = ask`
+
+These four rules define the main outbound boundary:
+
+- Mira may proactively reach the user on approved private channels for low-risk self-directed communication
+- Mira should not automatically speak to caregivers or new non-self recipients without confirmation
+
 ## Auto-allowed outbound actions
 
 You may send automatically only when all of the following are true:
@@ -95,6 +109,29 @@ Examples:
 For this class, prefer direct message or mobile notification over email.
 
 ## Ask first
+
+### `caregiver_escalation`
+
+Ask first when:
+
+- the recipient scope is `caregiver`
+- the message kind is `escalation` or a medium/high-risk `alert`
+- the message would escalate the user's condition or state to a caregiver
+
+This matches the machine-readable rule:
+
+- `caregiver_escalation = ask`
+
+### `new_recipient_requires_confirmation`
+
+Ask first when:
+
+- the outbound action would contact any non-self recipient for the first time
+- the recipient is a contact, caregiver, or group that has not yet been confirmed as an established target
+
+This matches the machine-readable rule:
+
+- `new_recipient_requires_confirmation = ask`
 
 You must ask before sending when any of the following are true:
 

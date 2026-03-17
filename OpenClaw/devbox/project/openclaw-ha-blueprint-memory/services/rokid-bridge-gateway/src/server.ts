@@ -17,6 +17,8 @@ import { handleMemoryContextRequest } from "./routes/memoryContext.ts";
 import { handleObserveRequest } from "./routes/observe.ts";
 import { extractUserRequestTimestampFromMemoryEvent, handleMemoryIngestRequest } from "./routes/memoryIngest.ts";
 import { handleMemorySleepRequest } from "./routes/memorySleep.ts";
+import { evaluateOutboundIntent, loadOutboundPolicy } from "./outbound/outboundPolicyEvaluator.ts";
+import { handleOutboundEvaluateRequest } from "./routes/outboundEvaluate.ts";
 import { TransientMemoryStore } from "./store/transientMemory.ts";
 
 type BridgeServerOptions = {
@@ -142,6 +144,7 @@ export function createBridgeServer(options: BridgeServerOptions = {}) {
   const memoryLedger = options.memoryLedger ?? defaultMemoryRuntime?.memoryLedger;
   const memoryWorkspaceDir = options.memoryWorkspaceDir ?? defaultMemoryRuntime?.memoryWorkspaceDir;
   const idleSleepThresholdMs = resolveIdleSleepThresholdMs();
+  const outboundPolicyPromise = loadOutboundPolicy(process.env.MIRA_OUTBOUND_POLICY_PATH);
 
   const touchUserRequest = (occurredAt: string | null) => {
     if (!memoryLedger || !occurredAt) {
@@ -263,6 +266,17 @@ export function createBridgeServer(options: BridgeServerOptions = {}) {
           ledger: memoryLedger,
         });
         const result = await handleMemoryContextRequest(await readJson(req), retriever);
+        writeJson(res, result.status, result.body);
+        return;
+      }
+
+      if (req.method === "POST" && url.pathname === "/v1/outbound/evaluate") {
+        const outboundPolicy = await outboundPolicyPromise;
+        const result = handleOutboundEvaluateRequest(
+          await readJson(req),
+          outboundPolicy,
+          evaluateOutboundIntent,
+        );
         writeJson(res, result.status, result.body);
         return;
       }
