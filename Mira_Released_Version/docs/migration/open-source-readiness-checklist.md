@@ -20,6 +20,7 @@ This checklist tracks whether `Mira_Released_Version/` is clean enough to be cop
 - confirm deploy docs do not rely on private devbox paths
 - confirm all top-level docs prefer release-side links over prototype-tree links
 - confirm package names and README language are public-facing
+- run the shared release verification entrypoint from [package.json](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/package.json)
 
 ## Known Remaining Decisions
 

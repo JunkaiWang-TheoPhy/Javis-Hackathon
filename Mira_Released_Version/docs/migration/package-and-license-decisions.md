@@ -16,6 +16,10 @@ That policy is already reflected in:
 - [modules/home-assistant/plugin/package.json](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/modules/home-assistant/plugin/package.json)
 - [services/notification-router/package.json](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/services/notification-router/package.json)
 
+The release-root workspace entrypoint now lives at:
+
+- [package.json](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/package.json)
+
 ## Lockfile Policy
 
 Current release-side state:

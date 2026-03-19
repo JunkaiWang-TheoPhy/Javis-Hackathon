@@ -11,6 +11,7 @@ This document tracks whether `Mira_Released_Version/` is ready to become its own
 - source-to-release mapping exists
 - a Git baseline has already been established in the current repo
 - release-side installed dependencies are no longer carried in the tree
+- a release-root workspace and verification entrypoint now exist
 
 ## Ready Enough For Initial Split
 

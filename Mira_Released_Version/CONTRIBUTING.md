@@ -27,6 +27,13 @@ Before proposing a release-side change as baseline-ready, confirm:
 - docs point to release-side files first
 - source boundaries are reflected in the migration mapping
 
+Run:
+
+```bash
+cd Mira_Released_Version
+npm run verify:release
+```
+
 ## Current Status
 
 This file is intentionally short.

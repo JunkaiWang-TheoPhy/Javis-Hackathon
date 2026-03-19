@@ -104,3 +104,12 @@ Use these public release docs together:
 ## Practical Rule
 
 If a proposed addition makes `Mira_Released_Version` look more like a private backup than a public package, it probably belongs in the main prototype repo or in internal docs, not in the release tree itself.
+
+## Shared Verification Entry
+
+The release tree now exposes a shared root-level verification entry:
+
+```bash
+cd Mira_Released_Version
+npm run verify:release
+```

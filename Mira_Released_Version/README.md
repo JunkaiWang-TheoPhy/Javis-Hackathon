@@ -16,6 +16,7 @@ Current public-repo hygiene companions:
 
 - [CONTRIBUTING.md](./CONTRIBUTING.md)
 - [CHANGELOG.md](./CHANGELOG.md)
+- [package.json](./package.json)
 
 ## Quick Start
 
@@ -143,6 +144,10 @@ The current release-baseline companions now also exist at:
 - [docs/migration/open-source-readiness-checklist.md](./docs/migration/open-source-readiness-checklist.md)
 - [docs/migration/repository-split-readiness.md](./docs/migration/repository-split-readiness.md)
 - [docs/migration/package-and-license-decisions.md](./docs/migration/package-and-license-decisions.md)
+
+The release root now also provides a shared verification entrypoint:
+
+- `npm run verify:release`
 
 ### Core
 
