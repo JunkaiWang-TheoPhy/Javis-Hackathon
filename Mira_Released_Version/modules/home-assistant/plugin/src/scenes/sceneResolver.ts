@@ -4,6 +4,9 @@ import {
   type DevicesRegistry,
   type LoadedDevice,
 } from "../registry/loadDevicesRegistry.ts";
+import { evaluateConfirmationDecision } from "../policies/confirmationPolicy.ts";
+import { evaluateOutboundStep } from "../policies/outboundPolicyAdapter.ts";
+import { evaluateActionRisk } from "../policies/riskPolicy.ts";
 import { getSceneDefinition, type SceneDefinition, type SceneSelector } from "./sceneDefinitions.ts";
 
 export type SceneResolveInput = {
@@ -51,6 +54,51 @@ export type ResolvedScenePlan = {
   steps: ScenePlanStep[];
 };
 
+function deriveStepStatusFromConfirmation(
+  decision: "auto" | "ask" | "double_confirm" | "block",
+): ScenePlanStep["status"] {
+  if (decision === "auto") {
+    return "planned";
+  }
+  if (decision === "block") {
+    return "blocked";
+  }
+  return "needs_confirmation";
+}
+
+function deriveStepStatusFromOutboundDecision(
+  decision: "allow" | "ask" | "block",
+): ScenePlanStep["status"] {
+  if (decision === "allow") {
+    return "planned";
+  }
+  if (decision === "block") {
+    return "blocked";
+  }
+  return "needs_confirmation";
+}
+
+function derivePlanStatus(steps: ScenePlanStep[], hasMissingRequiredRoles: boolean) {
+  if (hasMissingRequiredRoles) {
+    return "blocked" as const;
+  }
+
+  const hasBlocked = steps.some((step) => step.status === "blocked");
+  const hasConfirmation = steps.some((step) => step.status === "needs_confirmation");
+  const hasPlanned = steps.some((step) => step.status === "planned");
+
+  if (hasBlocked && hasPlanned) {
+    return "partially_blocked" as const;
+  }
+  if (hasBlocked && !hasPlanned) {
+    return "blocked" as const;
+  }
+  if (hasConfirmation) {
+    return "needs_confirmation" as const;
+  }
+  return "ready" as const;
+}
+
 function checkPreconditions(definition: SceneDefinition, context: SceneResolveInput["context"]) {
   for (const condition of definition.preconditions) {
     const value = context[condition.field as keyof SceneResolveInput["context"]];
@@ -84,6 +132,22 @@ function resolveValueFromContext(
   }
 
   return payload;
+}
+
+function materializeCapabilityData(
+  capability: DeviceCapability,
+  resolvedTemplatePayload: Record<string, unknown>,
+) {
+  const source = capability.dataTemplate ?? capability.data ?? resolvedTemplatePayload;
+  const materializedEntries = Object.entries(source ?? {}).map(([key, value]) => {
+    if (value === "{{value}}") {
+      return [key, resolvedTemplatePayload.value ?? null];
+    }
+    return [key, value];
+  });
+
+  const materialized = Object.fromEntries(materializedEntries);
+  return Object.keys(materialized).length > 0 ? materialized : undefined;
 }
 
 function findCapability(device: LoadedDevice, intent: string): DeviceCapability | null {
@@ -133,11 +197,23 @@ export function resolveScenePlan(input: SceneResolveInput): ResolvedScenePlan {
         if (!capability) {
           continue;
         }
+        const resolvedTemplatePayload = resolveValueFromContext(input, template);
 
-        const confirmationDecision = capability.requiresConfirmation || input.policyContext.requiresHumanApprovalDefault
-          ? "ask"
-          : "auto";
-        if (confirmationDecision !== "auto") {
+        const risk = evaluateActionRisk({
+          device,
+          capability,
+          sceneId: definition.id,
+          context: input.context,
+        });
+        const confirmation = evaluateConfirmationDecision({
+          actionRiskTier: risk.riskTier,
+          capabilityRequiresConfirmation: capability.requiresConfirmation,
+          requiresHumanApprovalDefault: input.policyContext.requiresHumanApprovalDefault,
+          confirmationMode: input.policyContext.confirmationMode,
+          triggeredBy: input.context.triggeredBy,
+        });
+        const stepStatus = deriveStepStatusFromConfirmation(confirmation.decision);
+        if (stepStatus === "needs_confirmation") {
           requiredConfirmations.push(`${device.deviceId}:${template.intent}`);
         }
 
@@ -146,9 +222,9 @@ export function resolveScenePlan(input: SceneResolveInput): ResolvedScenePlan {
           kind: "device_intent",
           role: selector.role,
           targetId: device.deviceId,
-          status: "planned",
-          actionRiskTier: capability.riskTier ?? "side_effect",
-          confirmationDecision,
+          status: stepStatus,
+          actionRiskTier: risk.riskTier,
+          confirmationDecision: confirmation.decision,
           payload: {
             deviceId: device.deviceId,
             displayName: device.displayName,
@@ -156,27 +232,43 @@ export function resolveScenePlan(input: SceneResolveInput): ResolvedScenePlan {
             intent: template.intent,
             domain: capability.domain,
             service: capability.service,
-            data: resolveValueFromContext(input, template),
+            data: materializeCapabilityData(capability, resolvedTemplatePayload),
           },
-          reasons: [],
+          reasons: [...risk.reasons, ...confirmation.reasons],
         });
       }
     }
   }
 
   for (const notification of definition.optionalNotifications ?? []) {
+    const outbound = evaluateOutboundStep({
+      messageKind: notification.message_kind,
+      recipientScope: notification.recipient_scope,
+      privacyLevel: "private",
+      knownRecipient: notification.recipient_scope === "self",
+      quietHoursActive: input.context.quietHours,
+    });
+    const stepStatus = deriveStepStatusFromOutboundDecision(outbound.decision);
+    if (stepStatus === "needs_confirmation") {
+      requiredConfirmations.push(`notify:${notification.message_kind}:${notification.recipient_scope}`);
+    }
+
     steps.push({
       stepId: `notify:${notification.message_kind}:${notification.recipient_scope}`,
       kind: "outbound_message",
-      status: "planned",
+      status: stepStatus,
       outboundRiskTier: notification.message_kind === "alert" ? "medium" : "low",
-      outboundDecision: notification.recipient_scope === "self" ? "allow" : "ask",
+      outboundDecision: outbound.decision,
       payload: {
         messageKind: notification.message_kind,
         recipientScope: notification.recipient_scope,
         content: notification.contentTemplate,
+        source: input.context.triggeredBy ?? "event",
+        preferredChannels: ["openclaw_channel_dm"],
+        fallbackChannels: ["email"],
+        privacyLevel: "private",
       },
-      reasons: [],
+      reasons: outbound.reasons,
     });
   }
 
@@ -193,8 +285,8 @@ export function resolveScenePlan(input: SceneResolveInput): ResolvedScenePlan {
 
   return {
     sceneId: input.sceneId,
-    planStatus: "ready",
-    summary: `Scene '${definition.id}' resolved into ${steps.length} planned steps.`,
+    planStatus: derivePlanStatus(steps, false),
+    summary: `Scene '${definition.id}' resolved into ${steps.length} plan step(s).`,
     reasons: [],
     requiredConfirmations,
     steps,

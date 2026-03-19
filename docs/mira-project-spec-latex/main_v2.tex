@@ -1,0 +1,502 @@
+% !TEX program = xelatex
+\documentclass[11pt,fontset=none]{ctexart}
+
+\newcommand{\ReportLeftMargin}{18mm}
+\newcommand{\ReportRightMargin}{18mm}
+\newcommand{\ReportTopMargin}{18mm}
+\newcommand{\ReportBottomMargin}{18mm}
+
+\usepackage[
+  a4paper,
+  left=\ReportLeftMargin,
+  right=\ReportRightMargin,
+  top=\ReportTopMargin,
+  bottom=\ReportBottomMargin
+]{geometry}
+\usepackage{fontspec}
+\usepackage{graphicx}
+\usepackage[table]{xcolor}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{tcolorbox}
+\usepackage{titlesec}
+\usepackage{setspace}
+\usepackage{caption}
+\usepackage{amssymb}
+\usepackage{needspace}
+\usepackage{fancyhdr}
+\usepackage{enumitem}
+\usepackage{xurl}
+
+\defaultfontfeatures{Ligatures=TeX, Scale=MatchLowercase}
+\setmainfont{Baskerville}
+\setsansfont{Avenir Next}
+\setCJKmainfont[
+  BoldFont={Songti SC Bold},
+  ItalicFont={Songti SC},
+  BoldItalicFont={Songti SC Bold}
+]{Songti SC}
+\setCJKsansfont[
+  BoldFont={Hiragino Sans GB W6},
+  ItalicFont={Hiragino Sans GB W3},
+  BoldItalicFont={Hiragino Sans GB W6}
+]{Hiragino Sans GB W3}
+\setCJKmonofont[
+  BoldFont={Hiragino Sans GB W6},
+  ItalicFont={Hiragino Sans GB W3},
+  BoldItalicFont={Hiragino Sans GB W6}
+]{Hiragino Sans GB W3}
+\newCJKfontfamily\TitleCJK[
+  BoldFont={Lantinghei SC},
+  ItalicFont={Lantinghei SC},
+  BoldItalicFont={Lantinghei SC}
+]{Lantinghei SC}
+
+\definecolor{MiraText}{HTML}{2F3640}
+\definecolor{MiraMuted}{HTML}{D8DDE6}
+\definecolor{MiraSoft}{HTML}{F7F8FA}
+\definecolor{MiraAccent}{HTML}{A85746}
+\definecolor{MiraAccentSoft}{HTML}{FFF4EF}
+\definecolor{MiraWarm}{HTML}{FFF5EB}
+\definecolor{MiraWarmBorder}{HTML}{FED4A4}
+\definecolor{MiraGreen}{HTML}{2C7A56}
+\definecolor{MiraGreenSoft}{HTML}{EDF8F2}
+\definecolor{MiraBlue}{HTML}{2F5EA8}
+\definecolor{MiraBlueSoft}{HTML}{EFF5FF}
+\definecolor{MiraGray}{HTML}{6B7280}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.38em}
+\setstretch{1.16}
+\renewcommand{\arraystretch}{1.28}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\footnotesize\sffamily\color{MiraGray} MIRA | Judging Brief}
+\rhead{\footnotesize\sffamily\color{MiraGray} OpenClaw Hackathon}
+\renewcommand{\headrulewidth}{0pt}
+\cfoot{\footnotesize\sffamily\color{MiraText}\thepage}
+
+\titleformat{\section}
+  {\LARGE\bfseries\sffamily\TitleCJK\color{MiraText}}
+  {}
+  {0pt}
+  {}
+
+\titleformat{\subsection}
+  {\large\bfseries\sffamily\TitleCJK\color{MiraText}}
+  {}
+  {0pt}
+  {}
+
+\titlespacing*{\section}{0pt}{0.2em}{0.65em}
+\titlespacing*{\subsection}{0pt}{0.4em}{0.35em}
+
+\captionsetup{font=small,labelformat=empty}
+\tcbset{boxrule=0.85pt,arc=5pt,left=10pt,right=10pt,top=8pt,bottom=8pt}
+
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\newlist{tightitemize}{itemize}{1}
+\setlist[tightitemize]{label=--, leftmargin=1.2em, itemsep=0.25em, topsep=0.2em, parsep=0em, partopsep=0em}
+
+\newcommand{\PageDivider}{\vspace{0.7em}{\color{MiraMuted}\rule{\linewidth}{0.55pt}}\vspace{0.45em}}
+\newcommand{\DeckTitle}[1]{{\LARGE\bfseries\sffamily\TitleCJK\color{MiraText} #1\par}}
+\newcommand{\DeckSub}[1]{{\small\color{MiraGray} #1\par}}
+\newcommand{\Metric}[2]{\textbf{#1}\enspace #2\par}
+\newcommand{\RepoPath}[1]{{\footnotesize\path{#1}}}
+
+\newtcolorbox{summarybox}{
+  colback=white,
+  colframe=MiraMuted,
+  boxrule=0.9pt,
+  arc=5pt
+}
+
+\newtcolorbox{accentbox}{
+  colback=MiraAccentSoft,
+  colframe=MiraWarmBorder,
+  boxrule=0.9pt,
+  arc=5pt
+}
+
+\newtcolorbox{greenbox}{
+  colback=MiraGreenSoft,
+  colframe=MiraGreen,
+  boxrule=0.9pt,
+  arc=5pt
+}
+
+\newtcolorbox{bluebox}{
+  colback=MiraBlueSoft,
+  colframe=MiraBlue,
+  boxrule=0.9pt,
+  arc=5pt
+}
+
+\begin{document}
+\thispagestyle{empty}
+
+\vspace*{-\ReportTopMargin}
+\noindent\makebox[\linewidth][l]{%
+  \hspace*{-\ReportLeftMargin}\includegraphics[width=\paperwidth]{assets/cover-banner.png}%
+}
+
+\vspace{1.0cm}
+\DeckTitle{Mira 评审说明书}
+\DeckSub{proof-first judging brief | 面向评委的项目说明，而非品牌宣言}
+
+\begin{summarybox}
+\textbf{一句话定位}\par
+Mira 是一个基于 OpenClaw 的主动感受型 AI 伴侣，使用眼镜、可穿戴信号与家居执行面，完成\textbf{低打扰、可解释、可控}的关怀闭环。
+\end{summarybox}
+
+\vspace{0.6em}
+\begin{tabularx}{\linewidth}{|Y|Y|Y|Y|}
+\hline
+\rowcolor{MiraSoft}
+\centering\textbf{Perception} & \centering\textbf{Memory} & \centering\textbf{Judgment} & \centering\textbf{Action}\tabularnewline
+\hline
+\centering 眼镜画面、心率、环境上下文 & \centering 短期状态与近期事件记忆 & \centering 判断是否值得打扰 & \centering 镜片提示、耳机/手表、家居执行\tabularnewline
+\hline
+\end{tabularx}
+
+\vspace{0.6em}
+\begin{accentbox}
+\textbf{评委先看这三点}
+\begin{tightitemize}
+\item 本项目主打的不是“更复杂的 AI”，而是\textbf{更实际的 care loop}。
+\item 当前材料把“已实现 / 部分实现 / 愿景”明确分层，避免把概念包装成现成能力。
+\item 本次评审主打闭环是：\textbf{公开表达/演讲前支持}与\textbf{wearable -> Home Assistant} 两条已验证路径。
+\end{tightitemize}
+\end{accentbox}
+
+\newpage
+\section*{一、主问题与主用户}
+\DeckSub{把叙事收束到一个评委最容易判断实际价值的高频时刻}
+
+\begin{summarybox}
+\textbf{主场景锚点}\par
+\textbf{公开表达前的高压时刻。} 用户在上台、路演、演讲前往往不会主动对 AI 说“我现在很紧张”，但这个时刻恰恰最适合主动感知、最容易观察、也最容易形成低打扰闭环。
+\end{summarybox}
+
+\vspace{0.55em}
+\begin{tabularx}{\linewidth}{Y Y}
+\begin{accentbox}
+\textbf{当前 AI 的问题}
+\begin{tightitemize}
+\item 大多依赖用户显式开口。
+\item 即使会主动发消息，也常常不知道用户当下状态。
+\item 在真正紧张或疲惫时，用户往往不想先发起对话。
+\end{tightitemize}
+\end{accentbox}
+&
+\begin{greenbox}
+\textbf{Mira 的区别}
+\begin{tightitemize}
+\item 先感知，再决定是否值得行动。
+\item 默认沉默；不确定时不打扰。
+\item 动作不是聊天优先，而是\textbf{最小、最合适的支持}。
+\end{tightitemize}
+\end{greenbox}
+\end{tabularx}
+
+\vspace{0.4em}
+\Metric{Current AI}{needs explicit ask}
+\Metric{Mira}{acts before the ask, but only when appropriate}
+
+\PageDivider
+
+\textbf{为什么先锚定这一类用户？}
+\begin{tightitemize}
+\item 这是一个\textbf{单一、高频、容易展示}的痛点，适合 hackathon 评审。
+\item 既能体现主动感知，也能体现“低打扰”和“分寸感”。
+\item 其他场景如独居老人、回家关怀、儿童安全可作为\textbf{未来扩展场景}，不与 MVP 抢叙事中心。
+\end{tightitemize}
+
+\begin{bluebox}
+\textbf{未来扩展方向（本次不作为主判分对象）}\par
+独居老人趋势守护、下班回家照护、儿童危险姿态监测、社交记忆与长期关系理解。
+\end{bluebox}
+
+\newpage
+\section*{二、当前实现分层}
+\DeckSub{把 marketing claim 变成 engineering status}
+
+\begin{tabularx}{\linewidth}{Y Y Y}
+\begin{greenbox}
+\textbf{已实现 / 已验证}
+\begin{tightitemize}
+\item Rokid 观察事件接入与 `POST /v1/observe`
+\item 心率事件到家庭动作的 demo 路径
+\item 待确认动作缓存与确认接口
+\item Memory ledger / transient memory 基础链路
+\item Home Assistant 执行插件与 demo 场景
+\item outbound policy 文件化与测试
+\end{tightitemize}
+\end{greenbox}
+&
+\begin{bluebox}
+\textbf{部分实现 / 可演示}
+\begin{tightitemize}
+\item 演讲前鼓励的现场 narrative 闭环
+\item 多模态判断与记忆检索拼接
+\item 低风险主动提醒 / 私聊型提醒
+\item 眼镜侧陪伴式输出体验
+\end{tightitemize}
+\end{bluebox}
+&
+\begin{accentbox}
+\textbf{愿景 / 扩展方向}
+\begin{tightitemize}
+\item 独居老人趋势型守护
+\item 回家时刻自动照护编排
+\item 儿童危险姿态长期监护
+\item 更稳定的社交记忆与长期陪伴
+\end{tightitemize}
+\end{accentbox}
+\end{tabularx}
+
+\PageDivider
+
+\textbf{本次主打闭环}
+\begin{tightitemize}
+\item \textbf{闭环 A：} 演讲前主动感知 -> 最小鼓励输出
+\item \textbf{闭环 B：} wearable / 观察事件 -> OpenClaw -> Home Assistant 执行
+\end{tightitemize}
+
+\begin{summarybox}
+\textbf{为何这样分层？}\par
+评委需要看到的是“这次比赛里到底做成了什么”。因此本稿明确区分：
+\textbf{Implemented / Partially implemented / Vision}，
+避免把所有场景写成一个语气层级。
+\end{summarybox}
+
+\newpage
+\section*{三、主 demo：演讲鼓励场景全链路}
+\DeckSub{从“有感染力的故事”改成“可解释的闭环”}
+
+\begin{summarybox}
+\textbf{场景目标}\par
+用户上台前不会主动说“我很紧张”，但系统可以从视觉、穿戴状态和近期上下文中判断：此时是否值得给出一句\textbf{最小支持}。
+\end{summarybox}
+
+\vspace{0.5em}
+\begin{tabularx}{\linewidth}{L{0.08\linewidth}Y}
+\textbf{1.} & Rokid 观察到用户已处于路演/演讲场景，周围存在 PPT 与观众等公开表达线索。\\
+\textbf{2.} & 可穿戴侧出现紧张信号，例如心率提升或身体状态变化。\\
+\textbf{3.} & 系统检索近期上下文与准备痕迹，形成“此刻确实值得支持”的判断。\\
+\textbf{4.} & Care policy 决定是否行动。若不确定，则保持沉默。\\
+\textbf{5.} & 若高置信度成立，则输出一句\textbf{最小、不过度暴露隐私}的鼓励信息。\\
+\textbf{6.} & 输出优先在眼镜 / 耳机等私密界面完成，避免公共暴露与过度打扰。\\
+\end{tabularx}
+
+\vspace{0.6em}
+\begin{accentbox}
+\textbf{示例输出}\par
+“放轻松，你肯定可以做到的。深呼吸。你这两天做了很多准备，去拿下这个舞台。”
+\end{accentbox}
+
+\PageDivider
+
+\begin{tabularx}{\linewidth}{Y Y}
+\begin{greenbox}
+\textbf{这页要证明什么？}
+\begin{tightitemize}
+\item Mira 不是普通 chatbot。
+\item 它的价值不在“能不能聊”，而在“能不能在合适时机少说一句但更有用的话”。
+\item 它的关键能力是\textbf{先判断要不要行动}，而不是默认一直说话。
+\end{tightitemize}
+\end{greenbox}
+&
+\begin{bluebox}
+\textbf{fallback 与边界}
+\begin{tightitemize}
+\item 观察不充分时，不输出支持话术。
+\item 动作优先级：私密支持优于公开提醒。
+\item 中高风险外发动作保留确认步骤，不在该 demo 中自动扩张。
+\end{tightitemize}
+\end{bluebox}
+\end{tabularx}
+
+\newpage
+\section*{四、工程结构与可复现路径}
+\DeckSub{从 philosophy 改成 data flow + component evidence}
+
+\begin{summarybox}
+\textbf{最简 pipeline}\par
+\RepoPath{frame + wearable signal + context -> observe -> memory -> policy -> confirm / execute}
+\end{summarybox}
+
+\vspace{0.55em}
+\small
+\arrayrulecolor{MiraMuted}
+\begin{tabularx}{\linewidth}{L{0.18\linewidth} L{0.32\linewidth} Y}
+\hline
+\rowcolor{MiraSoft}
+\textbf{组件} & \textbf{作用} & \textbf{仓库证据} \\
+\hline
+Rokid bridge gateway & 接收观察事件、规范化响应、保存待确认动作 & \RepoPath{services/rokid-bridge-gateway/src/routes/observe.ts} \newline \RepoPath{.../routes/confirm.ts} \\
+Memory layer & 记录观察、确认与记忆检索上下文 & \RepoPath{.../memory/sqliteMemoryLedger.ts} \newline \RepoPath{.../store/transientMemory.ts} \\
+Policy layer & 对外发行为做 quiet hours、recipient scope 与风险规则控制 & \RepoPath{services/rokid-bridge-gateway/config/outbound-policy.yaml} \newline \RepoPath{.../outbound/outboundPolicyEvaluator.ts} \\
+HA executor & 把判断转成 Home Assistant / 多生态动作 & \RepoPath{plugins/openclaw-plugin-ha-control/src/index.ts} \newline \RepoPath{.../src/ecosystem.ts} \\
+Demo scripts & 打通可复现的 end-to-end 演示路径 & \RepoPath{scripts/demo-sequence.sh} \newline \RepoPath{scripts/demo-rokid-coffee-sequence.sh} \\
+\hline
+\end{tabularx}
+\normalsize
+
+\PageDivider
+
+\begin{bluebox}
+\textbf{工程语言下的四层理解}
+\begin{tightitemize}
+\item \textbf{Sensor ingestion:} 眼镜、可穿戴、脚本与设备事件进入系统。
+\item \textbf{Memory write / retrieve:} 观察事件写入 ledger，形成可追溯上下文。
+\item \textbf{Care policy engine:} 不是“看到就做”，而是先判断是否值得打扰。
+\item \textbf{Action router:} 动作最终路由到眼镜、通知或 Home Assistant 执行面。
+\end{tightitemize}
+\end{bluebox}
+
+\newpage
+\section*{五、价值证明页}
+\DeckSub{不是“问题有多大”，而是“闭环有多真”}
+
+\small
+\arrayrulecolor{MiraMuted}
+\begin{tabularx}{\linewidth}{L{0.22\linewidth} L{0.24\linewidth} Y}
+\hline
+\rowcolor{MiraSoft}
+\textbf{闭环} & \textbf{证据类型} & \textbf{实际价值} \\
+\hline
+Wearable -> HA cooling & 仓库 README 的 Demo 1 路径 \newline \RepoPath{./scripts/demo-sequence.sh} & 证明系统能把生理状态事件变成家庭执行响应，而不是只做聊天输出。 \\
+Rokid observe -> confirm -> HA & 仓库 README 的 Demo 2 路径 \newline \RepoPath{./scripts/demo-rokid-coffee-sequence.sh} & 证明系统具备“观察 -> 待确认动作 -> 执行”的 inspectable action loop。 \\
+演讲鼓励 narrative & 路演讲稿与硬件 demo deck & 证明 Mira 的目标不是“更会说话”，而是“在高价值时刻少打扰、但更贴身”。 \\
+\hline
+\end{tabularx}
+\normalsize
+
+\vspace{0.6em}
+\begin{greenbox}
+\textbf{Judge takeaway}\par
+你什么都没说，Mira 仍然先注意到了你，并在不越界的前提下给出了帮助。
+\end{greenbox}
+
+\vspace{0.45em}
+\begin{tabularx}{\linewidth}{Y Y Y}
+\begin{summarybox}
+\textbf{降低求助门槛}\par
+减少“用户必须先表达自己状态”的交互门槛。
+\end{summarybox}
+&
+\begin{summarybox}
+\textbf{把支持提前}\par
+把支持提前到关键时刻，而不是事后安慰。
+\end{summarybox}
+&
+\begin{summarybox}
+\textbf{系统可解释}\par
+动作路径可解释、可确认、可追溯，不是黑盒自动化。
+\end{summarybox}
+\end{tabularx}
+
+\newpage
+\section*{六、安全与边界}
+\DeckSub{把“我们重视安全”改成“当前有哪些明确规则”}
+
+\begin{tabularx}{\linewidth}{Y Y}
+\begin{bluebox}
+\textbf{当前 repo 中已文件化的规则}
+\begin{tightitemize}
+\item 默认动作：\textbf{ask}
+\item 需要已知 recipient
+\item 默认要求 private channel
+\item quiet hours：23:00 -- 08:00
+\item rate limits：每小时 3 次、每天 10 次
+\item caregiver escalation：默认 ask
+\item public / social posting：block
+\item secret / credential / raw private data：block
+\end{tightitemize}
+\end{bluebox}
+&
+\begin{greenbox}
+\textbf{当前设计中强调的产品原则}
+\begin{tightitemize}
+\item 默认沉默，不确定不行动
+\item 高风险外发需要确认
+\item 用户持有暂停 / 擦除 / 撤销权
+\item 家居执行应在 allowlist / whitelist 内进行
+\item 感知是为了照顾，不是为了监控
+\end{tightitemize}
+\end{greenbox}
+\end{tabularx}
+
+\vspace{0.55em}
+\begin{summarybox}
+\textbf{为何这一页重要？}\par
+Mira 的定义不是“更主动就更好”，而是\textbf{在被允许的边界内、用可审计规则主动}。这也是它与普通“全自动 agent”最关键的区别之一。
+\end{summarybox}
+
+\vspace{0.55em}
+\small
+\arrayrulecolor{MiraMuted}
+\begin{tabularx}{\linewidth}{L{0.22\linewidth}Y}
+\hline
+\rowcolor{MiraSoft}
+\textbf{机制} & \textbf{证据} \\
+\hline
+Outbound policy & \RepoPath{services/rokid-bridge-gateway/config/outbound-policy.yaml} \\
+Confirmation path & \RepoPath{services/rokid-bridge-gateway/src/routes/confirm.ts} \\
+Policy evaluation tests & \RepoPath{services/rokid-bridge-gateway/src/__tests__/outbound-policy.test.ts} \\
+\hline
+\end{tabularx}
+\normalsize
+
+\newpage
+\section*{七、路线图与团队}
+\DeckSub{从 hackathon MVP 到可发布 companion system}
+
+\begin{tabularx}{\linewidth}{L{0.16\linewidth}Y}
+\textbf{Hackathon now} & 聚焦 1--2 条主闭环：演讲鼓励、wearable -> HA、Rokid 观察 -> confirm -> action。 \\
+\textbf{Next 1 month} & 把 care policy、日志、确认链路与设备执行面进一步产品化，让 demo 更 inspectable、更稳定。 \\
+\textbf{3--6 months} & 扩展到回家关怀、独居守护、社交通知与 channel-agnostic communication，并把 Mira Core 做成更清晰的发布结构。 \\
+\end{tabularx}
+
+\vspace{0.7em}
+\arrayrulecolor{MiraMuted}
+\begin{tabularx}{\linewidth}{L{0.16\linewidth}Y}
+\hline
+\rowcolor{MiraSoft}
+\textbf{成员} & \textbf{本次聚焦职责} \\
+\hline
+Rick & 产品定义、路演叙事、用户体验、主场景 framing 与整体表达。 \\
+Junkai & 后端链路、OpenClaw / Rokid / HA 接入、安全边界与执行链路。 \\
+\hline
+\end{tabularx}
+
+\vspace{0.75em}
+\begin{summarybox}
+\textbf{评委最后 10 秒记住这三点}\par
+\begin{tightitemize}
+\item Mira 证明的是“先感知、再判断、再行动”的 care loop，而不是聊天文案。
+\item 本次比赛已经打通两类主路径：演讲鼓励 narrative 与 wearable / observe -> confirm -> HA。
+\item 系统不是默认自动化，而是有 policy、确认链路与设备边界的可控执行。
+\end{tightitemize}
+\end{summarybox}
+
+\vspace{0.75em}
+\begin{greenbox}
+\textbf{最后一句}\par
+Mira 想证明的不是“AI 可以更炫”，而是：\textbf{AI 可以在合适的时候，更早一点懂你，更稳一点帮你。}
+\end{greenbox}
+
+\vspace{0.35em}
+{\small\color{MiraGray}
+Relevant repo anchors: \RepoPath{README.md},
+\RepoPath{OpenClaw/devbox/project/openclaw-ha-blueprint-memory/README.md},
+\RepoPath{Readme/mira-pitch-script-v1.pdf},
+\RepoPath{Readme/mira-track3-hardware-demo-deck.pdf}
+\par}
+
+\end{document}

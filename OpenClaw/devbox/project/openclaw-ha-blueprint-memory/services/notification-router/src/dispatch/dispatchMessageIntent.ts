@@ -5,6 +5,7 @@ import {
 import type { OutboundDecision } from "../../../rokid-bridge-gateway/src/outbound/outboundPolicyTypes.ts";
 
 import { dispatchOpenClawChannelDm } from "../channels/openclawChannelDm.ts";
+import { dispatchResendEmail } from "../channels/resendEmail.ts";
 import type {
   ChannelDeliveryResult,
   NotificationRouterConfig,
@@ -72,6 +73,10 @@ async function dispatchAllowedChannel(
 
   if (channel === "openclaw_channel_dm" && channelConfig.kind === "webhook") {
     return dispatchOpenClawChannelDm(intent, channelConfig);
+  }
+
+  if (channelConfig.kind === "resend_email") {
+    return dispatchResendEmail(channel, intent, channelConfig);
   }
 
   return {

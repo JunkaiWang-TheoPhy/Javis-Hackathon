@@ -17,9 +17,15 @@ import { handleMemoryContextRequest } from "./routes/memoryContext.ts";
 import { handleObserveRequest } from "./routes/observe.ts";
 import { extractUserRequestTimestampFromMemoryEvent, handleMemoryIngestRequest } from "./routes/memoryIngest.ts";
 import { handleMemorySleepRequest } from "./routes/memorySleep.ts";
+import { dispatchOutboundIntent as defaultDispatchOutboundIntent } from "./outbound/notificationRouterClient.ts";
 import { evaluateOutboundIntent, loadOutboundPolicy } from "./outbound/outboundPolicyEvaluator.ts";
+import { handleOutboundDispatchRequest } from "./routes/outboundDispatch.ts";
 import { handleOutboundEvaluateRequest } from "./routes/outboundEvaluate.ts";
 import { TransientMemoryStore } from "./store/transientMemory.ts";
+import type {
+  NotificationDispatchResponse,
+  OutboundMessageIntent,
+} from "../../../packages/contracts/src/index.ts";
 
 type BridgeServerOptions = {
   dispatchHomeAssistantAction?: (action: {
@@ -31,6 +37,9 @@ type BridgeServerOptions = {
   haControlConfig?: HaControlConfig;
   memoryLedger?: MemoryLedger;
   memoryWorkspaceDir?: string;
+  dispatchOutboundIntent?: (
+    intent: OutboundMessageIntent,
+  ) => Promise<NotificationDispatchResponse>;
 };
 
 const DEFAULT_IDLE_SLEEP_THRESHOLD_MS = 2 * 60 * 60 * 1000;
@@ -141,6 +150,9 @@ export function createBridgeServer(options: BridgeServerOptions = {}) {
   const dispatchHomeAssistantAction =
     options.dispatchHomeAssistantAction ??
     defaultDispatchHomeAssistantAction;
+  const dispatchOutboundIntent =
+    options.dispatchOutboundIntent ??
+    defaultDispatchOutboundIntent;
   const memoryLedger = options.memoryLedger ?? defaultMemoryRuntime?.memoryLedger;
   const memoryWorkspaceDir = options.memoryWorkspaceDir ?? defaultMemoryRuntime?.memoryWorkspaceDir;
   const idleSleepThresholdMs = resolveIdleSleepThresholdMs();
@@ -276,6 +288,15 @@ export function createBridgeServer(options: BridgeServerOptions = {}) {
           await readJson(req),
           outboundPolicy,
           evaluateOutboundIntent,
+        );
+        writeJson(res, result.status, result.body);
+        return;
+      }
+
+      if (req.method === "POST" && url.pathname === "/v1/outbound/dispatch") {
+        const result = await handleOutboundDispatchRequest(
+          await readJson(req),
+          dispatchOutboundIntent,
         );
         writeJson(res, result.status, result.body);
         return;

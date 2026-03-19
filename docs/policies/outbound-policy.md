@@ -18,6 +18,7 @@ The current three-layer layout is:
 
 ```text
 Mira_v1/openclaw-workspace/OUTBOUND_POLICY.md
+OpenClaw/devbox/project/openclaw-ha-blueprint-memory/services/notification-router/config/outbound-policy.yaml
 OpenClaw/devbox/project/openclaw-ha-blueprint-memory/services/rokid-bridge-gateway/config/outbound-policy.yaml
 docs/policies/outbound-policy.md
 ```
@@ -34,7 +35,7 @@ Purpose:
 - refine `AGENTS.md` for actions that leave the machine
 - explain what is allowed, what requires confirmation, and what is blocked
 
-### `services/rokid-bridge-gateway/config/outbound-policy.yaml`
+### `services/notification-router/config/outbound-policy.yaml`
 
 Audience:
 
@@ -43,8 +44,20 @@ Audience:
 Purpose:
 
 - provide structured `allow / ask / block` rules
-- serve as the temporary machine-enforced policy file
-- prepare the later move to `services/notification-router/config/outbound-policy.yaml`
+- serve as the formal runtime target placement
+- define the long-term canonical machine-readable policy path
+
+### `services/rokid-bridge-gateway/config/outbound-policy.yaml`
+
+Audience:
+
+- runtime code during transition
+
+Purpose:
+
+- preserve compatibility during the gateway-to-router convergence period
+- support parity checks while `rokid-bridge-gateway` still carries local evaluator logic
+- avoid treating the gateway-local file as the only runtime policy source
 
 ### `docs/policies/outbound-policy.md`
 
@@ -78,6 +91,12 @@ So the division is:
 ## 4. Current Policy Model
 
 The current model is intentionally conservative.
+
+It should also be read as a coexistence model:
+
+- `notification-router/config/outbound-policy.yaml` is the formal runtime target
+- `rokid-bridge-gateway/config/outbound-policy.yaml` is a transition-era compatibility copy
+- this document explains both at the same time so the repository is not misread as having a single temporary placement
 
 Default rule:
 
@@ -193,24 +212,42 @@ The intended actions are:
 
 That keeps the runtime semantics simple enough to implement incrementally.
 
-## 11. Future Migration
+## 11. Current Runtime Ownership State
 
-The current runtime file lives under:
-
-- `services/rokid-bridge-gateway/config/outbound-policy.yaml`
-
-This is a temporary placement because there is no dedicated `notification-router` service in the current repo layout yet.
-
-When that service is formalized, the machine-readable policy should move to:
+The repository now contains two runtime YAML placements at the same time:
 
 - `services/notification-router/config/outbound-policy.yaml`
+- `services/rokid-bridge-gateway/config/outbound-policy.yaml`
 
-At that point:
+These should not be interpreted as equal long-term owners.
 
-- `rokid-bridge-gateway` should consume it rather than own it
-- other event sources should also route through the same policy file
+The intended reading is:
 
-## 12. Change Log
+- `notification-router/config/outbound-policy.yaml`
+  - formal runtime target
+  - intended canonical ownership point
+- `rokid-bridge-gateway/config/outbound-policy.yaml`
+  - transitional compatibility placement
+  - still present because the gateway has not fully collapsed to router-only policy ownership
+
+So the repository is no longer in a pure "temporary placement only" phase.
+
+It is now in a coexistence phase:
+
+- the formal runtime home exists
+- the transition-layer copy still exists
+- the remaining architectural decision is whether the gateway should keep a compatibility copy or stop owning outbound policy entirely
+
+## 12. Final Convergence Direction
+
+The preferred end state remains:
+
+- `notification-router` owns the canonical machine-readable outbound-policy file
+- upstream services submit normalized outbound intents
+- `rokid-bridge-gateway` no longer acts as an independent primary policy owner
+- any remaining gateway-local YAML is either removed or clearly marked compatibility-only
+
+## 13. Change Log
 
 ### 2026-03-17
 
@@ -218,3 +255,8 @@ At that point:
 - added model-readable outbound guidance to the workspace
 - added machine-readable `allow / ask / block` rules
 - linked `AGENTS.md` to `OUTBOUND_POLICY.md`
+
+### 2026-03-19
+
+- updated this document to describe the current coexistence of formal and transition-era runtime policy YAML placements
+- aligned the policy doc with the service README language used by `notification-router` and `rokid-bridge-gateway`
