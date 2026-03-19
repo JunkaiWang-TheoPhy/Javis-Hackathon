@@ -28,6 +28,11 @@ This checklist tracks whether `Mira_Released_Version/` is clean enough to be cop
 - whether to carry package lockfiles for all release-side packages
 - which release-side tests must be copied versus referenced from the active repo
 
+See also:
+
+- [repository-split-readiness.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/docs/migration/repository-split-readiness.md)
+- [package-and-license-decisions.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/docs/migration/package-and-license-decisions.md)
+
 ## Operator Rule
 
 If a file would be unsafe or confusing in a public repository, do not move it into `Mira_Released_Version/`.

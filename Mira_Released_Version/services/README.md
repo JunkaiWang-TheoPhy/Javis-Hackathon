@@ -52,3 +52,7 @@ The current release-side service package is still a first pass:
 - it is self-contained on purpose
 - it uses a built-in default outbound policy object
 - it should later converge toward active-runtime parity without losing release portability
+
+The current package naming and lockfile policy are tracked in:
+
+- [../docs/migration/package-and-license-decisions.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/docs/migration/package-and-license-decisions.md)

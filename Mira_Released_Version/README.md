@@ -12,6 +12,11 @@ This directory is the staging root for a standalone public repository that will 
 
 It is not intended to be a raw mirror of the current devbox runtime or a dump of the full prototype workspace.
 
+Current public-repo hygiene companions:
+
+- [CONTRIBUTING.md](./CONTRIBUTING.md)
+- [CHANGELOG.md](./CHANGELOG.md)
+
 ## Quick Start
 
 The current fastest way into this release tree is:
@@ -136,6 +141,8 @@ The current release-baseline companions now also exist at:
 
 - [docs/migration/release-baseline.md](./docs/migration/release-baseline.md)
 - [docs/migration/open-source-readiness-checklist.md](./docs/migration/open-source-readiness-checklist.md)
+- [docs/migration/repository-split-readiness.md](./docs/migration/repository-split-readiness.md)
+- [docs/migration/package-and-license-decisions.md](./docs/migration/package-and-license-decisions.md)
 
 ### Core
 

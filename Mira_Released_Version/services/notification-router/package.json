@@ -1,5 +1,5 @@
 {
-  "name": "@mira/notification-router",
+  "name": "@mira-release/notification-router",
   "private": true,
   "type": "module",
   "scripts": {

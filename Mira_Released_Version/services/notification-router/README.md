@@ -84,6 +84,10 @@ Recent hardening added:
 - local YAML-backed policy loading when the optional `yaml` dependency is installed
 - a release-side package test in [src/__tests__/notification-router.test.ts](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/services/notification-router/src/__tests__/notification-router.test.ts)
 
+The current package namespace is:
+
+- `@mira-release/notification-router`
+
 The current operator-facing companion now also exists at:
 
 - [docs/operator-checklist.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/services/notification-router/docs/operator-checklist.md)
