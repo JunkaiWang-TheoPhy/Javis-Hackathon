@@ -102,7 +102,9 @@ The built-in default path uses:
 - [defaultOutboundPolicy.ts](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/services/notification-router/src/policy/defaultOutboundPolicy.ts)
 - [outboundPolicyLoader.ts](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/services/notification-router/src/policy/outboundPolicyLoader.ts)
 
-The file-backed path uses the release package's own `yaml` dependency rather than the active runtime package graph.
+The file-backed path uses the release package's own optional `yaml` dependency rather than the active runtime package graph.
+
+If `outboundPolicyPath` is not used, the release-side package can still boot from the built-in default policy without installing `yaml`.
 
 The example YAML remains the release-side documentation target:
 

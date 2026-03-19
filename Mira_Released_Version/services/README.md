@@ -37,6 +37,7 @@ That service entry now includes a matching config skeleton:
 - [notification-router/src/server.ts](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/services/notification-router/src/server.ts)
 - [notification-router/src/types.ts](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/services/notification-router/src/types.ts)
 - [notification-router/docs/runtime-contract.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/services/notification-router/docs/runtime-contract.md)
+- [notification-router/docs/operator-checklist.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/services/notification-router/docs/operator-checklist.md)
 
 The current release-side interpretation is:
 

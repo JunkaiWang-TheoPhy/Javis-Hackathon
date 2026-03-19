@@ -1,11 +1,21 @@
 import { readFile } from "node:fs/promises";
 
-import { parse } from "yaml";
-
 import { DEFAULT_OUTBOUND_POLICY } from "./defaultOutboundPolicy.ts";
 import type { LoadedOutboundPolicy } from "./outboundPolicyTypes.ts";
 
 export type OutboundPolicyInput = LoadedOutboundPolicy | string | URL;
+
+async function parseYaml(raw: string): Promise<unknown> {
+  try {
+    const yamlModule = await import("yaml");
+    return yamlModule.parse(raw);
+  } catch (error) {
+    throw new Error(
+      "YAML policy loading requires the optional 'yaml' package in the release-side notification-router package.",
+      { cause: error },
+    );
+  }
+}
 
 function isLoadedOutboundPolicy(input: unknown): input is LoadedOutboundPolicy {
   if (!input || typeof input !== "object") {
@@ -32,7 +42,7 @@ export async function loadOutboundPolicy(
   }
 
   const raw = await readFile(input, "utf8");
-  const parsed = parse(raw) as unknown;
+  const parsed = await parseYaml(raw);
   if (!isLoadedOutboundPolicy(parsed)) {
     throw new Error("Outbound policy file did not parse into a valid policy shape.");
   }

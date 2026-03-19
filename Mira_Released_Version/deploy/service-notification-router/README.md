@@ -26,6 +26,10 @@ This directory will hold release-side deployment guidance for the outbound routi
 
 This directory now documents the minimal release-side startup path for the first-pass `notification-router` package.
 
+Unified deploy comparison:
+
+- [../deploy-paths-overview.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/deploy/deploy-paths-overview.md)
+
 ## Minimal Local Run
 
 Expected source package:

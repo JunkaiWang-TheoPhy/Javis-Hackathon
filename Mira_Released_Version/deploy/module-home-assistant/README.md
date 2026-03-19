@@ -26,6 +26,10 @@ This directory will hold deployment notes for Mira core plus the Home Assistant 
 
 This directory now marks the first concrete deploy path for Mira core plus the Home Assistant flagship module.
 
+Unified deploy comparison:
+
+- [../deploy-paths-overview.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/deploy/deploy-paths-overview.md)
+
 ## Required Inputs
 
 Use these release-side files together:

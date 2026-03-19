@@ -44,3 +44,7 @@ File relationship:
 - `openclaw.example.json` now wires the release-safe `lingzhu` core plugin into the minimal-core story by reusing the current `plugins.entries.lingzhu` config shape.
 
 At this point, every file from [Mira_v1/openclaw-config](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_v1/openclaw-config) has a release-side counterpart under this directory.
+
+The current minimal runtime contract now also lives at:
+
+- [minimal-runtime-contract.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/core/openclaw-config/minimal-runtime-contract.md)

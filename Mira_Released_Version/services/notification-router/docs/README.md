@@ -27,3 +27,4 @@ This directory holds release-side architecture and runtime notes for `notificati
 The first release-side service doc already present here is:
 
 - [runtime-contract.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/services/notification-router/docs/runtime-contract.md)
+- [operator-checklist.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/services/notification-router/docs/operator-checklist.md)

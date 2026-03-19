@@ -26,6 +26,10 @@ This directory will hold deployment notes for the smallest Mira core runtime.
 
 This directory now marks the first concrete deploy path for a core-only release setup.
 
+Unified deploy comparison:
+
+- [../deploy-paths-overview.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/deploy/deploy-paths-overview.md)
+
 ## Minimal Core Deploy Inputs
 
 Use these two files together:

@@ -49,6 +49,7 @@ The first core-only onboarding path now exists through:
 
 - [examples/minimal-core/README.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/examples/minimal-core/README.md)
 - [deploy/core/README.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/deploy/core/README.md)
+- [openclaw-config/minimal-runtime-contract.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/core/openclaw-config/minimal-runtime-contract.md)
 
 The first release-safe core plugin package now also exists:
 
@@ -57,6 +58,7 @@ The first release-safe core plugin package now also exists:
 It is now part of the documented minimal-core path together with:
 
 - [openclaw-config/openclaw.example.json](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/core/openclaw-config/openclaw.example.json)
+- [openclaw-config/minimal-runtime-contract.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/core/openclaw-config/minimal-runtime-contract.md)
 - [examples/minimal-core/README.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/examples/minimal-core/README.md)
 
 The remaining source material still lives in:
@@ -66,3 +68,8 @@ The remaining source material still lives in:
 - [Mira_v1/lingzhu-bridge](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_v1/lingzhu-bridge)
 
 The only still-unmigrated file inside [Mira_v1/openclaw-workspace](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_v1/openclaw-workspace) is the dated memory log, which remains intentionally excluded from release core.
+
+The current release baseline and open-source readiness notes now also live at:
+
+- [../docs/migration/release-baseline.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/docs/migration/release-baseline.md)
+- [../docs/migration/open-source-readiness-checklist.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/docs/migration/open-source-readiness-checklist.md)

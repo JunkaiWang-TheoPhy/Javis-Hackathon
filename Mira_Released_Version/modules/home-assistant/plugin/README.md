@@ -25,3 +25,9 @@ This directory will hold the release-side plugin package for Mira's Home Assista
 ## Current Status
 
 The first release-side plugin source skeleton already exists under `src/`, including scene definition, scene resolver, and executor files.
+
+The current package and source-boundary companions now also exist:
+
+- [package.json](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/modules/home-assistant/plugin/package.json)
+- [tsconfig.json](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/modules/home-assistant/plugin/tsconfig.json)
+- [src/README.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/modules/home-assistant/plugin/src/README.md)

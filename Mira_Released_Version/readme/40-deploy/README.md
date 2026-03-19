@@ -46,3 +46,7 @@ So the current deploy reading order is:
 The page that turns those deploy notes into a single onboarding sequence now lives at:
 
 - [readme/00-overview/getting-started.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/readme/00-overview/getting-started.md)
+
+The operator-facing comparison page now also lives at:
+
+- [deploy/deploy-paths-overview.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/deploy/deploy-paths-overview.md)

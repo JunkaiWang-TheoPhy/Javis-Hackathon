@@ -21,6 +21,7 @@ The current fastest way into this release tree is:
 The current ordered onboarding path is:
 
 - [readme/00-overview/getting-started.md](./readme/00-overview/getting-started.md)
+- [deploy/deploy-paths-overview.md](./deploy/deploy-paths-overview.md)
 
 That page compares the three currently real paths:
 
@@ -42,6 +43,8 @@ What already exists in this release tree:
 - the first migrated `core/` files for persona, workspace, and config
 - the first minimal-core onboarding path
 - the first home-stack onboarding path
+- a first Git-ready release baseline document
+- an open-source readiness checklist
 
 What is not fully migrated yet:
 
@@ -127,6 +130,12 @@ Its current sections are:
 The first concrete contributor-facing development guide now exists at:
 
 - [readme/50-development/contributing-and-migration.md](./readme/50-development/contributing-and-migration.md)
+- [CONTRIBUTING.md](./CONTRIBUTING.md)
+
+The current release-baseline companions now also exist at:
+
+- [docs/migration/release-baseline.md](./docs/migration/release-baseline.md)
+- [docs/migration/open-source-readiness-checklist.md](./docs/migration/open-source-readiness-checklist.md)
 
 ### Core
 
@@ -154,6 +163,7 @@ The first real migrated core files now include:
 - [core/openclaw-config/lingzhu-config-snippet.example.json5](./core/openclaw-config/lingzhu-config-snippet.example.json5)
 - [core/openclaw-config/lingzhu-system-prompt.txt](./core/openclaw-config/lingzhu-system-prompt.txt)
 - [core/openclaw-config/openclaw.example.json](./core/openclaw-config/openclaw.example.json)
+- [core/openclaw-config/minimal-runtime-contract.md](./core/openclaw-config/minimal-runtime-contract.md)
 
 The first release-safe core plugin package now also exists:
 
@@ -214,6 +224,10 @@ The first release-safe notification-router package files now include:
 - [services/notification-router/src/server.ts](./services/notification-router/src/server.ts)
 - [services/notification-router/src/types.ts](./services/notification-router/src/types.ts)
 - [services/notification-router/docs/runtime-contract.md](./services/notification-router/docs/runtime-contract.md)
+
+The current deploy stories are now intentionally unified through:
+
+- [deploy/deploy-paths-overview.md](./deploy/deploy-paths-overview.md)
 
 ## First Public Module
 

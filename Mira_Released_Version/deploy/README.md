@@ -25,3 +25,7 @@ This directory will hold release-side deployment material.
 ## Current Status
 
 The first reserved recipe location is [deploy/minimal](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/deploy/minimal).
+
+The current unified operator-facing comparison page now lives at:
+
+- [deploy-paths-overview.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/deploy/deploy-paths-overview.md)

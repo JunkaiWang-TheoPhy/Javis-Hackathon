@@ -80,8 +80,13 @@ It is:
 Recent hardening added:
 
 - local package scripts in [package.json](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/services/notification-router/package.json)
-- local YAML-backed policy loading
+- a local compiler config in [tsconfig.json](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/services/notification-router/tsconfig.json)
+- local YAML-backed policy loading when the optional `yaml` dependency is installed
 - a release-side package test in [src/__tests__/notification-router.test.ts](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/services/notification-router/src/__tests__/notification-router.test.ts)
+
+The current operator-facing companion now also exists at:
+
+- [docs/operator-checklist.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/services/notification-router/docs/operator-checklist.md)
 
 The first release-side composition example that uses this service now lives at:
 
@@ -90,3 +95,34 @@ The first release-side composition example that uses this service now lives at:
 The first advanced composition example that combines this service with the Home Assistant module now also lives at:
 
 - [examples/home-stack-with-notification-router/README.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/examples/home-stack-with-notification-router/README.md)
+
+## Current Source Boundary
+
+Currently migrated into the release-side service package:
+
+- `package.json`
+- `src/server.ts`
+- `src/types.ts`
+- `src/routes/dispatchIntent.ts`
+- `src/dispatch/dispatchMessageIntent.ts`
+- `src/channels/openclawChannelDm.ts`
+- `src/channels/resendEmail.ts`
+- `src/config/routerConfig.ts`
+- release-side policy/config examples
+- a release-side package-local test
+
+Currently not carried over as release runtime source:
+
+- active runtime secrets and provider credentials
+- active-repo-only cross-package verification files
+- compatibility placement owned by `rokid-bridge-gateway`
+- installed `node_modules/`
+
+The canonical migration record now lives at:
+
+- [docs/migration/source-to-release-mapping.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/docs/migration/source-to-release-mapping.md)
+
+The current release-baseline companions also live at:
+
+- [../../docs/migration/release-baseline.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/docs/migration/release-baseline.md)
+- [../../docs/migration/open-source-readiness-checklist.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/docs/migration/open-source-readiness-checklist.md)

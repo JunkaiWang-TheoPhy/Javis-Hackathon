@@ -33,3 +33,22 @@ This first migrated package intentionally includes only release-safe, transport-
 - Lingzhu request and config types
 
 The live transport handler remains outside release core for now.
+
+## Current Source Boundary
+
+Currently migrated into release core:
+
+- `Mira_v1/lingzhu-bridge/src/first-turn-opening.ts`
+- `Mira_v1/lingzhu-bridge/src/memory-context.ts`
+- `Mira_v1/lingzhu-bridge/src/types.ts`
+- two package-local tests for those helpers
+
+Currently excluded from release core:
+
+- `Mira_v1/lingzhu-bridge/src/http-handler.ts`
+- `Mira_v1/lingzhu-bridge/src/image-message-utils.ts`
+- transport-specific live extension glue
+
+The canonical migration record now lives at:
+
+- [docs/migration/source-to-release-mapping.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/docs/migration/source-to-release-mapping.md)
