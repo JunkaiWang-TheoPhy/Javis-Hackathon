@@ -17,6 +17,14 @@ Start here, then read in this order:
 5. [40-deploy](./40-deploy/README.md)
 6. [50-development](./50-development/README.md)
 
+If you want the shortest entrypoint first, open:
+
+- [00-overview/quick-start.md](./00-overview/quick-start.md)
+
+If you want the ordered onboarding path, open:
+
+- [00-overview/getting-started.md](./00-overview/getting-started.md)
+
 ## Current Status
 
 This portal is the first release-side skeleton.
@@ -27,5 +35,15 @@ It currently focuses on:
 - ownership rules
 - migration intent
 - second-level public navigation for modules, deploy, examples, and docs
+
+The first concrete release-side reading paths now already exist for:
+
+- `minimal-core`
+- `home-stack`
+- `service-notification-router`
+
+The first concrete development-side entrypoint now also exists for contributors:
+
+- [50-development/contributing-and-migration.md](./50-development/contributing-and-migration.md)
 
 It does not yet contain the full migrated documentation set.

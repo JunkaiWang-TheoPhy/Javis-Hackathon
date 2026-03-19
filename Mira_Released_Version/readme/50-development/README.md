@@ -26,7 +26,11 @@ This section explains how the release tree should evolve.
 
 Development notes currently still live across the main repository.
 
-This section reserves the release-side development guidance layer.
+This section is no longer only a placeholder.
+
+The first concrete development-side guide now exists at:
+
+- [contributing-and-migration.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/readme/50-development/contributing-and-migration.md)
 
 The release tree now also contains supporting internal shells under:
 

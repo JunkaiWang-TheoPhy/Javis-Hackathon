@@ -12,6 +12,22 @@ This directory is the staging root for a standalone public repository that will 
 
 It is not intended to be a raw mirror of the current devbox runtime or a dump of the full prototype workspace.
 
+## Quick Start
+
+The current fastest way into this release tree is:
+
+- [readme/00-overview/quick-start.md](./readme/00-overview/quick-start.md)
+
+The current ordered onboarding path is:
+
+- [readme/00-overview/getting-started.md](./readme/00-overview/getting-started.md)
+
+That page compares the three currently real paths:
+
+- `minimal-core`
+- `home-stack`
+- `service-notification-router`
+
 ## Current Status
 
 `Mira_Released_Version/` is under active assembly.
@@ -25,6 +41,7 @@ What already exists in this release tree:
 - the first release-side `readme/`, `core/`, `services/`, and `deploy/` skeleton
 - the first migrated `core/` files for persona, workspace, and config
 - the first minimal-core onboarding path
+- the first home-stack onboarding path
 
 What is not fully migrated yet:
 
@@ -107,6 +124,10 @@ Its current sections are:
 - [40-deploy](./readme/40-deploy/README.md)
 - [50-development](./readme/50-development/README.md)
 
+The first concrete contributor-facing development guide now exists at:
+
+- [readme/50-development/contributing-and-migration.md](./readme/50-development/contributing-and-migration.md)
+
 ### Core
 
 The smallest independently deployable Mira package:
@@ -134,6 +155,20 @@ The first real migrated core files now include:
 - [core/openclaw-config/lingzhu-system-prompt.txt](./core/openclaw-config/lingzhu-system-prompt.txt)
 - [core/openclaw-config/openclaw.example.json](./core/openclaw-config/openclaw.example.json)
 
+The first release-safe core plugin package now also exists:
+
+- [core/plugins/lingzhu-bridge/README.md](./core/plugins/lingzhu-bridge/README.md)
+
+The minimal-core path now explicitly includes both the release-safe config and the release-safe core plugin path:
+
+- [core/openclaw-config/openclaw.example.json](./core/openclaw-config/openclaw.example.json)
+- [examples/minimal-core/README.md](./examples/minimal-core/README.md)
+
+The first core-plus-service composition path now exists through:
+
+- [examples/service-notification-router/README.md](./examples/service-notification-router/README.md)
+- [deploy/service-notification-router/README.md](./deploy/service-notification-router/README.md)
+
 ### Modules
 
 Official optional capability layers such as:
@@ -147,6 +182,7 @@ The module shell now includes:
 
 - [modules/README.md](./modules/README.md)
 - [modules/home-assistant/README.md](./modules/home-assistant/README.md)
+- [modules/home-assistant/config/README.md](./modules/home-assistant/config/README.md)
 
 ### Hardware
 
@@ -196,6 +232,16 @@ Its architectural center is:
 
 It exists outside `core/` because Mira's identity is not Home Assistant.
 Home Assistant is the current strongest execution surface for the home environment.
+
+The first module onboarding path now exists through:
+
+- [examples/home-stack/README.md](./examples/home-stack/README.md)
+- [deploy/module-home-assistant/README.md](./deploy/module-home-assistant/README.md)
+- [modules/home-assistant/config/home-assistant-module.example.json](./modules/home-assistant/config/home-assistant-module.example.json)
+
+The first advanced path that combines the flagship module with the outbound service now exists through:
+
+- [examples/home-stack-with-notification-router/README.md](./examples/home-stack-with-notification-router/README.md)
 
 ## Available Now
 

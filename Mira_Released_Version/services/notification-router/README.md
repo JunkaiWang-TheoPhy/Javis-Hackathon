@@ -82,3 +82,11 @@ Recent hardening added:
 - local package scripts in [package.json](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/services/notification-router/package.json)
 - local YAML-backed policy loading
 - a release-side package test in [src/__tests__/notification-router.test.ts](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/services/notification-router/src/__tests__/notification-router.test.ts)
+
+The first release-side composition example that uses this service now lives at:
+
+- [examples/service-notification-router/README.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/examples/service-notification-router/README.md)
+
+The first advanced composition example that combines this service with the Home Assistant module now also lives at:
+
+- [examples/home-stack-with-notification-router/README.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/examples/home-stack-with-notification-router/README.md)

@@ -50,6 +50,15 @@ The first core-only onboarding path now exists through:
 - [examples/minimal-core/README.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/examples/minimal-core/README.md)
 - [deploy/core/README.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/deploy/core/README.md)
 
+The first release-safe core plugin package now also exists:
+
+- [plugins/lingzhu-bridge/README.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/core/plugins/lingzhu-bridge/README.md)
+
+It is now part of the documented minimal-core path together with:
+
+- [openclaw-config/openclaw.example.json](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/core/openclaw-config/openclaw.example.json)
+- [examples/minimal-core/README.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/examples/minimal-core/README.md)
+
 The remaining source material still lives in:
 
 - [Mira_v1/openclaw-workspace](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_v1/openclaw-workspace)

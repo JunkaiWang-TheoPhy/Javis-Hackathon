@@ -33,6 +33,7 @@ Current files:
 - [custom-right-codes-vision-snippet.example.json5](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/core/openclaw-config/custom-right-codes-vision-snippet.example.json5)
 - [lingzhu-config-snippet.example.json5](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/core/openclaw-config/lingzhu-config-snippet.example.json5)
 - [lingzhu-system-prompt.txt](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/core/openclaw-config/lingzhu-system-prompt.txt)
+- [openclaw.example.json](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/core/openclaw-config/openclaw.example.json)
 
 File relationship:
 
@@ -40,5 +41,6 @@ File relationship:
 - `custom-right-codes-vision-snippet.example.json5` is a release-safe example derived from the source custom provider snippet.
 - `lingzhu-config-snippet.example.json5` is a templated release-safe variant of the source Lingzhu plugin config.
 - `lingzhu-system-prompt.txt` is a sanitized runtime prompt that removes devbox-specific node and bridge details while preserving Mira behavior.
+- `openclaw.example.json` now wires the release-safe `lingzhu` core plugin into the minimal-core story by reusing the current `plugins.entries.lingzhu` config shape.
 
 At this point, every file from [Mira_v1/openclaw-config](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_v1/openclaw-config) has a release-side counterpart under this directory.

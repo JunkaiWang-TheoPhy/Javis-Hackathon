@@ -33,6 +33,7 @@ This directory now documents the first honest minimal-core path.
 - Mira persona files are present
 - a release-safe workspace skeleton is present
 - a release-safe OpenClaw config example is present
+- a release-safe core plugin path is present
 - no first-party module is required
 - no Home Assistant or hardware bridge is assumed
 
@@ -49,6 +50,7 @@ The current minimal-core path depends on:
 - [core/workspace/OUTBOUND_POLICY.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/core/workspace/OUTBOUND_POLICY.md)
 - [core/workspace/TOOLS.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/core/workspace/TOOLS.md)
 - [core/openclaw-config/openclaw.example.json](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/core/openclaw-config/openclaw.example.json)
+- [core/plugins/lingzhu-bridge/README.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/core/plugins/lingzhu-bridge/README.md)
 - [deploy/core/env.example](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/deploy/core/env.example)
 
 ## Setup Order
@@ -56,8 +58,9 @@ The current minimal-core path depends on:
 1. Start from [core/README.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/core/README.md) to understand core boundaries.
 2. Read the persona and workspace files under [core/persona](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/core/persona) and [core/workspace](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/core/workspace).
 3. Copy and adapt [openclaw.example.json](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/core/openclaw-config/openclaw.example.json) for the target OpenClaw runtime.
-4. Copy and adapt [env.example](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/deploy/core/env.example) for local environment values.
-5. Confirm the OpenClaw runtime points at the release-side workspace path.
+4. Review [core/plugins/lingzhu-bridge/README.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/core/plugins/lingzhu-bridge/README.md) and make the package available to the target OpenClaw runtime using your preferred plugin installation workflow.
+5. Copy and adapt [env.example](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/deploy/core/env.example) for local environment values.
+6. Confirm the OpenClaw runtime points at the release-side workspace path and uses the `lingzhu` plugin entry from the release-safe config.
 
 ## What You Can Validate
 
@@ -65,6 +68,7 @@ After wiring the above files into a real OpenClaw installation, the minimal-core
 
 - Mira can load as a persona-driven workspace
 - timezone and compaction defaults are set
+- the release-safe `lingzhu` core plugin can be enabled from config
 - outbound behavior remains policy-gated
 - no Home Assistant module is required for the core identity layer
 

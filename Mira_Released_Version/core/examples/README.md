@@ -28,6 +28,10 @@ This directory now points at the first concrete example path:
 
 That example is the current proof target for the claim that `core/` can stand on its own.
 
+It now also carries the first release-safe core plugin path through:
+
+- [plugins/lingzhu-bridge/README.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/core/plugins/lingzhu-bridge/README.md)
+
 Future core examples can branch from it, but should preserve the same rule:
 
 - no module dependency unless the example explicitly says so

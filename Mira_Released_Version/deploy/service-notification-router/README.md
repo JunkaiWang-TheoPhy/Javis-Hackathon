@@ -93,3 +93,7 @@ Current limitations:
 - deploy packaging, secrets management, and container/runtime manifests are still out of scope for this first pass
 - the local startup script expects `npm install` to have been run in `services/notification-router`
 - the sample dispatch path assumes a reachable DM webhook if `openclaw_channel_dm` is selected
+
+The release-side composition example that connects this deploy path back to Mira core lives at:
+
+- [examples/service-notification-router/README.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/examples/service-notification-router/README.md)

@@ -24,4 +24,14 @@ This directory will hold migration notes from the prototype repository into the 
 
 ## Current Status
 
-This placeholder marks the future migration-doc area inside the release tree.
+This area is no longer only a placeholder.
+
+At the moment, the most direct public-facing migration entrypoint is:
+
+- [readme/50-development/contributing-and-migration.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/readme/50-development/contributing-and-migration.md)
+
+This directory should hold the more internal companion notes for:
+
+- source-to-release mapping
+- staged migration rationale
+- what remains intentionally excluded from the release tree
