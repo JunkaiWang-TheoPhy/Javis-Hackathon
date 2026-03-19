@@ -1,0 +1,77 @@
+{
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "replace-me-provider": {
+        "baseUrl": "https://api.example.com/v1",
+        "apiKey": "REPLACE_ME_API_KEY",
+        "api": "openai-responses",
+        "models": [
+          {
+            "id": "gpt-5.4",
+            "name": "gpt-5.4",
+            "reasoning": true,
+            "input": [
+              "text",
+              "image"
+            ],
+            "contextWindow": 200000,
+            "maxTokens": 8192
+          }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "replace-me-provider/gpt-5.4"
+      },
+      "workspace": "./core/workspace",
+      "userTimezone": "Asia/Shanghai",
+      "compaction": {
+        "mode": "safeguard"
+      }
+    }
+  },
+  "plugins": {
+    "allow": [
+      "lingzhu"
+    ],
+    "entries": {
+      "lingzhu": {
+        "enabled": true,
+        "config": {
+          "agentId": "main",
+          "systemPrompt": "<load release-safe prompt from ./core/openclaw-config/lingzhu-system-prompt.txt>",
+          "memoryContextEnabled": true,
+          "memoryContextUrl": "http://127.0.0.1:3301/v1/memory/context",
+          "memoryContextAudience": "auto",
+          "memoryContextTimeoutMs": 1500,
+          "memoryContextWorkingLimit": 4,
+          "memoryContextFactLimit": 4
+        }
+      }
+    }
+  },
+  "tools": {
+    "profile": "coding",
+    "web": {
+      "search": {
+        "enabled": false
+      },
+      "fetch": {
+        "enabled": true
+      }
+    }
+  },
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto",
+    "restart": true,
+    "ownerDisplay": "raw"
+  },
+  "session": {
+    "dmScope": "per-channel-peer"
+  }
+}

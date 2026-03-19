@@ -1,0 +1,8 @@
+{
+  "name": "@mira-release/home-assistant-module-plugin",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "echo 'Release-side Home Assistant plugin tests are tracked in the active repo and will be migrated later.'"
+  }
+}

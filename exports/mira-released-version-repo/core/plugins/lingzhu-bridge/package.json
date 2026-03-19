@@ -1,0 +1,11 @@
+{
+  "name": "@mira-release/lingzhu-bridge-core",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "tsx --test tests/*.test.mts"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.5"
+  }
+}

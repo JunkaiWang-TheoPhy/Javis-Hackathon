@@ -1,0 +1,15 @@
+{
+  "name": "mira-released-version",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "core/plugins/lingzhu-bridge",
+    "modules/home-assistant/plugin",
+    "services/notification-router"
+  ],
+  "scripts": {
+    "verify:release": "node scripts/verify-release.mjs",
+    "test:release": "node --test scripts/__tests__/*.test.mjs",
+    "export:repo": "node scripts/export-release-repo.mjs"
+  }
+}
