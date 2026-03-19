@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "verify:release": "node scripts/verify-release.mjs",
-    "test:release": "node --test scripts/__tests__/*.test.mjs"
+    "test:release": "node --test scripts/__tests__/*.test.mjs",
+    "export:repo": "node scripts/export-release-repo.mjs"
   }
 }

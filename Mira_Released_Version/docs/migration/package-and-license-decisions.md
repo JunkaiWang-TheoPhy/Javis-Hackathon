@@ -38,6 +38,10 @@ The release tree still needs a final top-level `LICENSE` before public publicati
 
 That decision remains open on purpose. This repository should not guess a license without an explicit project choice.
 
+Until then, the release tree carries:
+
+- [../../LICENSE.placeholder.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/LICENSE.placeholder.md)
+
 ## Short Recommendation
 
 Before public launch:

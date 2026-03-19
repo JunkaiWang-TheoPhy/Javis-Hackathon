@@ -17,6 +17,7 @@ This checklist tracks whether `Mira_Released_Version/` is clean enough to be cop
 - remove installed dependencies such as `node_modules/`
 - remove local environment files
 - confirm all runtime examples use placeholder credentials
+- confirm [LICENSE.placeholder.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/LICENSE.placeholder.md) is replaced before public launch
 - confirm deploy docs do not rely on private devbox paths
 - confirm all top-level docs prefer release-side links over prototype-tree links
 - confirm package names and README language are public-facing

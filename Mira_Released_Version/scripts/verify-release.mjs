@@ -25,6 +25,8 @@ const REQUIRED_FILES = [
   "services/notification-router/docs/runtime-contract.md"
 ];
 
+const REQUIRED_ALTERNATIVES = [["LICENSE", "LICENSE.placeholder.md"]];
+
 const JSON_FILES = [
   "package.json",
   "core/openclaw-config/openclaw.example.json",
@@ -65,6 +67,11 @@ function loadJson(rootDir, relPath) {
 
 export function collectReleaseVerification(rootDir = DEFAULT_ROOT) {
   const missingFiles = REQUIRED_FILES.filter((file) => !existsSync(join(rootDir, file)));
+  for (const alternatives of REQUIRED_ALTERNATIVES) {
+    if (!alternatives.some((file) => existsSync(join(rootDir, file)))) {
+      missingFiles.push(`one-of:${alternatives.join("|")}`);
+    }
+  }
 
   const invalidJson = [];
   for (const file of JSON_FILES) {

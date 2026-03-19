@@ -11,6 +11,9 @@
 - added package-oriented runtime docs for `services/notification-router`
 - added package-oriented runtime docs for `modules/home-assistant`
 - unified the three current deploy paths with a shared overview
+- added a release-root verification entry
+- added a release export script and repository split checklist
+- added a license placeholder for pre-publication export
 
 ### Changed
 

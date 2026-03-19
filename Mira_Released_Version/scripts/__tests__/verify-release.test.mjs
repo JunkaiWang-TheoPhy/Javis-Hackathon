@@ -25,6 +25,7 @@ test("collectReleaseVerification fails when a release package name is outside th
     "README.md": "# x\n",
     "CONTRIBUTING.md": "# x\n",
     "CHANGELOG.md": "# x\n",
+    "LICENSE.placeholder.md": "# x\n",
     ".gitignore": "node_modules/\n",
     "docs/migration/source-to-release-mapping.md": "# x\n",
     "docs/migration/release-baseline.md": "# x\n",

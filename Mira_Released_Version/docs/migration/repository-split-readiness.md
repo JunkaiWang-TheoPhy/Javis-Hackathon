@@ -36,6 +36,7 @@ The current tree is ready enough for an initial split if the goal is:
 3. add a final `LICENSE`
 4. decide whether to keep or regenerate lockfiles
 5. add CI for the runnable release-side packages
+6. use the export path documented in [repository-split-checklist.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/docs/migration/repository-split-checklist.md)
 
 ## Companion Documents
 

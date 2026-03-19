@@ -32,6 +32,7 @@ Run:
 ```bash
 cd Mira_Released_Version
 npm run verify:release
+npm run export:repo
 ```
 
 ## Current Status

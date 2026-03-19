@@ -112,4 +112,5 @@ The release tree now exposes a shared root-level verification entry:
 ```bash
 cd Mira_Released_Version
 npm run verify:release
+npm run export:repo
 ```
