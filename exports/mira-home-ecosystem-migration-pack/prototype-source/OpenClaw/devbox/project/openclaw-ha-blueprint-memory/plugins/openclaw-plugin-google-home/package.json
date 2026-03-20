@@ -1,0 +1,10 @@
+{
+  "name": "openclaw-plugin-google-home",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Google Home / Nest skeleton plugin for OpenClaw",
+  "openclaw": {
+    "extensions": ["./src/index.ts"]
+  }
+}

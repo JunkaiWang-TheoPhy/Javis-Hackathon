@@ -1,0 +1,14 @@
+{
+  "name": "openclaw-plugin-ha-control",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Home Assistant control plugin for OpenClaw",
+  "openclaw": {
+    "extensions": ["./src/index.ts"]
+  },
+  "dependencies": {
+    "@sinclair/typebox": "^0.34.41",
+    "ws": "^8.18.3"
+  }
+}

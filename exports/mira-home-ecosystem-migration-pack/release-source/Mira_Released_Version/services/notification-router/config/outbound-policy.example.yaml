@@ -1,0 +1,93 @@
+# Release-safe example derived from the active notification-router policy.
+version: 1
+policy_name: mira_outbound_policy
+effective_date: "2026-03-19"
+current_runtime_path: services/notification-router/config/outbound-policy.yaml
+
+defaults:
+  action: ask
+  known_recipient_required: true
+  private_channel_required: true
+  respect_quiet_hours: true
+  log_all_attempts: true
+  log_reason: true
+
+quiet_hours:
+  timezone: Asia/Shanghai
+  start: "23:00"
+  end: "08:00"
+
+rate_limits:
+  per_hour: 3
+  per_day: 10
+  per_rule:
+    user_self_reminder: 5
+    user_self_checkin: 3
+    user_self_summary: 3
+    user_self_private_alert: 6
+
+channel_classes:
+  private:
+    - email
+    - direct_message
+    - mobile_notify
+    - openclaw_channel_dm
+  shared:
+    - group_message
+    - shared_channel
+  public:
+    - public_post
+    - social_post
+
+rules:
+  - name: user_self_reminder
+    enabled: true
+    action: allow
+    recipient_scope: [self]
+    message_kind: [reminder]
+    risk_tier: [low]
+    allowed_channels: [email, direct_message, mobile_notify, openclaw_channel_dm]
+
+  - name: user_self_checkin
+    enabled: true
+    action: allow
+    recipient_scope: [self]
+    message_kind: [checkin]
+    risk_tier: [low]
+    allowed_channels: [email, direct_message, mobile_notify, openclaw_channel_dm]
+
+  - name: user_self_summary
+    enabled: true
+    action: allow
+    recipient_scope: [self]
+    message_kind: [summary]
+    risk_tier: [low]
+    allowed_channels: [email, direct_message, openclaw_channel_dm]
+
+  - name: user_self_private_alert
+    enabled: true
+    action: allow
+    recipient_scope: [self]
+    message_kind: [alert]
+    risk_tier: [medium]
+    allowed_channels: [direct_message, mobile_notify, openclaw_channel_dm]
+    content_tags_allowed: [wellbeing, schedule, safety, device, home, project]
+
+  - name: caregiver_escalation
+    enabled: true
+    action: ask
+    recipient_scope: [caregiver]
+    message_kind: [escalation, alert]
+    risk_tier: [medium, high]
+
+  - name: new_recipient_requires_confirmation
+    enabled: true
+    action: ask
+    first_contact: true
+    recipient_scope: [known_contact, caregiver, group]
+
+  - name: block_public_posting
+    enabled: true
+    action: block
+    recipient_scope: [public]
+    allowed_channels: [public_post, social_post]

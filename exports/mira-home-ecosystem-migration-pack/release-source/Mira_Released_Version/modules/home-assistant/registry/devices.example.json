@@ -1,0 +1,327 @@
+{
+  "schemaVersion": "1.0.0",
+  "registryName": "mira_home_devices_example",
+  "devices": [
+    {
+      "id": "mi-bedroom-fan",
+      "displayName": "Bedroom Fan",
+      "ecosystemId": "xiaomi-home",
+      "vendor": "xiaomi",
+      "integration": "home_assistant",
+      "connectionMode": "hybrid",
+      "directAdapter": "xiaomi-miot",
+      "kind": "fan",
+      "area": "bedroom",
+      "entityId": "fan.mi_bedroom",
+      "aliases": [
+        "bedroom fan",
+        "mi fan",
+        "xiaomi fan"
+      ],
+      "traits": [
+        "actuator",
+        "climate_comfort"
+      ],
+      "externalIds": {
+        "miotDid": "12345"
+      },
+      "capabilityProfiles": [
+        "power.basic",
+        "fan.percentage"
+      ],
+      "capabilities": [
+        {
+          "intent": "turn_on",
+          "domain": "fan",
+          "service": "turn_on",
+          "riskTier": "side_effect"
+        },
+        {
+          "intent": "turn_off",
+          "domain": "fan",
+          "service": "turn_off",
+          "riskTier": "side_effect"
+        },
+        {
+          "intent": "set_percentage",
+          "domain": "fan",
+          "service": "set_percentage",
+          "dataTemplate": {
+            "percentage": "{{value}}"
+          },
+          "supportedValues": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "requiresConfirmation": true,
+          "riskTier": "side_effect"
+        }
+      ],
+      "sceneBindings": [
+        {
+          "role": "cooling.primary_fan",
+          "priority": 100
+        },
+        {
+          "role": "arrival.cooling_target",
+          "priority": 90
+        }
+      ],
+      "stateHints": {
+        "presenceSensitive": false,
+        "quietHoursRelevant": true
+      }
+    },
+    {
+      "id": "bedroom-climate",
+      "displayName": "Bedroom AC",
+      "ecosystemId": "ha-home",
+      "vendor": "generic",
+      "integration": "home_assistant",
+      "connectionMode": "home_assistant",
+      "kind": "climate",
+      "area": "bedroom",
+      "entityId": "climate.bedroom_ac",
+      "aliases": [
+        "bedroom ac",
+        "bedroom air conditioner",
+        "aircon"
+      ],
+      "traits": [
+        "actuator",
+        "climate_comfort"
+      ],
+      "capabilityProfiles": [
+        "power.basic",
+        "climate.temperature"
+      ],
+      "capabilities": [
+        {
+          "intent": "turn_on",
+          "domain": "climate",
+          "service": "turn_on",
+          "riskTier": "side_effect"
+        },
+        {
+          "intent": "set_hvac_mode",
+          "domain": "climate",
+          "service": "set_hvac_mode",
+          "dataTemplate": {
+            "hvac_mode": "{{value}}"
+          },
+          "supportedValues": {
+            "type": "enum",
+            "values": [
+              "cool",
+              "heat",
+              "fan_only",
+              "dry"
+            ]
+          },
+          "riskTier": "side_effect"
+        },
+        {
+          "intent": "set_temperature",
+          "domain": "climate",
+          "service": "set_temperature",
+          "dataTemplate": {
+            "temperature": "{{value}}"
+          },
+          "supportedValues": {
+            "type": "number",
+            "minimum": 16,
+            "maximum": 30
+          },
+          "requiresConfirmation": true,
+          "riskTier": "side_effect"
+        }
+      ],
+      "sceneBindings": [
+        {
+          "role": "cooling.primary_climate",
+          "priority": 100
+        },
+        {
+          "role": "sleep.quiet_climate",
+          "priority": 70
+        }
+      ],
+      "stateHints": {
+        "presenceSensitive": true,
+        "quietHoursRelevant": true
+      }
+    },
+    {
+      "id": "living-room-speaker",
+      "displayName": "Living Room Speaker",
+      "ecosystemId": "ha-home",
+      "vendor": "generic",
+      "integration": "home_assistant",
+      "connectionMode": "home_assistant",
+      "kind": "media_player",
+      "area": "living_room",
+      "entityId": "media_player.living_room_speaker",
+      "aliases": [
+        "living room speaker",
+        "home speaker",
+        "music speaker"
+      ],
+      "traits": [
+        "actuator",
+        "media"
+      ],
+      "capabilityProfiles": [
+        "power.basic",
+        "media.playback",
+        "media.volume"
+      ],
+      "capabilities": [
+        {
+          "intent": "turn_on",
+          "domain": "media_player",
+          "service": "turn_on",
+          "riskTier": "side_effect"
+        },
+        {
+          "intent": "play_media",
+          "domain": "media_player",
+          "service": "play_media",
+          "dataTemplate": {
+            "media_content_id": "{{value}}",
+            "media_content_type": "music"
+          },
+          "requiresConfirmation": false,
+          "riskTier": "side_effect"
+        },
+        {
+          "intent": "set_volume",
+          "domain": "media_player",
+          "service": "volume_set",
+          "dataTemplate": {
+            "volume_level": "{{value}}"
+          },
+          "supportedValues": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "riskTier": "side_effect"
+        }
+      ],
+      "sceneBindings": [
+        {
+          "role": "mood.arrival_audio",
+          "priority": 80
+        },
+        {
+          "role": "focus.scene_audio",
+          "priority": 70
+        }
+      ],
+      "stateHints": {
+        "presenceSensitive": true,
+        "quietHoursRelevant": true
+      }
+    },
+    {
+      "id": "hue-arrival-scene",
+      "displayName": "Hue Arrival Scene",
+      "ecosystemId": "hue-home",
+      "vendor": "hue",
+      "integration": "home_assistant",
+      "connectionMode": "bridge",
+      "directAdapter": "hue-local",
+      "kind": "scene",
+      "area": "living_room",
+      "entityId": "scene.hue_arrival",
+      "aliases": [
+        "arrival lights",
+        "hue arrival scene",
+        "evening lights"
+      ],
+      "traits": [
+        "scene",
+        "lighting"
+      ],
+      "externalIds": {
+        "hueSceneId": "scene-1",
+        "hueBridgeId": "bridge-1"
+      },
+      "capabilityProfiles": [
+        "scene.activate"
+      ],
+      "capabilities": [
+        {
+          "intent": "activate",
+          "domain": "scene",
+          "service": "turn_on",
+          "riskTier": "side_effect"
+        }
+      ],
+      "sceneBindings": [
+        {
+          "role": "lighting.arrival_scene",
+          "priority": 90
+        },
+        {
+          "role": "lighting.quiet_evening",
+          "priority": 70
+        }
+      ],
+      "stateHints": {
+        "presenceSensitive": true,
+        "quietHoursRelevant": true
+      }
+    },
+    {
+      "id": "front-door-lock",
+      "displayName": "Front Door Lock",
+      "ecosystemId": "matter-home",
+      "vendor": "matter",
+      "integration": "home_assistant",
+      "connectionMode": "home_assistant",
+      "kind": "lock",
+      "area": "entry",
+      "entityId": "lock.front_door",
+      "aliases": [
+        "front door lock",
+        "door lock",
+        "entry lock"
+      ],
+      "traits": [
+        "actuator",
+        "security"
+      ],
+      "capabilityProfiles": [
+        "lock.basic"
+      ],
+      "capabilities": [
+        {
+          "intent": "lock",
+          "domain": "lock",
+          "service": "lock",
+          "requiresConfirmation": false,
+          "riskTier": "side_effect"
+        },
+        {
+          "intent": "unlock",
+          "domain": "lock",
+          "service": "unlock",
+          "requiresConfirmation": true,
+          "riskTier": "confirm"
+        }
+      ],
+      "sceneBindings": [
+        {
+          "role": "security.entry_lock",
+          "priority": 100
+        }
+      ],
+      "stateHints": {
+        "presenceSensitive": true,
+        "quietHoursRelevant": false
+      }
+    }
+  ]
+}
