@@ -1,0 +1,11 @@
+{
+  "name": "@openclaw/mi-band-bridge",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "OpenClaw plugin that forwards Mi Band read-only requests to the local desktop bridge",
+  "openclaw": {
+    "extensions": [
+      "./index.mjs"
+    ]
+  }
+}

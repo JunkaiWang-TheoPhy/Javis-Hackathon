@@ -1,0 +1,11 @@
+{
+  "name": "@openclaw/printer-bridge",
+  "version": "1.0.0",
+  "description": "OpenClaw plugin that forwards printer actions to a local macOS printer bridge",
+  "type": "module",
+  "openclaw": {
+    "extensions": [
+      "./index.mjs"
+    ]
+  }
+}

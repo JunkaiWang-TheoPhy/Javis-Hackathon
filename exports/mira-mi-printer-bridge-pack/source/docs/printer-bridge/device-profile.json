@@ -1,0 +1,31 @@
+{
+  "local_host": {
+    "role": "macos_printer_bridge",
+    "computer_name": "Thomas的MacBook Air",
+    "local_host_name": "ThomasdeMacBook-Air",
+    "hostname": "ThomasdeMacBook-Air.local",
+    "listen_url": "http://127.0.0.1:9771"
+  },
+  "printer": {
+    "queue_name": "Mi_Wireless_Photo_Printer_1S__6528_",
+    "display_name": "Mi Wireless Photo Printer 1S [6528]",
+    "default_media_aliases": {
+      "three_inch": "3x3.Fullbleed"
+    },
+    "supported_media": [
+      "3x3",
+      "3x3.Fullbleed",
+      "4x6",
+      "4x6.Fullbleed"
+    ]
+  },
+  "bridge": {
+    "remote_host_alias": "devbox",
+    "transport": "ssh_queue_connector",
+    "remote_bridge_reference": "queue://devbox/home/devbox/.openclaw/printer-bridge-queue",
+    "remote_queue_root": "/home/devbox/.openclaw/printer-bridge-queue",
+    "bridge_state_source": "~/.openclaw-printer-bridge-tunnel.json",
+    "local_port": 9771,
+    "auth_env_var": "OPENCLAW_PRINTER_BRIDGE_TOKEN"
+  }
+}
