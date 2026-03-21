@@ -25,6 +25,7 @@ class RemotePluginTest(unittest.TestCase):
         for name in (
             'name: "band_get_status"',
             'name: "band_get_latest"',
+            'name: "band_get_fresh_latest"',
             'name: "band_get_events"',
             'name: "band_get_alerts"',
         ):
@@ -34,6 +35,8 @@ class RemotePluginTest(unittest.TestCase):
         text = PLUGIN_INDEX.read_text(encoding="utf-8")
         self.assertIn("bridgeBaseUrl", text)
         self.assertIn("bridgeToken", text)
+        self.assertIn("freshReadMaxWaitSeconds", text)
+        self.assertIn("freshReadRequestTimeoutMs", text)
         self.assertIn("OPENCLAW_MI_BAND_BRIDGE_URL", text)
         self.assertIn("OPENCLAW_MI_BAND_BRIDGE_TOKEN", text)
         self.assertIn("Use this tool instead of direct bridge HTTP calls.", text)

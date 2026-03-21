@@ -28,27 +28,31 @@ LOCAL_PROFILE_PATH = STATE_DIR / "profile.json"
 LOCAL_README_PATH = STATE_DIR / "README.md"
 TUNNEL_STATE_PATH = Path.home() / ".openclaw-printer-bridge-tunnel.json"
 DEFAULT_REMOTE_ALIAS = os.environ.get("OPENCLAW_PRINTER_BRIDGE_REMOTE_ALIAS", "openclaw-projectsai")
-DEFAULT_REMOTE_OPENCLAW_HOME = os.environ.get(
-    "OPENCLAW_PRINTER_BRIDGE_REMOTE_OPENCLAW_HOME",
-    "/root/.openclaw",
+DEFAULT_REMOTE_RUNTIME_ROOT = os.environ.get(
+    "OPENCLAW_PRINTER_BRIDGE_REMOTE_RUNTIME_ROOT",
+    "/root/mira/.mira-runtime/mira-openclaw",
 )
 DEFAULT_REMOTE_QUEUE_ROOT = os.environ.get(
     "OPENCLAW_PRINTER_BRIDGE_REMOTE_QUEUE_ROOT",
-    f"{DEFAULT_REMOTE_OPENCLAW_HOME}/printer-bridge-queue",
+    f"{DEFAULT_REMOTE_RUNTIME_ROOT}/openclaw-state/printer-bridge-queue",
 )
 REMOTE_HELPER_PATH = os.environ.get(
     "OPENCLAW_PRINTER_BRIDGE_REMOTE_HELPER",
-    f"{DEFAULT_REMOTE_OPENCLAW_HOME}/extensions/printer-bridge/queue_bridge_admin.py",
+    f"{DEFAULT_REMOTE_RUNTIME_ROOT}/core/plugins/printer-bridge/queue_bridge_admin.py",
 )
+REMOTE_GATEWAY_START_COMMAND = os.environ.get(
+    "OPENCLAW_PRINTER_BRIDGE_REMOTE_START_COMMAND",
+    "",
+).strip()
 REMOTE_GATEWAY_BIN = os.environ.get(
     "OPENCLAW_PRINTER_BRIDGE_REMOTE_OPENCLAW_BIN",
     "/root/.nvm/versions/node/v22.22.0/bin/openclaw",
 )
 REMOTE_GATEWAY_LOG = os.environ.get(
     "OPENCLAW_PRINTER_BRIDGE_REMOTE_GATEWAY_LOG",
-    f"{DEFAULT_REMOTE_OPENCLAW_HOME}/gateway-printer-bridge.log",
+    f"{DEFAULT_REMOTE_RUNTIME_ROOT}/runtime.log",
 )
-REMOTE_GATEWAY_PORT = 18789
+REMOTE_GATEWAY_PORT = int(os.environ.get("OPENCLAW_PRINTER_BRIDGE_REMOTE_GATEWAY_PORT", "18790"))
 CONNECTOR_HEALTH_TIMEOUT_SECONDS = 30.0
 STAGED_SSH_IDENTITY_FILE = Path(
     os.environ.get(
@@ -109,7 +113,7 @@ def wait_for_public_bridge_url(
 
 
 def build_remote_gateway_start_command(remote_alias: str) -> list[str]:
-    remote_command = (
+    remote_command = REMOTE_GATEWAY_START_COMMAND or (
         f"nohup {REMOTE_GATEWAY_BIN} gateway run --force "
         f"> {REMOTE_GATEWAY_LOG} 2>&1 < /dev/null &"
     )
@@ -399,7 +403,7 @@ def persist_local_memory(bridge_reference: str, remote_alias: str) -> None:
         f"- launchd connector label: `{TUNNEL_LABEL}`",
         f"- launchd sync label: `{SYNC_LABEL}`",
         f"- launchd runtime directory: `{STATE_DIR / 'runtime'}`",
-        "- launchd connector job keeps the devbox queue drained from the Mac host over SSH",
+        "- launchd connector job keeps the remote Mira queue drained from the Mac host over SSH",
         "- launchd sync job reruns bridge refresh every 5 minutes",
     ]
     LOCAL_README_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")

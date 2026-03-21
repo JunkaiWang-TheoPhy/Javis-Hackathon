@@ -62,3 +62,61 @@ Current limitations:
 - `camera.clip` is still unreliable because the macOS OpenClaw app can crash during video export completion.
 - Prefer `camera.snap` for live captures unless the user explicitly wants to debug `camera.clip`.
 - The current primary model is expected to support image input for camera analysis. If image reasoning regresses, check the provider model catalog first before blaming the node.
+
+## Local Mi Band Bridge
+
+This workspace can also reach the user's Mi Band data through a local desktop bridge.
+
+- bridge host: `Thomas的MacBook Air`
+- local host names: `ThomasdeMacBook-Air`, `ThomasdeMacBook-Air.local`
+- source phone: `Xiaomi 12X`
+- source band: `Xiaomi Smart Band 9 Pro A094`
+- transport path: local desktop bridge exposed to the cloud runtime
+- primary tools: `band_get_status`, `band_get_latest`, `band_get_events`, `band_get_alerts`, `band_get_fresh_latest`
+
+Known physiological information entry catalog to mention when the user asks broadly:
+
+- cardiovascular: heart rate, resting heart rate, average heart rate, maximum heart rate, minimum heart rate
+- oxygen: blood oxygen / SpO2, including sleeping blood-oxygen style entries in the Xiaomi Health surface
+- activity: steps, distance, calories
+- sleep: sleep duration, fall-asleep time, wake-up time, sleep stages, sleep score or quality, sleep regularity or continuity, average sleeping heart rate, average sleeping blood oxygen, breathing-related sleep indicators
+- stress and recovery: stress, all-day stress, workout or training stress, recovery, physical recovery, mental recovery, fatigue level, HRV-related indicators
+
+What is currently structured and queryable:
+
+- band identity and firmware
+- phone identity and adb transport
+- connection status and last-seen timing
+- heart rate
+- blood oxygen / SpO2
+- steps
+- distance
+- calories
+- source timestamp
+- bridge timestamp
+- freshness in seconds
+- runtime status
+- event history
+- active alerts
+- fresh-read success or timeout metadata
+
+Known Xiaomi Health modules that may be mentioned but should not be overstated as stable bridge outputs:
+
+- sleep
+- stress
+- recovery
+
+Current stance:
+
+- sleep is a known module with stronger evidence in logs and APK resources
+- stress and recovery are known modules in the Xiaomi app surface and APK resources
+- none of these should be described as stable structured bridge fields unless `MI_BAND_BRIDGE.md` explicitly says they are wired in
+
+Important operating rules:
+
+- for "current heart rate right now", prefer `band_get_fresh_latest`
+- for a cached snapshot or summary of wearable state, use `band_get_latest`
+- for debugging or health of the bridge itself, use `band_get_status`, `band_get_events`, and `band_get_alerts`
+- do not collapse `available` and `fresh` into the same claim; a readable sample can still be stale
+- if the user only wants the list of physiological entry types, give the broader catalog first instead of starting with bridge maturity caveats
+- do not imply sleep, stress, recovery, or similar Xiaomi Health modules are stable bridge fields unless `MI_BAND_BRIDGE.md` says they are wired in

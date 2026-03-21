@@ -4,7 +4,7 @@ import path from "node:path";
 
 const PLUGIN_ID = "printer-bridge";
 const DEFAULT_MEDIA = "3x3.Fullbleed";
-const DEFAULT_QUEUE_ROOT = "/root/.openclaw/printer-bridge-queue";
+const DEFAULT_QUEUE_ROOT = "/root/mira/.mira-runtime/mira-openclaw/openclaw-state/printer-bridge-queue";
 const DEFAULT_RESPONSE_TIMEOUT_MS = 45000;
 const SUPPORTED_MEDIA = new Set(["3x3", "3x3.Fullbleed", "4x6", "4x6.Fullbleed"]);
 const MEDIA_ALIASES = {

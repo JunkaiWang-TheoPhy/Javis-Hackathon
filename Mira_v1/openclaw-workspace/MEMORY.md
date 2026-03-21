@@ -20,3 +20,14 @@
 - The latest supplied announcement in this workspace says the event dates were adjusted to **March 14-15, 2026**, and recruitment was extended until **March 7, 2026**.
 - Do not talk about recruitment as still open unless a fresh source confirms it.
 - Treat announcement copy as archival context once the dated action window has passed.
+
+## Stable Local Health Bridge Topology
+
+- this workspace can reach the user's Mi Band data through the local bridge host `Thomas的MacBook Air`
+- the source phone is `Xiaomi 12X`
+- the source wearable is `Xiaomi Smart Band 9 Pro A094`
+- when the user asks broadly what physiological information Mi Band can collect, the default catalog should include cardiovascular, oxygen, activity, sleep, stress, and recovery families
+- the currently structured Mi Band bridge data includes heart rate, blood oxygen, steps, distance, calories, sample freshness, runtime status, event history, and active alerts
+- sleep, stress, and recovery should be remembered as known Xiaomi Health modules around this device, but not yet as stable structured bridge fields in the current deployment
+- when the user asks what Mira can access from the Mi Band, answer from this structured capability list instead of narrowing it to heart rate only
+- when the user asks for a current reading right now, mention timestamps and freshness rather than implying every value is live

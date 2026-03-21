@@ -1,6 +1,6 @@
 # Mi Band Desktop Bridge
 
-This directory contains the desktop-side bridge that reads Xiaomi Fitness data from the attached `Xiaomi 12X` over `adb`, serves local HTTP endpoints, and exposes those endpoints to the cloud `OpenClaw` runtime on `devbox`.
+This directory contains the desktop-side bridge that reads Xiaomi Fitness data from the attached `Xiaomi 12X` over `adb`, serves local HTTP endpoints, and exposes those endpoints to a remote `OpenClaw` runtime.
 
 ## Why This Exists
 
@@ -26,8 +26,9 @@ The desktop bridge avoids that limitation by reading `adb logcat` and readable e
 - `client.py`: read-only desktop client for local bridge endpoints
 - `wireless_adb.py`: optional wireless ADB helper, kept disabled by default
 - `start_bridge.sh`: run the local bridge
-- `start_tunnel.sh`: expose the local bridge through a public HTTPS tunnel
-- `deploy_remote.py`: install or refresh the remote OpenClaw plugin on `devbox`
+- `start_tunnel.sh`: expose the local bridge through either Cloudflare quick tunnels or an SSH reverse tunnel
+- `deploy_remote.py`: install or refresh the remote OpenClaw plugin on a reachable SSH host
+- `install_launchd.py`: install persistent user LaunchAgents for the local bridge and SSH reverse tunnel
 - `openclaw_band_plugin/`: remote read-only OpenClaw plugin
 
 ## Local Endpoints
@@ -41,6 +42,7 @@ http://127.0.0.1:9782
 - `GET /health`
 - `GET /v1/band/status`
 - `GET /v1/band/latest`
+- `POST /v1/band/fresh-read`
 - `GET /v1/band/events?limit=50`
 - `GET /v1/band/alerts?active=true`
 - `GET /v1/band/debug/evidence`
@@ -94,6 +96,15 @@ Set a bridge token:
 export OPENCLAW_MI_BAND_BRIDGE_TOKEN=test-token
 ```
 
+Current defaults:
+
+- local bridge poll interval: `10` seconds
+- local bridge cache source: Xiaomi external logs first, `adb logcat` only as fallback
+- fresh-read timeout: `60` seconds
+- fresh-read success rule: return a heart-rate sample that is newer than the previous one and at most `60` seconds old
+- fresh-read trigger: open the exported router entry via `adb shell am start -W -n com.mi.health/.router.framework.RouterActivity -a android.intent.action.VIEW -d wearable://region.hlth.io.mi.com/applinks/heart_rate_detail_page`
+- reason for the router trigger: on this Xiaomi 12X, `adb shell input` is blocked by the system, so the bridge cannot rely on simulated taps to press `开始体验`
+
 Start the service:
 
 ```bash
@@ -106,33 +117,87 @@ Read the latest snapshot:
 python3 tools/mi_band_desktop_bridge/client.py latest --token "$OPENCLAW_MI_BAND_BRIDGE_TOKEN"
 ```
 
+Request a fresh heart-rate read with a 60-second budget:
+
+```bash
+python3 tools/mi_band_desktop_bridge/client.py fresh \
+  --token "$OPENCLAW_MI_BAND_BRIDGE_TOKEN" \
+  --max-wait-seconds 60
+```
+
+The local CLI timeout for `fresh` is intentionally longer than the wait budget because the bridge still needs extra time for the trigger command and repeated `adb` collection passes.
+
 One-shot collector run without starting the server:
 
 ```bash
 python3 tools/mi_band_desktop_bridge/bridge_server.py --once
 ```
 
-## Devbox OpenClaw Usage
+Install persistent launchd agents on this Mac:
 
-Start the public tunnel:
+```bash
+python3 tools/mi_band_desktop_bridge/install_launchd.py
+```
+
+This installs two user LaunchAgents under `~/Library/LaunchAgents`:
+
+- `com.javis.openclaw.mi-band-bridge`
+- `com.javis.openclaw.mi-band-tunnel`
+
+## Remote OpenClaw Usage
+
+The deploy script now auto-detects the remote `HOME` and `openclaw` binary over SSH, so it no longer assumes `/home/devbox`.
+
+### Option A: SSH Reverse Tunnel
+
+Recommended for `root@43.165.168.66` because it avoids third-party public tunnels and keeps the bridge reachable on the remote loopback only.
+
+Start the reverse tunnel:
+
+```bash
+OPENCLAW_MI_BAND_BRIDGE_TUNNEL_PROVIDER=ssh-reverse \
+OPENCLAW_MI_BAND_BRIDGE_REMOTE=root@43.165.168.66 \
+OPENCLAW_MI_BAND_BRIDGE_REMOTE_BIND_PORT=19782 \
+zsh tools/mi_band_desktop_bridge/start_tunnel.sh
+```
+
+This writes `http://127.0.0.1:19782` into `~/.openclaw-mi-band-bridge-tunnel.json`, and the remote host can call that loopback URL directly.
+
+Deploy the plugin to the server:
+
+```bash
+python3 tools/mi_band_desktop_bridge/deploy_remote.py --remote root@43.165.168.66
+```
+
+### Option B: Cloudflare Quick Tunnel
+
+If a public HTTPS tunnel is preferred and your network allows Cloudflare quick tunnels, start it with:
 
 ```bash
 zsh tools/mi_band_desktop_bridge/start_tunnel.sh
 ```
 
-Deploy the plugin to `devbox`:
+Then deploy to the chosen remote host:
 
 ```bash
-python3 tools/mi_band_desktop_bridge/deploy_remote.py
+python3 tools/mi_band_desktop_bridge/deploy_remote.py --remote <user@host>
 ```
+
+Current remote plugin defaults:
+
+- refresh interval: `10` seconds
+- active Mira runtime cache file: `/root/mira/.mira-runtime/mira-openclaw/openclaw-state/MI_BAND_LATEST.json`
+- tool reads prefer the cached snapshot when it exists, then fall back to live bridge calls
+- `band_get_fresh_latest` bypasses the cache and calls `POST /v1/band/fresh-read`
 
 The deploy script:
 
 - creates or reuses `~/.openclaw-mi-band-bridge.env`
-- reads the active public tunnel URL from `~/.openclaw-mi-band-bridge-tunnel.json`
-- copies the plugin into `/home/devbox/.openclaw/extensions/mi-band-bridge`
-- patches `/home/devbox/.openclaw/openclaw.json`
+- reads the active bridge URL from `~/.openclaw-mi-band-bridge-tunnel.json`
+- copies the plugin into `<remote-home>/.openclaw/extensions/mi-band-bridge`
+- patches `<remote-home>/.openclaw/openclaw.json`
 - updates remote workspace notes
+- configures remote cache sync into `MI_BAND_LATEST.json`
 
 ## Verified On 2026-03-15
 

@@ -6,7 +6,7 @@
     "properties": {
       "queueRoot": {
         "type": "string",
-        "default": "/root/.openclaw/printer-bridge-queue"
+        "default": "/root/mira/.mira-runtime/mira-openclaw/openclaw-state/printer-bridge-queue"
       },
       "responseTimeoutMs": {
         "type": "number",

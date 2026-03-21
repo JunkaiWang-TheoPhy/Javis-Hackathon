@@ -1,7 +1,7 @@
 {
   "host": "127.0.0.1",
   "port": 9782,
-  "poll_seconds": 60,
+  "poll_seconds": 10,
   "event_limit": 200,
   "token_env_var": "OPENCLAW_MI_BAND_BRIDGE_TOKEN",
   "adb_target_env_var": "OPENCLAW_MI_BAND_ADB_TARGET",
@@ -26,5 +26,15 @@
   "xiaomi_log_dirs": [
     "/sdcard/Android/data/com.mi.health/files/log",
     "/sdcard/Download/wearablelog"
-  ]
+  ],
+  "fresh_read": {
+    "timeout_seconds": 60,
+    "poll_interval_seconds": 5,
+    "max_sample_age_seconds": 60,
+    "trigger_strategy": "adb_shell_commands",
+    "trigger_timeout_seconds": 20,
+    "trigger_commands": [
+      "am start -W -n com.mi.health/.router.framework.RouterActivity -a android.intent.action.VIEW -d wearable://region.hlth.io.mi.com/applinks/heart_rate_detail_page"
+    ]
+  }
 }

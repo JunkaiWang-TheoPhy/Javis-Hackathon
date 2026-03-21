@@ -10,6 +10,26 @@
       },
       "bridgeToken": {
         "type": "string"
+      },
+      "pollSeconds": {
+        "type": "number",
+        "default": 10
+      },
+      "requestTimeoutMs": {
+        "type": "number",
+        "default": 5000
+      },
+      "freshReadMaxWaitSeconds": {
+        "type": "number",
+        "default": 60
+      },
+      "freshReadRequestTimeoutMs": {
+        "type": "number",
+        "default": 70000
+      },
+      "cacheFilePath": {
+        "type": "string",
+        "default": "/home/devbox/.openclaw/workspace/MI_BAND_LATEST.json"
       }
     }
   }

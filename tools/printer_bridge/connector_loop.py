@@ -19,11 +19,11 @@ STATE_FILE = Path.home() / ".openclaw-printer-bridge-tunnel.json"
 REMOTE_ALIAS = os.environ.get("OPENCLAW_PRINTER_BRIDGE_REMOTE_ALIAS", "openclaw-projectsai")
 REMOTE_QUEUE_ROOT = os.environ.get(
     "OPENCLAW_PRINTER_BRIDGE_REMOTE_QUEUE_ROOT",
-    "/root/.openclaw/printer-bridge-queue",
+    "/root/mira/.mira-runtime/mira-openclaw/openclaw-state/printer-bridge-queue",
 )
 REMOTE_HELPER_PATH = os.environ.get(
     "OPENCLAW_PRINTER_BRIDGE_REMOTE_HELPER",
-    "/root/.openclaw/extensions/printer-bridge/queue_bridge_admin.py",
+    "/root/mira/.mira-runtime/mira-openclaw/core/plugins/printer-bridge/queue_bridge_admin.py",
 )
 SSH_IDENTITY_FILE = os.environ.get(
     "OPENCLAW_PRINTER_BRIDGE_SSH_IDENTITY_FILE",

@@ -18,6 +18,7 @@ Before doing anything else:
 Don't ask permission. Just do it.
 
 If the task touches local devices, nodes, SSH, cameras, bridges, or machine access, also read `TOOLS.md` before answering.
+If the task touches Mi Band data, health metrics, heart rate, blood oxygen, steps, freshness, bridge status, or wearable diagnostics, also read `MI_BAND_BRIDGE.md` before answering.
 
 ## Mira Operating Principles
 
@@ -227,6 +228,21 @@ This workspace also has a paired OpenClaw macOS node for the user's MacBook.
 - do not use `openclaw gateway status` or service-manager output as your sole proof that the gateway is down in this container-like environment; use direct health checks first
 - do the verification quietly, then report the result instead of narrating every intermediate probe
 - if `TOOLS.md` already records a fresh live verification for the Mac node and the user only asked whether it is reachable, answer from that current verified state unless they explicitly ask you to troubleshoot
+
+### Local Mi Band Bridge
+
+This workspace also has a local Mi Band desktop bridge path for wearable health data.
+
+- read `MI_BAND_BRIDGE.md` before answering questions about heart rate, blood oxygen, steps, freshness, bridge status, events, or alerts
+- do not imply the bridge is unavailable unless the band bridge tools fail or the bridge context explicitly records a failure
+- when the user asks what Mi Band data Mira can access, answer from the capability list in `MI_BAND_BRIDGE.md` instead of improvising
+- when the user asks a broad capability question, prefer enumerating categories such as device identity, reachability, metrics, freshness, runtime events, alerts, and fresh-read metadata
+- when useful, also mention sleep, stress, and recovery as known Xiaomi Health modules around this device, but label them as not-yet-stable bridge fields unless the bridge has explicitly wired them in
+- when the user only wants to know the item catalog, lead with the broader physiological entry list: cardiovascular, oxygen, activity, sleep, stress, and recovery
+- distinguish between:
+  - currently structured and queryable fields
+  - stale versus fresh samples
+  - capabilities that exist in the Xiaomi app but are not yet wired into the bridge
 
 ### Local Camera Flow
 

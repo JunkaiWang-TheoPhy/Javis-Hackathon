@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shlex
 import subprocess
 import sys
 import threading
@@ -24,6 +25,18 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 import parser as band_parser
+from measurement_trigger import build_trigger
+
+
+METRIC_LOG_PATTERN = r"latestHrRecord=HrItem|latestSpoRecord=Spo2Item|DailyStepReport\("
+PREFERRED_XIAOMI_LOG_NAMES = (
+    "XiaomiFit.main.log",
+    "XiaomiFit.main.log.bak.1",
+    "XiaomiFit.device.log",
+    "XiaomiFit.device.log.bak.1",
+    "Transfer.device.log",
+    "Transfer.device.log.bak.1",
+)
 
 
 def load_bridge_config(path: Path = CONFIG_PATH) -> dict[str, Any]:
@@ -72,6 +85,37 @@ def resolve_adb_transport(config: dict[str, Any]) -> str:
     return "wireless" if ":" in target else "usb"
 
 
+def build_metric_extract_command(file_path: str, limit: int = 120) -> str:
+    quoted_path = shlex.quote(file_path)
+    quoted_pattern = shlex.quote(METRIC_LOG_PATTERN)
+    return (
+        f"(toybox grep -E {quoted_pattern} {quoted_path} 2>/dev/null || "
+        f"grep -E {quoted_pattern} {quoted_path} 2>/dev/null || "
+        f"tail -n {limit} {quoted_path}) | tail -n {limit}"
+    )
+
+
+def has_metric_markers(text: str) -> bool:
+    return any(marker in text for marker in ("latestHrRecord=HrItem", "latestSpoRecord=Spo2Item", "DailyStepReport("))
+
+
+def prioritize_xiaomi_log_names(names: list[str]) -> list[str]:
+    priority = {name: index for index, name in enumerate(PREFERRED_XIAOMI_LOG_NAMES)}
+    cleaned = [name.strip() for name in names if name.strip()]
+    return sorted(
+        cleaned,
+        key=lambda name: (priority.get(name, len(priority)), cleaned.index(name)),
+    )
+
+
+def read_json_body(handler: BaseHTTPRequestHandler) -> dict[str, Any]:
+    length = int(handler.headers.get("Content-Length", "0"))
+    raw = handler.rfile.read(length) if length else b"{}"
+    if not raw:
+        return {}
+    return json.loads(raw.decode("utf-8"))
+
+
 class AdbCollector:
     def __init__(self, config: dict[str, Any]) -> None:
         self.config = config
@@ -116,43 +160,39 @@ class AdbCollector:
                         chunks.append(f"FILE:{file_path}\n{tail}")
                 continue
 
-            listing = self.shell(f"ls -t {path} 2>/dev/null | head -2", timeout=10.0).stdout.splitlines()
-            for name in listing[:2]:
-                name = name.strip()
-                if not name:
-                    continue
-                tail = self.shell(f"tail -n 120 {path}/{name}", timeout=20.0).stdout
+            listing = self.shell(f"ls -t {path} 2>/dev/null | head -6", timeout=10.0).stdout.splitlines()
+            for name in prioritize_xiaomi_log_names(listing)[:4]:
+                tail = self.shell(build_metric_extract_command(f"{path}/{name}"), timeout=20.0).stdout
                 if tail:
                     chunks.append(f"FILE:{path}/{name}\n{tail}")
+                    if has_metric_markers(tail):
+                        break
         return "\n".join(chunks)
 
     def collect(self) -> dict[str, Any]:
         bridge_timestamp = datetime.now(band_parser.TZ).isoformat()
         adb_state = self.get_state()
         bluetooth_text = self.bluetooth_dump() if adb_state == "device" else ""
-        logcat_text = self.logcat_dump() if adb_state == "device" else ""
-
-        metric_data = band_parser.parse_metric_snapshot(logcat_text)
+        logcat_text = ""
+        external_text = self.external_log_dump() if adb_state == "device" else ""
+        metric_data = band_parser.parse_metric_snapshot(external_text)
         evidence = {
             "adb_state": adb_state,
-            "logcat": band_parser.extract_evidence_lines(logcat_text),
+            "logcat": {},
             "external_logs": {},
         }
-        source_kind = "adb_logcat"
+        source_kind = "xiaomi_external_logs"
 
-        if not any(
+        if any(
             metric_data["metrics"][key] is not None
             for key in ("heart_rate_bpm", "spo2_percent", "steps")
         ):
-            external_text = self.external_log_dump()
-            fallback_metrics = band_parser.parse_metric_snapshot(external_text)
-            if any(
-                fallback_metrics["metrics"][key] is not None
-                for key in ("heart_rate_bpm", "spo2_percent", "steps")
-            ):
-                metric_data = fallback_metrics
-                evidence["external_logs"] = band_parser.extract_evidence_lines(external_text)
-                source_kind = "xiaomi_external_logs"
+            evidence["external_logs"] = band_parser.extract_evidence_lines(external_text)
+        else:
+            logcat_text = self.logcat_dump() if adb_state == "device" else ""
+            metric_data = band_parser.parse_metric_snapshot(logcat_text)
+            evidence["logcat"] = band_parser.extract_evidence_lines(logcat_text)
+            source_kind = "adb_logcat"
 
         bluetooth = band_parser.parse_bluetooth_status(
             bluetooth_text,
@@ -239,11 +279,60 @@ def _alert(alert_type: str, summary: str, timestamp: str) -> dict[str, str]:
     }
 
 
+def resolve_fresh_read_settings(
+    config: dict[str, Any],
+    max_wait_seconds: float | None = None,
+) -> dict[str, float]:
+    fresh_read = config.get("fresh_read", {})
+    default_wait = float(fresh_read.get("timeout_seconds", 60) or 60)
+    return {
+        "max_wait_seconds": max(1.0, float(max_wait_seconds or default_wait)),
+        "poll_interval_seconds": max(0.05, float(fresh_read.get("poll_interval_seconds", 5) or 5)),
+        "max_sample_age_seconds": max(1.0, float(fresh_read.get("max_sample_age_seconds", 60) or 60)),
+    }
+
+
+def get_heart_rate_timestamp(snapshot: dict[str, Any]) -> str | None:
+    metrics = snapshot.get("metrics", {})
+    return metrics.get("heart_rate_at") or snapshot.get("timestamps", {}).get("source_timestamp")
+
+
+def heart_rate_sample_age_seconds(snapshot: dict[str, Any]) -> int | None:
+    return band_parser.freshness_seconds(
+        get_heart_rate_timestamp(snapshot),
+        str(snapshot.get("timestamps", {}).get("bridge_timestamp")),
+    )
+
+
+def snapshot_has_fresh_heart_rate(
+    snapshot: dict[str, Any],
+    *,
+    max_sample_age_seconds: float,
+    baseline_metric_timestamp: str | None = None,
+    require_newer_than_baseline: bool = False,
+) -> bool:
+    heart_rate = snapshot.get("metrics", {}).get("heart_rate_bpm")
+    metric_timestamp = get_heart_rate_timestamp(snapshot)
+    if heart_rate is None or not metric_timestamp:
+        return False
+
+    sample_age = heart_rate_sample_age_seconds(snapshot)
+    if sample_age is None or sample_age > max_sample_age_seconds:
+        return False
+
+    if not require_newer_than_baseline or not baseline_metric_timestamp:
+        return True
+
+    return datetime.fromisoformat(metric_timestamp) > datetime.fromisoformat(baseline_metric_timestamp)
+
+
 class BridgeRuntime:
     def __init__(self, config: dict[str, Any]) -> None:
         self.config = config
         self.collector = AdbCollector(config)
+        self.trigger = build_trigger(config, self.collector.shell)
         self.lock = threading.Lock()
+        self.fresh_read_lock = threading.Lock()
         self.snapshot: dict[str, Any] = {
             "ok": True,
             "device": config["band"],
@@ -286,6 +375,45 @@ class BridgeRuntime:
         self._seen_event_ids: set[str] = set()
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None
+
+    def _record_event(self, event_type: str, summary: str, details: dict[str, Any]) -> None:
+        self.events.appendleft(
+            {
+                "id": f"{event_type}-{int(time.time() * 1000)}",
+                "type": event_type,
+                "timestamp": datetime.now(band_parser.TZ).isoformat(),
+                "summary": summary,
+                "details": details,
+            }
+        )
+
+    def _snapshot_with_fresh_read(
+        self,
+        snapshot: dict[str, Any],
+        *,
+        ok: bool,
+        reason: str,
+        triggered: bool,
+        trigger_result: dict[str, Any],
+        settings: dict[str, float],
+        baseline_metric_timestamp: str | None,
+        request_started_at: str,
+    ) -> dict[str, Any]:
+        response = dict(snapshot)
+        response["fresh_read"] = {
+            "ok": ok,
+            "reason": reason,
+            "triggered": triggered,
+            "request_started_at": request_started_at,
+            "baseline_heart_rate_at": baseline_metric_timestamp,
+            "heart_rate_at": get_heart_rate_timestamp(snapshot),
+            "heart_rate_age_seconds": heart_rate_sample_age_seconds(snapshot),
+            "max_wait_seconds": settings["max_wait_seconds"],
+            "max_sample_age_seconds": settings["max_sample_age_seconds"],
+            "poll_interval_seconds": settings["poll_interval_seconds"],
+            "trigger": trigger_result,
+        }
+        return response
 
     def start(self) -> None:
         if self._thread is not None:
@@ -357,6 +485,99 @@ class BridgeRuntime:
         self.refresh(force=False)
         with self.lock:
             return self.snapshot
+
+    def get_fresh_snapshot(self, max_wait_seconds: float | None = None) -> dict[str, Any]:
+        settings = resolve_fresh_read_settings(self.config, max_wait_seconds=max_wait_seconds)
+        request_started_at = datetime.now(band_parser.TZ).isoformat()
+
+        with self.fresh_read_lock:
+            self.refresh(force=True)
+            with self.lock:
+                baseline_snapshot = self.snapshot
+                baseline_metric_timestamp = get_heart_rate_timestamp(baseline_snapshot)
+
+            if snapshot_has_fresh_heart_rate(
+                baseline_snapshot,
+                max_sample_age_seconds=settings["max_sample_age_seconds"],
+            ):
+                return self._snapshot_with_fresh_read(
+                    baseline_snapshot,
+                    ok=True,
+                    reason="already_fresh",
+                    triggered=False,
+                    trigger_result={"ok": True, "strategy": "skipped", "executed": False, "commands": []},
+                    settings=settings,
+                    baseline_metric_timestamp=baseline_metric_timestamp,
+                    request_started_at=request_started_at,
+                )
+
+            trigger_result = self.trigger.trigger()
+            self._record_event(
+                "fresh_read_started",
+                "fresh heart-rate read requested",
+                {
+                    "request_started_at": request_started_at,
+                    "trigger": trigger_result,
+                    "baseline_heart_rate_at": baseline_metric_timestamp,
+                },
+            )
+
+            deadline = time.monotonic() + settings["max_wait_seconds"]
+            latest_snapshot = baseline_snapshot
+            while True:
+                self.refresh(force=True)
+                with self.lock:
+                    latest_snapshot = self.snapshot
+
+                if snapshot_has_fresh_heart_rate(
+                    latest_snapshot,
+                    max_sample_age_seconds=settings["max_sample_age_seconds"],
+                    baseline_metric_timestamp=baseline_metric_timestamp,
+                    require_newer_than_baseline=True,
+                ):
+                    self._record_event(
+                        "fresh_read_succeeded",
+                        "fresh heart-rate sample observed",
+                        {
+                            "heart_rate_at": get_heart_rate_timestamp(latest_snapshot),
+                            "heart_rate_age_seconds": heart_rate_sample_age_seconds(latest_snapshot),
+                        },
+                    )
+                    return self._snapshot_with_fresh_read(
+                        latest_snapshot,
+                        ok=True,
+                        reason="fresh_sample_observed",
+                        triggered=bool(trigger_result.get("executed")),
+                        trigger_result=trigger_result,
+                        settings=settings,
+                        baseline_metric_timestamp=baseline_metric_timestamp,
+                        request_started_at=request_started_at,
+                    )
+
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    break
+                time.sleep(min(settings["poll_interval_seconds"], remaining))
+
+            self._record_event(
+                "fresh_read_timed_out",
+                "fresh heart-rate sample not observed before timeout",
+                {
+                    "baseline_heart_rate_at": baseline_metric_timestamp,
+                    "last_heart_rate_at": get_heart_rate_timestamp(latest_snapshot),
+                    "last_heart_rate_age_seconds": heart_rate_sample_age_seconds(latest_snapshot),
+                },
+            )
+            return self._snapshot_with_fresh_read(
+                latest_snapshot,
+                ok=False,
+                reason="timeout",
+                triggered=bool(trigger_result.get("executed")),
+                trigger_result=trigger_result,
+                settings=settings,
+                baseline_metric_timestamp=baseline_metric_timestamp,
+                request_started_at=request_started_at,
+            )
 
     def get_status(self) -> dict[str, Any]:
         self.refresh(force=False)
@@ -437,6 +658,27 @@ class BridgeHandler(BaseHTTPRequestHandler):
             return
         if parsed.path == "/v1/band/debug/evidence":
             self._write_json(HTTPStatus.OK, self.runtime.get_debug())
+            return
+
+        self._write_json(HTTPStatus.NOT_FOUND, {"ok": False, "error": "not found"})
+
+    def do_POST(self) -> None:
+        parsed = urlparse(self.path)
+        if not self._require_auth():
+            return
+
+        try:
+            payload = read_json_body(self)
+            if parsed.path == "/v1/band/fresh-read":
+                query = parse_qs(parsed.query)
+                raw_wait = payload.get("max_wait_seconds") if isinstance(payload, dict) else None
+                if raw_wait is None:
+                    raw_wait = query.get("max_wait_seconds", [None])[0]
+                max_wait_seconds = float(raw_wait) if raw_wait not in (None, "") else None
+                self._write_json(HTTPStatus.OK, self.runtime.get_fresh_snapshot(max_wait_seconds=max_wait_seconds))
+                return
+        except ValueError as exc:
+            self._write_json(HTTPStatus.BAD_REQUEST, {"ok": False, "error": str(exc)})
             return
 
         self._write_json(HTTPStatus.NOT_FOUND, {"ok": False, "error": "not found"})

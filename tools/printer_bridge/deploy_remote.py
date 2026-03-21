@@ -14,18 +14,31 @@ PLUGIN_ID = "printer-bridge"
 PLUGIN_DIR = ROOT / "openclaw_printer_plugin"
 QUEUE_HELPER = ROOT / "queue_bridge_admin.py"
 REMOTE_ALIAS = os.environ.get("OPENCLAW_PRINTER_BRIDGE_REMOTE_ALIAS", "openclaw-projectsai")
-REMOTE_OPENCLAW_HOME = os.environ.get("OPENCLAW_PRINTER_BRIDGE_REMOTE_OPENCLAW_HOME", "/root/.openclaw")
-REMOTE_EXTENSION_DIR = f"{REMOTE_OPENCLAW_HOME}/extensions/{PLUGIN_ID}"
-REMOTE_CONFIG_PATH = f"{REMOTE_OPENCLAW_HOME}/openclaw.json"
-REMOTE_WORKSPACE_DIR = f"{REMOTE_OPENCLAW_HOME}/workspace"
+REMOTE_RUNTIME_ROOT = os.environ.get(
+    "OPENCLAW_PRINTER_BRIDGE_REMOTE_RUNTIME_ROOT",
+    "/root/mira/.mira-runtime/mira-openclaw",
+)
+REMOTE_EXTENSION_DIR = os.environ.get(
+    "OPENCLAW_PRINTER_BRIDGE_REMOTE_EXTENSION_DIR",
+    f"{REMOTE_RUNTIME_ROOT}/core/plugins/{PLUGIN_ID}",
+)
+REMOTE_CONFIG_PATH = os.environ.get(
+    "OPENCLAW_PRINTER_BRIDGE_REMOTE_CONFIG_PATH",
+    f"{REMOTE_RUNTIME_ROOT}/core/openclaw-config/openclaw.local.json",
+)
+REMOTE_WORKSPACE_DIR = os.environ.get(
+    "OPENCLAW_PRINTER_BRIDGE_REMOTE_WORKSPACE_DIR",
+    f"{REMOTE_RUNTIME_ROOT}/core/workspace",
+)
 REMOTE_QUEUE_ROOT = os.environ.get(
     "OPENCLAW_PRINTER_BRIDGE_REMOTE_QUEUE_ROOT",
-    f"{REMOTE_OPENCLAW_HOME}/printer-bridge-queue",
+    f"{REMOTE_RUNTIME_ROOT}/openclaw-state/printer-bridge-queue",
 )
 OPENCLAW_BIN = os.environ.get(
     "OPENCLAW_PRINTER_BRIDGE_REMOTE_OPENCLAW_BIN",
     "/root/.nvm/versions/node/v22.22.0/bin/openclaw",
 )
+REMOTE_RESTART_COMMAND = os.environ.get("OPENCLAW_PRINTER_BRIDGE_REMOTE_RESTART_COMMAND", "").strip()
 DEFAULT_RESPONSE_TIMEOUT_MS = 45000
 STAGED_SSH_IDENTITY_FILE = Path(
     os.environ.get(
@@ -133,13 +146,21 @@ backup_path = config_path.with_name(
 )
 backup_path.write_text(config_path.read_text(encoding='utf-8'), encoding='utf-8')
 config = json.loads(config_path.read_text(encoding='utf-8'))
+printer_tools = [
+    'printer_get_status',
+    'printer_print_image',
+    'printer_print_pdf',
+    'printer_cancel_job',
+]
 
 tools = config.setdefault('tools', {{}})
 tools_allow = tools.setdefault('allow', [])
-if plugin_id not in tools_allow:
-    tools_allow.append(plugin_id)
-if 'openclaw-printer-bridge' in tools_allow:
-    tools_allow.remove('openclaw-printer-bridge')
+for tool_name in printer_tools:
+    if tool_name not in tools_allow:
+        tools_allow.append(tool_name)
+for obsolete in ('openclaw-printer-bridge', plugin_id):
+    while obsolete in tools_allow:
+        tools_allow.remove(obsolete)
 
 plugins = config.setdefault('plugins', {{}})
 allow = plugins.setdefault('allow', [])
@@ -147,6 +168,11 @@ if plugin_id not in allow:
     allow.append(plugin_id)
 if 'openclaw-printer-bridge' in allow:
     allow.remove('openclaw-printer-bridge')
+
+load = plugins.setdefault('load', {{}})
+load_paths = load.setdefault('paths', [])
+if {REMOTE_EXTENSION_DIR!r} not in load_paths:
+    load_paths.append({REMOTE_EXTENSION_DIR!r})
 
 entries = plugins.setdefault('entries', {{}})
 entries.pop('openclaw-printer-bridge', None)
@@ -161,12 +187,14 @@ entries[plugin_id] = {{
 
 installs = plugins.setdefault('installs', {{}})
 installs.pop('openclaw-printer-bridge', None)
+existing_install = installs.get(plugin_id, {{}})
 installs[plugin_id] = {{
     'source': 'path',
     'sourcePath': {REMOTE_EXTENSION_DIR!r},
     'installPath': {REMOTE_EXTENSION_DIR!r},
     'version': '1.0.0',
-    'installedAt': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
+    'installedAt': existing_install.get('installedAt')
+    or datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
 }}
 
 config_path.write_text(json.dumps(config, ensure_ascii=False, indent=2) + '\\n', encoding='utf-8')
@@ -189,10 +217,10 @@ printer_doc.write_text(
     '- supported media: 3x3, 3x3.Fullbleed, 4x6, 4x6.Fullbleed\\n'
     '- default three-inch media: 3x3.Fullbleed\\n'
     f"- remote queue root: {{queue_root}}\\n"
-    '- bridge transport: devbox-local request queue consumed by the Mac connector over SSH\\n\\n'
+    '- bridge transport: queue-backed request relay consumed by the Mac connector over SSH\\n\\n'
     '## Local Automation\\n\\n'
     '- launchd keeps the local bridge process alive on the Mac host.\\n'
-    '- launchd keeps the local connector alive so it can poll the devbox queue and return results.\\n'
+    '- launchd keeps the local connector alive so it can poll the remote queue and return results.\\n'
     '- launchd also reruns bridge sync periodically so the current queue-backed config stays deployed to OpenClaw.\\n\\n'
     '## Rules\\n\\n'
     '- All printing must go through the printer bridge plugin.\\n'
@@ -213,7 +241,7 @@ section = (
     f'- remote queue root: `{{queue_root}}`\\n'
     '- local automation: `launchd` bridge keepalive + connector keepalive + periodic sync\\n'
     '- OpenClaw printer tools: `printer_get_status`, `printer_print_image`, `printer_print_pdf`, `printer_cancel_job`\\n'
-    '- The queue is local to devbox; the Mac connector polls it over SSH and returns results back into the same queue\\n'
+    '- The queue lives in the remote Mira runtime; the Mac connector polls it over SSH and returns results back into the same queue\\n'
     '- Do not tell users about queue internals, bridge tokens, unauthorized, 401, API keys, or restart steps\\n'
     '- If the printer bridge fails, say printing is temporarily unavailable, then inspect status through the printer tools\\n'
 )
@@ -266,7 +294,8 @@ def main() -> None:
     )
 
     if not args.skip_restart:
-        run(build_ssh_command(args.remote, f"{OPENCLAW_BIN} gateway restart"))
+        restart_command = REMOTE_RESTART_COMMAND or f"{OPENCLAW_BIN} gateway restart"
+        run(build_ssh_command(args.remote, restart_command))
     print(f"Deployed {PLUGIN_ID} to {args.remote} using queue root {args.queue_root}")
 
 
