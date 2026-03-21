@@ -27,11 +27,28 @@ TUNNEL_LOG = STATE_DIR / "tunnel.log"
 LOCAL_PROFILE_PATH = STATE_DIR / "profile.json"
 LOCAL_README_PATH = STATE_DIR / "README.md"
 TUNNEL_STATE_PATH = Path.home() / ".openclaw-printer-bridge-tunnel.json"
-REMOTE_GATEWAY_BIN = "/home/devbox/.nvm/versions/node/v22.22.1/bin/openclaw"
-REMOTE_GATEWAY_LOG = "/home/devbox/.openclaw/gateway-printer-bridge.log"
+DEFAULT_REMOTE_ALIAS = os.environ.get("OPENCLAW_PRINTER_BRIDGE_REMOTE_ALIAS", "openclaw-projectsai")
+DEFAULT_REMOTE_OPENCLAW_HOME = os.environ.get(
+    "OPENCLAW_PRINTER_BRIDGE_REMOTE_OPENCLAW_HOME",
+    "/root/.openclaw",
+)
+DEFAULT_REMOTE_QUEUE_ROOT = os.environ.get(
+    "OPENCLAW_PRINTER_BRIDGE_REMOTE_QUEUE_ROOT",
+    f"{DEFAULT_REMOTE_OPENCLAW_HOME}/printer-bridge-queue",
+)
+REMOTE_HELPER_PATH = os.environ.get(
+    "OPENCLAW_PRINTER_BRIDGE_REMOTE_HELPER",
+    f"{DEFAULT_REMOTE_OPENCLAW_HOME}/extensions/printer-bridge/queue_bridge_admin.py",
+)
+REMOTE_GATEWAY_BIN = os.environ.get(
+    "OPENCLAW_PRINTER_BRIDGE_REMOTE_OPENCLAW_BIN",
+    "/root/.nvm/versions/node/v22.22.0/bin/openclaw",
+)
+REMOTE_GATEWAY_LOG = os.environ.get(
+    "OPENCLAW_PRINTER_BRIDGE_REMOTE_GATEWAY_LOG",
+    f"{DEFAULT_REMOTE_OPENCLAW_HOME}/gateway-printer-bridge.log",
+)
 REMOTE_GATEWAY_PORT = 18789
-DEFAULT_REMOTE_ALIAS = "devbox"
-DEFAULT_REMOTE_QUEUE_ROOT = "/home/devbox/.openclaw/printer-bridge-queue"
 CONNECTOR_HEALTH_TIMEOUT_SECONDS = 30.0
 STAGED_SSH_IDENTITY_FILE = Path(
     os.environ.get(
@@ -114,7 +131,7 @@ def build_remote_gateway_probe_command(remote_alias: str) -> list[str]:
 
 def build_remote_connector_status_command(remote_alias: str, queue_root: str) -> list[str]:
     remote_command = (
-        "python3 /home/devbox/.openclaw/extensions/printer-bridge/queue_bridge_admin.py "
+        f"python3 {REMOTE_HELPER_PATH} "
         f"status --queue-root {queue_root}"
     )
     return build_ssh_command(remote_alias, remote_command)
@@ -392,7 +409,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Bring up the local printer bridge stack and refresh remote OpenClaw config."
     )
-    parser.add_argument("--remote", default="devbox", help="SSH alias for the remote OpenClaw host")
+    parser.add_argument("--remote", default=DEFAULT_REMOTE_ALIAS, help="SSH alias for the remote OpenClaw host")
     parser.add_argument("--skip-remote-gateway", action="store_true", help="Do not ensure the remote gateway process is running")
     parser.add_argument("--force-restart-bridge", action="store_true", help="Restart the local bridge process even if health checks pass")
     parser.add_argument("--force-restart-tunnel", action="store_true", help="Restart the local SSH connector even if the current one is healthy")

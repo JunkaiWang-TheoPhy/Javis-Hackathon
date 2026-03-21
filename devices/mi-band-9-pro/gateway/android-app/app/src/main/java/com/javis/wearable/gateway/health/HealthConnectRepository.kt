@@ -1,5 +1,6 @@
 package com.javis.wearable.gateway.health
 
+import com.javis.wearable.gateway.BandConfig
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.Context
@@ -62,6 +63,12 @@ data class HealthMetrics(
     }
 }
 
+private data class MetricReadResult<T>(
+    val latestAt: Instant? = null,
+    val value: T? = null,
+    val recordCount: Int = 0
+)
+
 class HealthConnectRepository(
     private val context: Context,
     private val clock: Clock = Clock.systemDefaultZone()
@@ -82,6 +89,7 @@ class HealthConnectRepository(
     }
 
     suspend fun readLatestMetrics(): HealthMetrics {
+        val lookbackDays = BandConfig.healthConnectLookbackDays.coerceAtLeast(1)
         val availability = availability()
         if (!availability.available) {
             return HealthMetrics(
@@ -89,7 +97,10 @@ class HealthConnectRepository(
                 available = false,
                 permissionGranted = false,
                 statusMessage = availability.message,
-                debugInfo = mapOf("health_connect_status" to availability.message)
+                debugInfo = HealthConnectDiagnostics.buildDebugInfo(
+                    status = availability.message,
+                    lookbackDays = lookbackDays
+                )
             )
         }
 
@@ -101,32 +112,49 @@ class HealthConnectRepository(
                 available = true,
                 permissionGranted = false,
                 statusMessage = "missing_permissions",
-                debugInfo = mapOf("health_connect_status" to "missing_permissions")
+                debugInfo = HealthConnectDiagnostics.buildDebugInfo(
+                    status = "missing_permissions",
+                    lookbackDays = lookbackDays
+                )
             )
         }
 
         return runCatching {
             val endTime = Instant.now(clock)
-            val windowStart = endTime.minus(1, ChronoUnit.DAYS)
+            val windowStart = endTime.minus(lookbackDays.toLong(), ChronoUnit.DAYS)
 
             val heartRate = readLatestHeartRate(client, windowStart, endTime)
             val spo2 = readLatestSpo2(client, windowStart, endTime)
             val steps = readSteps(client, windowStart, endTime)
-            val sourceTimestamp = listOfNotNull(heartRate?.first, spo2?.first, steps?.first).maxOrNull()
+            val sourceTimestamp = listOfNotNull(
+                heartRate.latestAt,
+                spo2.latestAt,
+                steps.latestAt
+            ).maxOrNull()
 
             HealthMetrics(
-                heartRateBpm = heartRate?.second,
-                spo2Percent = spo2?.second,
-                steps = steps?.second,
+                heartRateBpm = heartRate.value,
+                spo2Percent = spo2.value,
+                steps = steps.value,
                 sourceTimestamp = sourceTimestamp,
-                heartRateSource = heartRate?.second?.let { "health_connect" },
-                spo2Source = spo2?.second?.let { "health_connect" },
-                stepsSource = steps?.second?.let { "health_connect" },
+                heartRateSource = heartRate.value?.let { "health_connect" },
+                spo2Source = spo2.value?.let { "health_connect" },
+                stepsSource = steps.value?.let { "health_connect" },
                 sdkStatus = availability.sdkStatus,
                 available = true,
                 permissionGranted = true,
                 statusMessage = "ok",
-                debugInfo = mapOf("health_connect_status" to "ok")
+                debugInfo = HealthConnectDiagnostics.buildDebugInfo(
+                    status = "ok",
+                    lookbackDays = lookbackDays,
+                    heartRateRecordCount = heartRate.recordCount,
+                    latestHeartRateAt = heartRate.latestAt,
+                    spo2RecordCount = spo2.recordCount,
+                    latestSpo2At = spo2.latestAt,
+                    stepRecordCount = steps.recordCount,
+                    latestStepsAt = steps.latestAt,
+                    totalSteps = steps.value
+                )
             )
         }.getOrElse { error ->
             HealthMetrics(
@@ -134,8 +162,9 @@ class HealthConnectRepository(
                 available = true,
                 permissionGranted = true,
                 statusMessage = "error:${error.javaClass.simpleName}",
-                debugInfo = mapOf(
-                    "health_connect_status" to "error:${error.javaClass.simpleName}"
+                debugInfo = HealthConnectDiagnostics.buildDebugInfo(
+                    status = "error:${error.javaClass.simpleName}",
+                    lookbackDays = lookbackDays
                 )
             )
         }
@@ -230,7 +259,7 @@ class HealthConnectRepository(
         client: HealthConnectClient,
         startTime: Instant,
         endTime: Instant
-    ): Pair<Instant, Int>? {
+    ): MetricReadResult<Int> {
         val response = client.readRecords(
             ReadRecordsRequest(
                 recordType = HeartRateRecord::class,
@@ -240,19 +269,24 @@ class HealthConnectRepository(
             )
         )
 
-        val latestSample = response.records
+        val samples = response.records
             .asSequence()
             .flatMap { it.samples.asSequence() }
-            .maxByOrNull { it.time }
+            .toList()
+        val latestSample = samples.maxByOrNull { it.time }
 
-        return latestSample?.let { it.time to it.beatsPerMinute.toInt() }
+        return MetricReadResult(
+            latestAt = latestSample?.time,
+            value = latestSample?.beatsPerMinute?.toInt(),
+            recordCount = samples.size
+        )
     }
 
     private suspend fun readLatestSpo2(
         client: HealthConnectClient,
         startTime: Instant,
         endTime: Instant
-    ): Pair<Instant, Int>? {
+    ): MetricReadResult<Int> {
         val response = client.readRecords(
             ReadRecordsRequest(
                 recordType = OxygenSaturationRecord::class,
@@ -263,22 +297,39 @@ class HealthConnectRepository(
         )
 
         val latestRecord = response.records.maxByOrNull { it.time }
-        return latestRecord?.let { it.time to it.percentage.value.roundToInt() }
+        return MetricReadResult(
+            latestAt = latestRecord?.time,
+            value = latestRecord?.percentage?.value?.roundToInt(),
+            recordCount = response.records.size
+        )
     }
 
     private suspend fun readSteps(
         client: HealthConnectClient,
         startTime: Instant,
         endTime: Instant
-    ): Pair<Instant, Int>? {
+    ): MetricReadResult<Int> {
+        val response = client.readRecords(
+            ReadRecordsRequest(
+                recordType = StepsRecord::class,
+                timeRangeFilter = TimeRangeFilter.between(startTime, endTime),
+                ascendingOrder = false,
+                pageSize = 500
+            )
+        )
         val aggregateResult = client.aggregate(
             AggregateRequest(
                 metrics = setOf(StepsRecord.COUNT_TOTAL),
                 timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
             )
         )
-        val totalSteps = aggregateResult[StepsRecord.COUNT_TOTAL]?.toInt() ?: return null
-        return endTime to totalSteps
+        val totalSteps = aggregateResult[StepsRecord.COUNT_TOTAL]?.toInt()
+        val latestRecord = response.records.maxByOrNull { it.endTime }
+        return MetricReadResult(
+            latestAt = latestRecord?.endTime,
+            value = totalSteps,
+            recordCount = response.records.size
+        )
     }
 
     companion object {

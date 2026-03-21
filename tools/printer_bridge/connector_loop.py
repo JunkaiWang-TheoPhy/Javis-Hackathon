@@ -16,14 +16,14 @@ ROOT = Path(__file__).resolve().parent
 BRIDGE_CONFIG = ROOT / "bridge_config.json"
 LOCAL_ENV_FILE = Path.home() / ".openclaw-printer-bridge.env"
 STATE_FILE = Path.home() / ".openclaw-printer-bridge-tunnel.json"
-REMOTE_ALIAS = os.environ.get("OPENCLAW_PRINTER_BRIDGE_REMOTE_ALIAS", "devbox")
+REMOTE_ALIAS = os.environ.get("OPENCLAW_PRINTER_BRIDGE_REMOTE_ALIAS", "openclaw-projectsai")
 REMOTE_QUEUE_ROOT = os.environ.get(
     "OPENCLAW_PRINTER_BRIDGE_REMOTE_QUEUE_ROOT",
-    "/home/devbox/.openclaw/printer-bridge-queue",
+    "/root/.openclaw/printer-bridge-queue",
 )
 REMOTE_HELPER_PATH = os.environ.get(
     "OPENCLAW_PRINTER_BRIDGE_REMOTE_HELPER",
-    "/home/devbox/.openclaw/extensions/printer-bridge/queue_bridge_admin.py",
+    "/root/.openclaw/extensions/printer-bridge/queue_bridge_admin.py",
 )
 SSH_IDENTITY_FILE = os.environ.get(
     "OPENCLAW_PRINTER_BRIDGE_SSH_IDENTITY_FILE",

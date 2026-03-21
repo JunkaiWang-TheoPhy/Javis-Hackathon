@@ -6,7 +6,7 @@
     "properties": {
       "queueRoot": {
         "type": "string",
-        "default": "/home/devbox/.openclaw/printer-bridge-queue"
+        "default": "/root/.openclaw/printer-bridge-queue"
       },
       "responseTimeoutMs": {
         "type": "number",

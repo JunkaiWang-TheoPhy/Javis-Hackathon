@@ -13,12 +13,19 @@ ROOT = Path(__file__).resolve().parent
 PLUGIN_ID = "printer-bridge"
 PLUGIN_DIR = ROOT / "openclaw_printer_plugin"
 QUEUE_HELPER = ROOT / "queue_bridge_admin.py"
-REMOTE_ALIAS = "devbox"
-REMOTE_EXTENSION_DIR = f"/home/devbox/.openclaw/extensions/{PLUGIN_ID}"
-REMOTE_CONFIG_PATH = "/home/devbox/.openclaw/openclaw.json"
-REMOTE_WORKSPACE_DIR = "/home/devbox/.openclaw/workspace"
-REMOTE_QUEUE_ROOT = "/home/devbox/.openclaw/printer-bridge-queue"
-OPENCLAW_BIN = "/home/devbox/.nvm/versions/node/v22.22.1/bin/openclaw"
+REMOTE_ALIAS = os.environ.get("OPENCLAW_PRINTER_BRIDGE_REMOTE_ALIAS", "openclaw-projectsai")
+REMOTE_OPENCLAW_HOME = os.environ.get("OPENCLAW_PRINTER_BRIDGE_REMOTE_OPENCLAW_HOME", "/root/.openclaw")
+REMOTE_EXTENSION_DIR = f"{REMOTE_OPENCLAW_HOME}/extensions/{PLUGIN_ID}"
+REMOTE_CONFIG_PATH = f"{REMOTE_OPENCLAW_HOME}/openclaw.json"
+REMOTE_WORKSPACE_DIR = f"{REMOTE_OPENCLAW_HOME}/workspace"
+REMOTE_QUEUE_ROOT = os.environ.get(
+    "OPENCLAW_PRINTER_BRIDGE_REMOTE_QUEUE_ROOT",
+    f"{REMOTE_OPENCLAW_HOME}/printer-bridge-queue",
+)
+OPENCLAW_BIN = os.environ.get(
+    "OPENCLAW_PRINTER_BRIDGE_REMOTE_OPENCLAW_BIN",
+    "/root/.nvm/versions/node/v22.22.0/bin/openclaw",
+)
 DEFAULT_RESPONSE_TIMEOUT_MS = 45000
 STAGED_SSH_IDENTITY_FILE = Path(
     os.environ.get(
@@ -169,6 +176,7 @@ for name in ('pending', 'claimed', 'responses', 'heartbeats'):
     (queue_path / name).mkdir(parents=True, exist_ok=True)
 
 workspace = Path({REMOTE_WORKSPACE_DIR!r})
+workspace.mkdir(parents=True, exist_ok=True)
 printer_doc = workspace / 'PRINTER_BRIDGE.md'
 printer_doc.write_text(
     '# PRINTER_BRIDGE.md\\n\\n'
@@ -209,7 +217,7 @@ section = (
     '- Do not tell users about queue internals, bridge tokens, unauthorized, 401, API keys, or restart steps\\n'
     '- If the printer bridge fails, say printing is temporarily unavailable, then inspect status through the printer tools\\n'
 )
-current_tools = tools_path.read_text(encoding='utf-8')
+current_tools = tools_path.read_text(encoding='utf-8') if tools_path.exists() else ''
 if '## Printer Bridge' in current_tools:
     before, _sep, _after = current_tools.partition('\\n## Printer Bridge\\n')
     tools_path.write_text(before.rstrip() + section + '\\n', encoding='utf-8')
@@ -219,7 +227,9 @@ else:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Deploy the OpenClaw printer bridge plugin to the remote devbox.")
+    parser = argparse.ArgumentParser(
+        description="Deploy the OpenClaw printer bridge plugin to the current remote OpenClaw host."
+    )
     parser.add_argument("--remote", default=REMOTE_ALIAS, help="SSH alias for the remote OpenClaw host")
     parser.add_argument("--queue-root", default=REMOTE_QUEUE_ROOT, help="Remote queue root used by the printer bridge plugin")
     parser.add_argument("--skip-restart", action="store_true", help="Skip `openclaw gateway restart` after copying files and patching config")

@@ -2,6 +2,7 @@ package com.javis.wearable.gateway
 
 object BandConfig {
     const val gatewayPort = 8765
+    const val healthConnectLookbackDays = 7
 
     const val bandName = "Xiaomi Smart Band 9 Pro A094"
     const val bandMac = "D0:AE:05:0D:A0:94"
