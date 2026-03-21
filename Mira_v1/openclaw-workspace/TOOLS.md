@@ -119,4 +119,13 @@ Important operating rules:
 - for debugging or health of the bridge itself, use `band_get_status`, `band_get_events`, and `band_get_alerts`
 - do not collapse `available` and `fresh` into the same claim; a readable sample can still be stale
 - if the user only wants the list of physiological entry types, give the broader catalog first instead of starting with bridge maturity caveats
+- for broad prompts like `Mi band上装载了哪些信息` or `有哪些生理信息`, explicitly include sleep, stress, and recovery in the first answer alongside heart rate, blood oxygen, steps, distance, and calories
+- for that exact prompt family, treat `压力` and `恢复度` as mandatory main-list items rather than optional examples
+- for that exact prompt family, answer with a plain Chinese item list rather than metric notation or raw field labels
+- do not mention `bpm`, `SpO2%`, `MAC`, `UUID`, `source_timestamp`, `freshness_seconds`, or similar technical names unless the user explicitly asks for data values, timing, or technical details
+- do not lead with device IDs, sync timestamps, or bridge diagnostics when the user only wants the entry catalog
+- do not include device identity, account binding, or connection metadata in that first catalog answer unless the user explicitly asks about设备信息/连接信息
+- prefer plain Chinese wording such as `血氧` instead of abbreviations such as `SpO2` in that first catalog answer
+- for those broad inventory prompts, do not append a maturity disclaimer in the same first answer unless the user explicitly asks what Mira can directly read right now
+- only explain which fields are currently wired into the bridge if the user explicitly asks about current direct readability
 - do not imply sleep, stress, recovery, or similar Xiaomi Health modules are stable bridge fields unless `MI_BAND_BRIDGE.md` says they are wired in

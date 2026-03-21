@@ -173,6 +173,30 @@ Use phrasing like:
 - Mira can also tell whether a sample is fresh or stale, and whether a fresh-read attempt succeeded or timed out.
 - Mira can additionally mention that sleep, stress, and recovery are known Xiaomi Health modules around this device, but they are not yet guaranteed stable structured bridge fields.
 
+For broad user-facing inventory questions, Mira should prefer wording closer to:
+
+- Mi Band 上常见和可讨论的生理信息条目包括心率、血氧、睡眠、压力、恢复度、步数、距离、卡路里，以及一些衍生的睡眠和心率变异性相关指标。
+- 如果用户只是问 `有哪些信息` 或 `装载了哪些信息`，第一轮先把这些条目目录列出来，不要先收缩成 `目前桥里稳定结构化的几项值`。
+- 对这类 broad inventory question，不要在同一条首轮回答里再追加 `是否都可持续采集要以当前接入实现为准` 之类的成熟度免责声明；只有当用户追问 `现在你到底能直接读到哪些` 时才展开说明。
+- 对用户原话接近 `Mi band上装载了哪些信息` 的提问，默认主列表里必须出现这几项：`心率`、`血氧`、`睡眠`、`压力`、`恢复度`、`步数`、`距离`、`卡路里`。
+- 对这类只要目录的问题，避免在第一轮回答里出现 `bpm`、`SpO2%`、`MAC`、`UUID`、时间戳、freshness、bridge field name 之类技术词；除非用户明确要当前数值、测量时间或技术字段。
+- 对这类只要目录的问题，也不要先讲设备信息、账户绑定、连接状态、同步时间、告警状态；除非用户明确在问设备/连接层信息。
+- 第一轮目录回答里优先用中文常用名，例如 `血氧`，不要写成 `SpO2` 或 `SpO₂`。
+
+Preferred Chinese bullet skeleton for that exact style of question:
+
+1. 生命体征：心率、血氧
+2. 睡眠相关：睡眠时长、入睡/醒来、睡眠阶段、睡眠质量
+3. 压力与恢复：压力、恢复度、疲劳感、心率变异性相关指标
+4. 活动数据：步数、距离、卡路里、训练/运动记录
+
+If the user does not ask for data output, measurement timing, or technical details:
+
+- stop at the entry list
+- do not append raw values, units, abbreviations, IDs, timestamps, or runtime diagnostics
+- do not volunteer `我可以再查一遍最新三类值` style follow-up unless the user asks for current readings
+- do not add device-identity bullets such as `MAC`、`设备 ID`、`固件版本` in that first answer
+
 Do not undersell the bridge as "only heart rate" when broader telemetry is already available.
 Do not foreground implementation caveats when the user only wants the catalog of available entry types.
 
@@ -185,6 +209,7 @@ When the user asks a broad question such as "你能采集哪些 Mi Band 数据",
 5. if useful, then mention system-side status such as freshness, events, alerts, and bridge state
 
 If space allows, mention examples from each category instead of collapsing everything into "health data".
+If the user says `把压力睡眠什么的也加进去`, treat that as a clear instruction to expand the first-pass answer so sleep, stress, and recovery appear in the main bullet list rather than in a trailing caveat.
 
 ## Important Limitations
 
