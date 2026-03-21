@@ -88,11 +88,28 @@ Use these internal release docs together:
 
 - [docs/architecture/README.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/docs/architecture/README.md)
 - [docs/migration/README.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/docs/migration/README.md)
+- [migration-bundles/README.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/migration-bundles/README.md)
 - [docs/migration/source-to-release-mapping.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/docs/migration/source-to-release-mapping.md)
 - [docs/migration/release-baseline.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/docs/migration/release-baseline.md)
 - [docs/migration/open-source-readiness-checklist.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/docs/migration/open-source-readiness-checklist.md)
 - [docs/migration/repository-split-readiness.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/docs/migration/repository-split-readiness.md)
 - [docs/migration/package-and-license-decisions.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/docs/migration/package-and-license-decisions.md)
+
+## When To Use Imported Migration Bundles
+
+Use the imported bundle layer under `migration-bundles/` when the material did not originate cleanly inside the current release tree, but still needs to stay close to `Mira_Released_Version` for ongoing migration work.
+
+Typical cases:
+
+- home ecosystem support copied from another repo context
+- Codex migration prompts and checklists that should travel with the release tree
+- standalone release-tree exports kept as a comparison surface
+
+Do not treat these bundles as active runtime roots. They are copied context and migration aids, not replacement entrypoints for the live release structure.
+
+The current imported bundle entrypoint is:
+
+- [migration-bundles/README.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/migration-bundles/README.md)
 
 ## Current Public Entry Companions
 

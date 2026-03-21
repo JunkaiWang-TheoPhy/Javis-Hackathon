@@ -1,0 +1,29 @@
+{
+  "module": "home-assistant",
+  "homeAssistant": {
+    "baseUrl": "http://homeassistant.local:8123",
+    "token": "REPLACE_ME_HA_LONG_LIVED_TOKEN",
+    "presence": {
+      "entityId": "person.user"
+    },
+    "notify": {
+      "channel": "openclaw_channel_dm",
+      "notificationRouterBaseUrl": "http://127.0.0.1:3302"
+    },
+    "registry": {
+      "devicesPath": "../registry/devices.example.json"
+    },
+    "scenes": {
+      "enabled": [
+        "arrival_cooling",
+        "post_workout_recovery",
+        "quiet_evening",
+        "high_heart_rate_response"
+      ]
+    },
+    "policies": {
+      "confirmationMode": "normal",
+      "requiresHumanApprovalDefault": true
+    }
+  }
+}

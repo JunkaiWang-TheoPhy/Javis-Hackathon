@@ -1,0 +1,10 @@
+{
+  "name": "openclaw-plugin-hue",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Philips Hue bridge plugin for OpenClaw",
+  "openclaw": {
+    "extensions": ["./src/index.ts"]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "id": "hue",
+  "name": "Philips Hue",
+  "description": "Minimal direct Philips Hue bridge tools for OpenClaw.",
+  "version": "0.1.0",
+  "skills": ["skills"],
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["baseUrl", "applicationKey"],
+    "properties": {
+      "baseUrl": { "type": "string", "description": "Hue bridge URL or API root, e.g. http://bridge.local" },
+      "applicationKey": { "type": "string", "description": "Hue application key" },
+      "bridgeId": { "type": "string", "description": "Optional expected bridge identifier" },
+      "defaultTransitionMs": { "type": "number", "description": "Optional default transition duration in milliseconds" }
+    }
+  },
+  "uiHints": {
+    "baseUrl": { "label": "Hue Bridge URL", "placeholder": "http://bridge.local" },
+    "applicationKey": { "label": "Hue Application Key", "sensitive": true },
+    "bridgeId": { "label": "Hue Bridge ID" },
+    "defaultTransitionMs": { "label": "Default Transition (ms)" }
+  }
+}

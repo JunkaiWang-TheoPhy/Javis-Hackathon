@@ -47,3 +47,9 @@ The current release-baseline and split-readiness pages now also exist at:
 - [repository-split-readiness.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/docs/migration/repository-split-readiness.md)
 - [package-and-license-decisions.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/docs/migration/package-and-license-decisions.md)
 - [repository-split-checklist.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/docs/migration/repository-split-checklist.md)
+
+Imported migration-oriented bundle directories now also exist under:
+
+- [migration-bundles/README.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/migration-bundles/README.md)
+
+Those bundles are intentionally kept outside the active runtime tree. They serve as copied context from other repos or export-only directories, so later Mira migration work can reuse the same source material and Codex prompts without rebuilding the context from scratch.

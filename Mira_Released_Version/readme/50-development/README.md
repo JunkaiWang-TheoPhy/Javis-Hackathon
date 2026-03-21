@@ -36,4 +36,16 @@ The release tree now also contains supporting internal shells under:
 
 - [docs/architecture/README.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/docs/architecture/README.md)
 - [docs/migration/README.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/docs/migration/README.md)
+- [migration-bundles/README.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/migration-bundles/README.md)
 - [apps/README.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/apps/README.md)
+
+Imported migration bundles now also exist for cases where release-side work needs copied context from other repos or export-only directories.
+
+Use these when you need:
+
+- the home ecosystem migration pack with checklist and Codex prompts
+- the exported standalone release-tree snapshot as a comparison surface
+
+The current imported bundle entrypoint is:
+
+- [migration-bundles/README.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/migration-bundles/README.md)

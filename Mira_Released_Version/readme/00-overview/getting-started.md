@@ -67,3 +67,17 @@ The shortest safe order is:
 - For household execution, stop after `home-stack`.
 - For outbound delivery, stop after `service-notification-router`.
 - For the broadest current release-side composition story, end at `home-stack-with-notification-router`.
+
+## If You Are Doing Migration Work
+
+If your goal is not only to read the current release tree but also to continue migration from other repos or export-only directories, use the imported bundle layer after the main onboarding path:
+
+- [migration-bundles/README.md](/Users/thomasjwang/Documents/GitHub/Javis-Hackathon/Mira_Released_Version/migration-bundles/README.md)
+
+That entrypoint is especially useful when you need:
+
+- the home ecosystem migration pack with copied source context
+- the Chinese migration checklist and Codex prompt bundle
+- the exported standalone release-tree snapshot as a comparison surface
+
+Treat those bundles as migration aids, not as the live release root.

@@ -45,5 +45,8 @@ The first concrete release-side reading paths now already exist for:
 The first concrete development-side entrypoint now also exists for contributors:
 
 - [50-development/contributing-and-migration.md](./50-development/contributing-and-migration.md)
+- [../migration-bundles/README.md](../migration-bundles/README.md)
+
+Imported migration bundles are also available when you need copied context from other repos or export-only directories, especially for release-side migration work that cannot be reconstructed from the current tree alone.
 
 It does not yet contain the full migrated documentation set.

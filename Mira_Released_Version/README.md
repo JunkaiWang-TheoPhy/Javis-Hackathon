@@ -147,6 +147,10 @@ The current release-baseline companions now also exist at:
 - [docs/migration/package-and-license-decisions.md](./docs/migration/package-and-license-decisions.md)
 - [docs/migration/repository-split-checklist.md](./docs/migration/repository-split-checklist.md)
 
+Imported migration bundles copied from other repo contexts now also exist under:
+
+- [migration-bundles/README.md](./migration-bundles/README.md)
+
 The release root now also provides a shared verification entrypoint:
 
 - `npm run verify:release`

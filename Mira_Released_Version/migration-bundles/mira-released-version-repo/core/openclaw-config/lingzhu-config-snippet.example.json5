@@ -1,0 +1,24 @@
+// Release-safe example derived from
+// Mira_v1/openclaw-config/lingzhu-config-snippet.json5.
+{
+  "plugins": {
+    "entries": {
+      "lingzhu": {
+        "enabled": true,
+        "config": {
+          "agentId": "main",
+          // Replace this placeholder with the contents of
+          // lingzhu-system-prompt.txt if your runtime requires an inline string.
+          "systemPrompt": "<load release-safe prompt from lingzhu-system-prompt.txt>",
+          "memoryContextEnabled": true,
+          // Replace with the memory context endpoint for your deployment.
+          "memoryContextUrl": "<memory-context-url>",
+          "memoryContextAudience": "auto",
+          "memoryContextTimeoutMs": 1500,
+          "memoryContextWorkingLimit": 4,
+          "memoryContextFactLimit": 4
+        }
+      }
+    }
+  }
+}

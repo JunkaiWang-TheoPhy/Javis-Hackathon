@@ -7,4 +7,8 @@
     <string name="grant_permissions_button">Grant Health Permissions</string>
     <string name="start_gateway_button">Start Gateway</string>
     <string name="stop_gateway_button">Stop Gateway</string>
+    <string name="permissions_rationale_title">Health Data Access</string>
+    <string name="permissions_rationale_heading">Why Mi Band Gateway requests Health Connect access</string>
+    <string name="permissions_rationale_body">Mi Band Gateway requests read-only access to heart rate, blood oxygen, and step count from Health Connect.\n\nThe app uses these values to populate the local gateway running on this phone so your desktop bridge can fetch current metrics when you start that flow.\n\nThe app does not write data back to Health Connect, and you can revoke access from Health Connect at any time.</string>
+    <string name="permissions_rationale_close_button">Close</string>
 </resources>
